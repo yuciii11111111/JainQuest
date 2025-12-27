@@ -1,0 +1,313 @@
+import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/glass_card.dart';
+import '../../../core/widgets/floating_card.dart';
+
+class GuruScreen extends StatefulWidget {
+  const GuruScreen({super.key});
+
+  @override
+  State<GuruScreen> createState() => _GuruScreenState();
+}
+
+class _GuruScreenState extends State<GuruScreen> {
+  final List<String> _popularQuestions = [
+    'What is Jainism?',
+    'Why is Ahimsa important?',
+    'Soul after death?',
+    'How does karma work?',
+    'Jain food rules?',
+    'The 5 vows?',
+    'Daily practice?',
+    'What is Moksha?',
+    'The Tirthankaras?',
+  ];
+
+  String? _selectedQuestion;
+  String? _answerText;
+  bool? _wasHelpful;
+
+  String _generateResponse(String question) {
+    if (question.toLowerCase().contains('ahimsa')) {
+      return 'Ahimsa is Jainism’s core principle of non-violence—avoiding harm to any living being through thought, word, and deed.';
+    } else if (question.toLowerCase().contains('karma')) {
+      return 'Karma is seen as subtle matter that sticks to the soul based on actions and intentions, influencing future experiences until purified.';
+    } else if (question.toLowerCase().contains('vows')) {
+      return 'The five vows guide daily conduct: non-violence, truth, non-stealing, celibacy or fidelity, and non-attachment.';
+    } else if (question.toLowerCase().contains('moksha')) {
+      return 'Moksha is liberation—when the soul sheds all karma and attains infinite knowledge, bliss, and freedom.';
+    }
+    return 'Jainism teaches that every soul can reach liberation through right knowledge, right faith, and right conduct.';
+  }
+
+  void _selectQuestion(String question) {
+    setState(() {
+      _selectedQuestion = question;
+      _answerText = _generateResponse(question);
+      _wasHelpful = null;
+    });
+  }
+
+  List<String> _keyPointsForAnswer() {
+    return const [
+      'Ahimsa (Non-violence) – Not harming any living being',
+      'Satya (Truth) – Always being honest',
+      'Aparigraha – Not being attached to material things',
+      'Self-improvement through spiritual practice',
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showingAnswer = _selectedQuestion != null;
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundBase,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    color: AppColors.textSecondary,
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('Ask Guru', style: Theme.of(context).textTheme.headlineMedium),
+                        Text(
+                          'Your Jain learning guide',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh_rounded),
+                    color: AppColors.textSecondary,
+                    onPressed: () {
+                      setState(() {
+                        _selectedQuestion = null;
+                        _answerText = null;
+                        _wasHelpful = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              if (!showingAnswer) ...[
+                Text(
+                  'Popular Questions',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                ..._popularQuestions.map(
+                  (q) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: FloatingCard(
+                      onTap: () => _selectQuestion(q),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.md,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              q,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded,
+                              size: 16, color: AppColors.textSecondary),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ] else ...[
+                Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          gradient: AppGradients.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: AppShadows.glowing,
+                        ),
+                        child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 46),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text('Guru', style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        'Your Jain learning guide',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (_selectedQuestion != null)
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        _selectedQuestion!,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: AppSpacing.md),
+                GlassCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.psychology_alt_rounded, color: AppColors.highlight),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'Guru',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      if (_answerText != null)
+                        Text(
+                          _answerText!,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      const SizedBox(height: AppSpacing.md),
+                      ..._keyPointsForAnswer().map(
+                        (point) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('• ', style: TextStyle(color: AppColors.textPrimary, fontSize: 16)),
+                              Expanded(
+                                child: Text(
+                                  point,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(AppRadius.small),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.lightbulb_rounded, color: AppColors.warning),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                'Fun Fact: Jainism is over 2,500 years old, making it one of the world\'s oldest religions.',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.warning,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text('Was this helpful?', style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FloatingCard(
+                        onTap: () => setState(() => _wasHelpful = true),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.thumb_up_rounded,
+                                color: _wasHelpful == true ? AppColors.success : AppColors.textSecondary),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text('Yes', style: Theme.of(context).textTheme.labelLarge),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: FloatingCard(
+                        onTap: () => setState(() => _wasHelpful = false),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.thumb_down_rounded,
+                                color: _wasHelpful == false ? AppColors.danger : AppColors.textSecondary),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text('No', style: Theme.of(context).textTheme.labelLarge),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text('Related Questions', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.sm),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _popularQuestions.take(5).map((q) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: AppSpacing.sm),
+                        child: FloatingCard(
+                          onTap: () => _selectQuestion(q),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          child: Text(
+                            q,
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
