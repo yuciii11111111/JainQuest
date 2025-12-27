@@ -219,7 +219,7 @@ class PrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+          disabledBackgroundColor: AppColors.primary.withOpacityValue(0.5),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
@@ -592,23 +592,23 @@ class MascotWidget extends StatelessWidget {
         gradient: isCelebrating
             ? LinearGradient(
                 colors: [
-                  color.withOpacity(0.3),
-                  color.withOpacity(0.1),
+                  color.withOpacityValue(0.3),
+                  color.withOpacityValue(0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : null,
-        color: isCelebrating ? null : color.withOpacity(0.1),
+        color: isCelebrating ? null : color.withOpacityValue(0.1),
         shape: BoxShape.circle,
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withOpacityValue(0.3),
           width: 2,
         ),
         boxShadow: isCelebrating
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.5),
+                  color: color.withOpacityValue(0.5),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),

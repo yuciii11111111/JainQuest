@@ -100,12 +100,12 @@ class AppShadows {
 
   static List<BoxShadow> get glassCard => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withOpacityValue(0.3),
           blurRadius: 20,
           offset: const Offset(0, 8),
         ),
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withOpacityValue(0.1),
           blurRadius: 6,
           offset: const Offset(0, 2),
         ),
@@ -113,12 +113,12 @@ class AppShadows {
 
   static List<BoxShadow> get glowing => [
         BoxShadow(
-          color: AppColors.primary.withOpacity(0.5),
+          color: AppColors.primary.withOpacityValue(0.5),
           blurRadius: 20,
           spreadRadius: 2,
         ),
         BoxShadow(
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withOpacityValue(0.3),
           blurRadius: 40,
           spreadRadius: 4,
         ),
@@ -126,7 +126,7 @@ class AppShadows {
 
   static List<BoxShadow> get floating => [
         BoxShadow(
-          color: Colors.black.withOpacity(0.4),
+          color: Colors.black.withOpacityValue(0.4),
           blurRadius: 30,
           offset: const Offset(0, 12),
         ),
@@ -170,6 +170,14 @@ class AppGradients {
       radius: radius,
       colors: AppColors.primaryGradient,
     );
+  }
+}
+
+extension ColorOpacityX on Color {
+  /// Opacity helper that uses [withValues] to avoid precision loss.
+  Color withOpacityValue(double opacity) {
+    final safeOpacity = opacity.clamp(0.0, 1.0).toDouble();
+    return withValues(alpha: safeOpacity);
   }
 }
 

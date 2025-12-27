@@ -350,8 +350,8 @@ class _XpChart extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.primary.withOpacity(0.3),
-                  AppColors.primary.withOpacity(0.0),
+                  AppColors.primary.withOpacityValue(0.3),
+                  AppColors.primary.withOpacityValue(0.0),
                 ],
               ),
             ),

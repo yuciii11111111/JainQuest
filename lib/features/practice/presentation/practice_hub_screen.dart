@@ -146,9 +146,9 @@ class PracticeHubScreen extends ConsumerWidget {
 
             // Tips
             Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+                color: AppColors.primary.withOpacityValue(0.1),
                 borderRadius: BorderRadius.circular(AppRadius.card),
               ),
               child: Row(
@@ -213,24 +213,24 @@ class _PracticeModeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: AppColors.backgroundCard,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: color.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        color: AppColors.backgroundCard,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: color.withOpacityValue(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacityValue(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
         child: Row(
           children: [
             Container(
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withOpacityValue(0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: color, size: 28),
@@ -259,7 +259,7 @@ class _PracticeModeCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withOpacityValue(0.1),
                           borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
                         child: Text(

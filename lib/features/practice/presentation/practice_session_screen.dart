@@ -230,7 +230,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                       vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
+                      color: AppColors.secondary.withOpacityValue(0.1),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Text(

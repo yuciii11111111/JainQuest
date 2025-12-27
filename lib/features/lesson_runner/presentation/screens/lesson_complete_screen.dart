@@ -115,9 +115,9 @@ class _LessonCompleteScreenWidgetState
                     end: const Offset(1, 1),
                     duration: 600.ms,
                     curve: Curves.easeOutBack,
-                  )
-                  .then()
-                  .shimmer(duration: 2000.ms, color: AppColors.achievementGold.withOpacity(0.3)),
+              )
+              .then()
+              .shimmer(duration: 2000.ms, color: AppColors.achievementGold.withOpacityValue(0.3)),
 
               const SizedBox(height: AppSpacing.xl),
 
@@ -256,10 +256,10 @@ class _LessonCompleteScreenWidgetState
                             curve: Curves.easeOutBack,
                           )
                           .then()
-                          .shimmer(
-                            duration: 2000.ms,
-                            color: AppColors.secondary.withOpacity(0.5),
-                          ),
+                      .shimmer(
+                        duration: 2000.ms,
+                        color: AppColors.secondary.withOpacityValue(0.5),
+                      ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         'Badge Earned!',

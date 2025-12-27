@@ -246,7 +246,7 @@ class _BossCheckpoint extends StatelessWidget {
               })
               .shimmer(
                 duration: 2000.ms,
-                color: AppColors.warning.withOpacity(0.5),
+                color: AppColors.warning.withOpacityValue(0.5),
               ),
           const SizedBox(width: AppSpacing.md),
           Column(

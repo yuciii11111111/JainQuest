@@ -86,7 +86,7 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
               vertical: AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withOpacityValue(0.1),
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: Text(

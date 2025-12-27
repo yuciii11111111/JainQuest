@@ -178,16 +178,16 @@ class _FloatingParticle extends StatelessWidget {
             offset: Offset(0, -50 * animation),
             child: Container(
               width: 4,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.6),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.4),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                  ),
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacityValue(0.6),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacityValue(0.4),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
                 ],
               ),
             ),

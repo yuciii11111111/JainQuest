@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:vibration/vibration.dart';
 import 'package:confetti/confetti.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -415,7 +414,7 @@ class _OptionTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: borderColor.withOpacity(0.15),
+                color: borderColor.withOpacityValue(0.15),
                 shape: BoxShape.circle,
                 border: Border.all(color: borderColor, width: 2),
               ),

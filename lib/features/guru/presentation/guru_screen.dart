@@ -164,9 +164,9 @@ class _GuruScreenState extends State<GuruScreen> {
                         vertical: AppSpacing.sm,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
+                        color: AppColors.primary.withOpacityValue(0.15),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.primary.withOpacityValue(0.3)),
                       ),
                       child: Text(
                         _selectedQuestion!,
@@ -219,7 +219,7 @@ class _GuruScreenState extends State<GuruScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: AppColors.warning.withOpacity(0.2),
+                          color: AppColors.warning.withOpacityValue(0.2),
                           borderRadius: BorderRadius.circular(AppRadius.small),
                         ),
                         child: Row(

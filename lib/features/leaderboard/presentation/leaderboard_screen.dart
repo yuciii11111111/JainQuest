@@ -400,7 +400,7 @@ class _PodiumPlace extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 color,
-                color.withOpacity(0.7),
+                color.withOpacityValue(0.7),
               ],
             ),
             borderRadius: const BorderRadius.vertical(

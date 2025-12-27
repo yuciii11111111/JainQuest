@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/profile_setup_dialog.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/gamification/gamification_constants.dart';
+import '../../../core/models/badge_definition.dart';
 import '../../../core/models/user_models.dart' as user_models;
 
 // Import types directly for convenience
@@ -282,7 +282,7 @@ class _BadgesTab extends StatelessWidget {
       combinedBadges.add(_BadgeDisplay(
         id: badge.id,
         name: badge.name,
-        description: badge.description ?? 'Complete lessons to unlock',
+        description: badge.description,
         isEarned: isEarned,
       ));
     }
@@ -363,7 +363,7 @@ class _BadgesTab extends StatelessWidget {
                             if (!badge.isEarned)
                               Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.backgroundBase.withOpacity(0.7),
+                                  color: AppColors.backgroundBase.withOpacityValue(0.7),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -443,9 +443,9 @@ class _BadgesTab extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacity(0.1),
+                    color: AppColors.warning.withOpacityValue(0.1),
                     borderRadius: BorderRadius.circular(AppRadius.small),
-                    border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.warning.withOpacityValue(0.3)),
                   ),
                   child: Text(
                     'Locked - Complete challenges to unlock',

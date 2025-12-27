@@ -1,4 +1,5 @@
 import '../models/lesson_models.dart';
+import '../models/badge_definition.dart';
 
 /// Complete Unit 1 content: Foundations of Jainism
 /// Contains 4 lessons with all screens defined
@@ -567,19 +568,4 @@ class Unit1Content {
       trigger: 'complete_U01_L04',
     ),
   ];
-}
-
-/// Simple badge definition for content
-class BadgeDefinition {
-  final String id;
-  final String name;
-  final String description;
-  final String trigger;
-
-  const BadgeDefinition({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.trigger,
-  });
 }

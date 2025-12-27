@@ -30,7 +30,7 @@ class ExplanationScreenWidget extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withOpacityValue(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -109,7 +109,7 @@ class _ExplanationSectionCard extends StatelessWidget {
         border: Border.all(color: AppColors.glassBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacityValue(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -216,9 +216,9 @@ class _InfoBox extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withOpacityValue(0.08),
         borderRadius: BorderRadius.circular(AppRadius.small),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withOpacityValue(0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

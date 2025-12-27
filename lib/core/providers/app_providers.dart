@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_models.dart';
 import '../models/lesson_models.dart';
+import '../models/badge_definition.dart';
 import '../services/storage_service.dart';
 import '../content/unit1_content.dart';
 

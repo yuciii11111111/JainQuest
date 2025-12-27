@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/floating_card.dart';
@@ -101,7 +100,7 @@ class _GlassBottomNav extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.backgroundCard.withOpacity(0.8),
+              color: AppColors.backgroundCard.withOpacityValue(0.8),
               border: const Border(
                 top: BorderSide(color: AppColors.glassBorder, width: 1),
               ),
@@ -198,9 +197,6 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dailyGoalProgress =
-        progress.completedLessons.isEmpty ? 0.0 : (progress.completedLessons.length / 3).clamp(0.0, 1.0);
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -375,7 +371,7 @@ class _HomeTab extends StatelessWidget {
                           size: 12,
                           color: index < progress.completedLessons.length
                               ? AppColors.primary
-                              : AppColors.textMuted.withOpacity(0.5),
+                              : AppColors.textMuted.withOpacityValue(0.5),
                         ),
                       ),
                     ),
@@ -502,8 +498,8 @@ class _JourneyStep extends StatelessWidget {
             Container(
               width: 28,
               height: 28,
-              decoration: BoxDecoration(
-                color: circleColor.withOpacity(0.2),
+            decoration: BoxDecoration(
+                color: circleColor.withOpacityValue(0.2),
                 shape: BoxShape.circle,
                 border: Border.all(color: circleColor, width: 2),
               ),
