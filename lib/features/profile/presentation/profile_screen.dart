@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/providers/theme_provider.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
@@ -12,7 +11,6 @@ import '../../../core/widgets/profile_setup_dialog.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/gamification/gamification_constants.dart';
 import '../../../core/models/user_models.dart' as user_models;
-import '../../../core/content/unit1_content.dart';
 
 // Import types directly for convenience
 typedef UserProfile = user_models.UserProfile;
@@ -33,7 +31,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -72,16 +70,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           ),
                           // Theme Toggle
                           IconButton(
-                            icon: ref.watch(themeModeProvider) == ThemeMode.dark
-                                ? const Icon(Icons.light_mode_rounded)
-                                : const Icon(Icons.dark_mode_rounded),
-                            color: AppColors.primary,
-                            onPressed: () {
-                              ref.read(themeModeProvider.notifier).toggleTheme();
-                            },
-                            tooltip: ref.watch(themeModeProvider) == ThemeMode.dark
-                                ? 'Switch to Light Mode'
-                                : 'Switch to Dark Mode',
+                            icon: const Icon(Icons.settings_rounded),
+                            color: AppColors.textSecondary,
+                            onPressed: () => Navigator.of(context).maybePop(),
+                            tooltip: 'Settings',
                           ),
                         ],
                       ),
@@ -188,73 +180,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           .slideY(begin: -0.1, end: 0, duration: 300.ms),
                     ),
 
-                    // Level Progress
-                    Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: FloatingCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Level Progress',
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                Text(
-                                  '${user.xpProgressInLevel}/${user.xpForNextLevel} XP',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Row(
-                              children: [
-                                ProgressRing(
-                                  progress: LevelSystem.getLevelProgress(
-                                    user.level,
-                                    user.totalXp,
-                                  ),
-                                  size: 80,
-                                  strokeWidth: 8,
-                                  child: Text(
-                                    '${user.level}',
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.md),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      AnimatedProgressBar(
-                                        progress: LevelSystem.getLevelProgress(
-                                          user.level,
-                                          user.totalXp,
-                                        ),
-                                        height: 12,
-                                      ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Text(
-                                        '${LevelSystem.getXpNeededForNextLevel(user.level, user.totalXp)} XP to Level ${user.level + 1}',
-                                        style: Theme.of(context).textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                          .animate(delay: 100.ms)
-                          .fadeIn(duration: 300.ms)
-                          .slideX(begin: -0.1, end: 0, duration: 300.ms),
-                    ),
-
                     // Tabs
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -274,7 +199,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           tabs: const [
                             Tab(text: 'Badges'),
                             Tab(text: 'Stats'),
-                            Tab(text: 'Details'),
                           ],
                         ),
                       ),
@@ -292,7 +216,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 children: [
                   _BadgesTab(progress: progress, lessonBadges: lessonBadges, allBadges: allBadges),
                   _StatsTab(user: user, progress: progress),
-                  _DetailsTab(user: user, progress: progress),
                 ],
               ),
             ),
@@ -571,384 +494,97 @@ class _StatsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate additional stats
     final totalLessonsCompleted = progress.completedLessons.length;
-    final totalXpEarned = user.totalXp;
-    final averageScore = _calculateAverageScore(progress);
-    final totalPracticeSessions = 0; // Placeholder - would come from practice logs
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
-          // Streak Stats
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.warm,
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                  ),
-                  child: const Icon(
-                    Icons.local_fire_department_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Current Streak',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '${user.currentStreak} days',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (user.currentStreak > 0)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: AppGradients.warm,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    child: Text(
-                      '🔥',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.primary,
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                  ),
-                  child: const Icon(
-                    Icons.emoji_events_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Best Streak',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '${user.longestStreak} days',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Learning Stats
-          Text(
-            'Learning Stats',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.success,
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lessons Completed',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '$totalLessonsCompleted',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.primary,
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                  ),
-                  child: const Icon(
-                    Icons.star_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Total XP Earned',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '$totalXpEarned XP',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (averageScore > 0) ...[
-            const SizedBox(height: AppSpacing.md),
-            FloatingCard(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: AppGradients.accent,
-                      borderRadius: BorderRadius.circular(AppRadius.small),
-                    ),
-                    child: const Icon(
-                      Icons.trending_up_rounded,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Average Score',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        Text(
-                          '$averageScore%',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.highlight.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                    border: Border.all(color: AppColors.highlight),
-                  ),
-                  child: Icon(
-                    Icons.fitness_center_rounded,
-                    color: AppColors.highlight,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Practice Sessions',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '$totalPracticeSessions',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  int _calculateAverageScore(ProgressState progress) {
-    if (progress.lessonProgress.isEmpty) return 0;
-    int totalScore = 0;
-    int count = 0;
-    for (final lessonProgress in progress.lessonProgress.values) {
-      if (lessonProgress.bestScore > 0) {
-        totalScore += lessonProgress.bestScore;
-        count++;
-      }
-    }
-    return count > 0 ? (totalScore / count).round() : 0;
-  }
-}
-
-class _DetailsTab extends StatelessWidget {
-  final UserProfile user;
-  final ProgressState progress;
-
-  const _DetailsTab({
-    required this.user,
-    required this.progress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final daysSinceJoined = DateTime.now().difference(user.createdAt).inDays;
-    final lastActivityDays = user.lastActivityDate != null
-        ? DateTime.now().difference(user.lastActivityDate!).inDays
-        : null;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Account Details',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.md),
           FloatingCard(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               children: [
-                _DetailRow(
-                  icon: Icons.person_rounded,
-                  label: 'Display Name',
-                  value: user.displayName ?? 'Not set',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _StatItem(
+                      icon: Icons.star_rounded,
+                      value: '${user.totalXp}',
+                      label: 'Points',
+                      color: AppColors.achievementGold,
+                    ),
+                    _StatItem(
+                      icon: Icons.public_rounded,
+                      value: '#1,438',
+                      label: 'World',
+                      color: AppColors.highlight,
+                    ),
+                    _StatItem(
+                      icon: Icons.location_on_rounded,
+                      value: '#56',
+                      label: 'Local',
+                      color: AppColors.secondary,
+                    ),
+                  ],
                 ),
-                const Divider(),
+                const SizedBox(height: AppSpacing.md),
+                Divider(color: AppColors.backgroundElevated, thickness: 1),
+                const SizedBox(height: AppSpacing.md),
                 _DetailRow(
-                  icon: Icons.fingerprint_rounded,
-                  label: 'User ID',
-                  value: user.id.substring(0, 8) + '...',
+                  icon: Icons.check_circle_rounded,
+                  label: 'Lessons Completed',
+                  value: '$totalLessonsCompleted/6',
                 ),
-                const Divider(),
+                const SizedBox(height: AppSpacing.sm),
                 _DetailRow(
-                  icon: Icons.calendar_today_rounded,
-                  label: 'Member Since',
-                  value: '${_formatDate(user.createdAt)} ($daysSinceJoined days ago)',
+                  icon: Icons.local_fire_department_rounded,
+                  label: 'Current Streak',
+                  value: '${user.currentStreak} days',
                 ),
-                const Divider(),
-                _DetailRow(
-                  icon: Icons.access_time_rounded,
-                  label: 'Last Activity',
-                  value: user.lastActivityDate != null
-                      ? '${_formatDate(user.lastActivityDate!)} ${lastActivityDays == 0 ? "(Today)" : "($lastActivityDays days ago)"}'
-                      : 'Never',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Progress Summary',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FloatingCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                _DetailRow(
-                  icon: Icons.shield_rounded,
-                  label: 'Current Level',
-                  value: 'Level ${user.level} • ${LevelSystem.getLevelTitle(user.level)}',
-                ),
-                const Divider(),
+                const SizedBox(height: AppSpacing.sm),
                 _DetailRow(
                   icon: Icons.workspace_premium_rounded,
                   label: 'Badges Earned',
-                  value: '${progress.earnedBadges.length}',
+                  value: '${progress.earnedBadges.length}/6',
                 ),
-                const Divider(),
+                const SizedBox(height: AppSpacing.sm),
                 _DetailRow(
-                  icon: Icons.book_rounded,
-                  label: 'Lessons Completed',
-                  value: '${progress.completedLessons.length}',
+                  icon: Icons.star_border_rounded,
+                  label: 'Total XP',
+                  value: '${user.totalXp}',
                 ),
-                const Divider(),
-                _DetailRow(
-                  icon: Icons.lock_open_rounded,
-                  label: 'Lessons Unlocked',
-                  value: '${progress.unlockedLessons.length}',
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          FloatingCard(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                ProgressRing(
+                  progress: LevelSystem.getLevelProgress(user.level, user.totalXp),
+                  size: 140,
+                  strokeWidth: 12,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${(LevelSystem.getLevelProgress(user.level, user.totalXp) * 100).round()}%',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      Text('Complete', style: Theme.of(context).textTheme.labelSmall),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Overall Progress',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Keep learning to unlock more!',
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
@@ -957,12 +593,7 @@ class _DetailsTab extends StatelessWidget {
       ),
     );
   }
-
-  String _formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
 }
-
 class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
