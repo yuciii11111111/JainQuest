@@ -55,7 +55,7 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
               ref.read(lessonRunnerProvider.notifier).endLesson();
               Navigator.of(context).pop();
             },
-            child: Text(
+            child: const Text(
               'Leave',
               style: TextStyle(color: AppColors.danger),
             ),

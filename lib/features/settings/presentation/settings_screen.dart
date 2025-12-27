@@ -70,7 +70,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
+            child: const Text(
               'Reset',
               style: TextStyle(color: AppColors.danger),
             ),
@@ -109,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: AppSpacing.xl),
 
             // Notifications section
-            _SectionHeader(title: 'Notifications'),
+            const _SectionHeader(title: 'Notifications'),
             const SizedBox(height: AppSpacing.md),
 
             _SettingsCard(
@@ -159,7 +159,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // Notification types
             if (notifPrefs.enableNotifications) ...[
-              _SectionHeader(title: 'Notification Types'),
+              const _SectionHeader(title: 'Notification Types'),
               const SizedBox(height: AppSpacing.md),
 
               _SettingsCard(
@@ -225,7 +225,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ],
 
             // Data section
-            _SectionHeader(title: 'Data'),
+            const _SectionHeader(title: 'Data'),
             const SizedBox(height: AppSpacing.md),
 
             _SettingsCard(
@@ -242,17 +242,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // About section
-            _SectionHeader(title: 'About'),
+            const _SectionHeader(title: 'About'),
             const SizedBox(height: AppSpacing.md),
 
-            _SettingsCard(
+            const _SettingsCard(
               children: [
                 _InfoTile(
                   icon: Icons.info_outline_rounded,
                   title: 'Version',
                   value: '1.0.0',
                 ),
-                const Divider(height: 1),
+                Divider(height: 1),
                 _InfoTile(
                   icon: Icons.code_rounded,
                   title: 'Built with',
@@ -271,7 +271,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.favorite_rounded,
                     color: AppColors.primary,
                     size: 32,
@@ -384,7 +384,7 @@ class _SwitchTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
@@ -448,7 +448,7 @@ class _TapTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textSecondary,
               ),

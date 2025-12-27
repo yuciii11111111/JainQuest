@@ -179,7 +179,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    HeartsPill(hearts: 5),
+                    const HeartsPill(hearts: 5),
                   ],
                 ),
               ),

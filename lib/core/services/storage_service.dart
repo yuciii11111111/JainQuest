@@ -199,7 +199,7 @@ class StorageService {
       lastCompletedAt: now,
       lastReplayBonusAt: isFirstCompletion
           ? null
-          : (existingProgress?.canGetReplayBonus == true ? now : existingProgress?.lastReplayBonusAt),
+          : (existingProgress.canGetReplayBonus == true ? now : existingProgress.lastReplayBonusAt),
     );
 
     final newLessonProgressMap = Map<String, LessonProgress>.from(progress.lessonProgress);

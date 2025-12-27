@@ -136,7 +136,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                 : AppColors.backgroundElevated,
                             child: Text(
                               entry.name[0].toUpperCase(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -365,7 +365,7 @@ class _PodiumPlace extends StatelessWidget {
                 ? const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 32)
                 : Text(
                     entry.name[0].toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: 24,
@@ -479,7 +479,7 @@ class _YourRankCard extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
+          const Icon(
             Icons.trending_up_rounded,
             color: AppColors.primary,
             size: 32,

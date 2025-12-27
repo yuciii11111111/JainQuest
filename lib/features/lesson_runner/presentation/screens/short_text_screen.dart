@@ -76,7 +76,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.schedule_rounded,
                 size: 16,
                 color: AppColors.textSecondary,

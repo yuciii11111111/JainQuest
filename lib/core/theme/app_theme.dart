@@ -342,7 +342,7 @@ class AppTheme {
       ),
 
       // Divider
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: AppColors.backgroundElevated,
         thickness: 1,
         space: AppSpacing.md,

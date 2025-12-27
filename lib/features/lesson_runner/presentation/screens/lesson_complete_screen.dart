@@ -88,7 +88,7 @@ class _LessonCompleteScreenWidgetState
             emissionFrequency: 0.05,
             numberOfParticles: 20,
             gravity: 0.1,
-            colors: [
+            colors: const [
               AppColors.primary,
               AppColors.secondary,
               AppColors.success,
@@ -147,7 +147,7 @@ class _LessonCompleteScreenWidgetState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star_rounded,
                           size: 40,
                           color: AppColors.achievementGold,
@@ -191,18 +191,18 @@ class _LessonCompleteScreenWidgetState
                           borderRadius: BorderRadius.circular(AppRadius.pill),
                           boxShadow: AppShadows.glowing,
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.emoji_events_rounded,
                               size: 20,
                               color: Colors.white,
                             ),
-                            const SizedBox(width: AppSpacing.xs),
+                            SizedBox(width: AppSpacing.xs),
                             Text(
                               'Perfect Score Bonus!',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -290,7 +290,7 @@ class _LessonCompleteScreenWidgetState
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.local_fire_department_rounded,
                           color: AppColors.warning,
                           size: 32,

@@ -95,7 +95,7 @@ class YoutubeVideoScreenWidget extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.info_outline_rounded,
                         color: AppColors.primary,
                         size: 20,
@@ -233,7 +233,7 @@ class _KeywordButton extends StatelessWidget {
 
           // Copy button
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 left: BorderSide(color: AppColors.glassBorder),
               ),

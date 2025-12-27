@@ -172,7 +172,7 @@ class _ExplanationSectionCard extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.image_rounded,
                     size: 48,
                     color: AppColors.textSecondary,

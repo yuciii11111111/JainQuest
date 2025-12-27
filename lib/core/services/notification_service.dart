@@ -140,7 +140,7 @@ class NotificationService {
           'Daily lesson reminder',
           'One short lesson today keeps your streak alive.',
           scheduledDate,
-          NotificationDetails(
+          const NotificationDetails(
             android: AndroidNotificationDetails(
               _learningChannelId,
               'Learning Reminders',
@@ -148,7 +148,7 @@ class NotificationService {
               importance: Importance.high,
               priority: Priority.high,
             ),
-            iOS: const DarwinNotificationDetails(
+            iOS: DarwinNotificationDetails(
               presentAlert: true,
               presentBadge: true,
               presentSound: true,
@@ -173,7 +173,7 @@ class NotificationService {
         'Streak reminder',
         'You are one session away from keeping your streak.',
         scheduledDate,
-        NotificationDetails(
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             _streakChannelId,
             'Streak Alerts',
@@ -181,7 +181,7 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
           ),
-          iOS: const DarwinNotificationDetails(
+          iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
             presentSound: true,
@@ -205,7 +205,7 @@ class NotificationService {
         'Ahimsa check-in',
         'Before your next reply today, pause for two seconds and choose a calmer response.',
         scheduledDate,
-        NotificationDetails(
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             _ahimsaChannelId,
             'Ahimsa Prompts',
@@ -213,7 +213,7 @@ class NotificationService {
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority,
           ),
-          iOS: const DarwinNotificationDetails(
+          iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentSound: true,
           ),
@@ -236,7 +236,7 @@ class NotificationService {
         'Quick reflection',
         'Name one moment today where you chose patience over impulse.',
         scheduledDate,
-        NotificationDetails(
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             _reflectionChannelId,
             'Reflection Prompts',
@@ -244,7 +244,7 @@ class NotificationService {
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority,
           ),
-          iOS: const DarwinNotificationDetails(
+          iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentSound: true,
           ),

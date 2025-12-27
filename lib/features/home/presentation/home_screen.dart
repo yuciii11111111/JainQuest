@@ -102,7 +102,7 @@ class _GlassBottomNav extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: AppColors.backgroundCard.withOpacity(0.8),
-              border: Border(
+              border: const Border(
                 top: BorderSide(color: AppColors.glassBorder, width: 1),
               ),
             ),
@@ -309,7 +309,7 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        Icon(Icons.local_fire_department_rounded, color: AppColors.warning, size: 28),
+                        const Icon(Icons.local_fire_department_rounded, color: AppColors.warning, size: 28),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.currentStreak}', style: Theme.of(context).textTheme.titleLarge),
                         Text('day streak', style: Theme.of(context).textTheme.labelSmall),
@@ -323,7 +323,7 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        Icon(Icons.favorite_rounded, color: AppColors.danger, size: 28),
+                        const Icon(Icons.favorite_rounded, color: AppColors.danger, size: 28),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.hearts}', style: Theme.of(context).textTheme.titleLarge),
                         Text('hearts', style: Theme.of(context).textTheme.labelSmall),
@@ -337,7 +337,7 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        Icon(Icons.star_rounded, color: AppColors.achievementGold, size: 28),
+                        const Icon(Icons.star_rounded, color: AppColors.achievementGold, size: 28),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.totalXp}', style: Theme.of(context).textTheme.titleLarge),
                         Text('XP', style: Theme.of(context).textTheme.labelSmall),
@@ -459,7 +459,7 @@ class _HomeTab extends StatelessWidget {
                     isCurrent: true,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _JourneyStep(
+                  const _JourneyStep(
                     label: 'The Five Vows',
                     isCompleted: false,
                     isCurrent: false,

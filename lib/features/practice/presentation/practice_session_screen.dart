@@ -87,11 +87,11 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.star_rounded, color: AppColors.secondary),
+                  const Icon(Icons.star_rounded, color: AppColors.secondary),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     '+${practiceState?.xpEarned ?? 0} XP',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColors.secondary,
@@ -100,11 +100,11 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.favorite_rounded, color: AppColors.danger),
-                  const SizedBox(width: AppSpacing.xs),
+                  SizedBox(width: AppSpacing.xs),
                   Text(
                     '+1 Heart',
                     style: TextStyle(
@@ -145,7 +145,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.quiz_rounded,
                 size: 64,
                 color: AppColors.textSecondary,

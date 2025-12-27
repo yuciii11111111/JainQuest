@@ -238,7 +238,7 @@ class _WeeklyChart extends StatelessWidget {
                 if (value.toInt() >= 0 && value.toInt() < days.length) {
                   return Text(
                     days[value.toInt()],
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
@@ -248,17 +248,17 @@ class _WeeklyChart extends StatelessWidget {
               },
             ),
           ),
-          leftTitles: AxisTitles(
+          leftTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          topTitles: AxisTitles(
+          topTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          rightTitles: AxisTitles(
+          rightTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
-        gridData: FlGridData(show: false),
+        gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
         barGroups: data.asMap().entries.map((entry) {
           return BarChartGroupData(
@@ -266,7 +266,7 @@ class _WeeklyChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.toDouble(),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: AppColors.primaryGradient,
@@ -299,7 +299,7 @@ class _XpChart extends StatelessWidget {
           drawVerticalLine: false,
           horizontalInterval: 200,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
+            return const FlLine(
               color: AppColors.backgroundElevated,
               strokeWidth: 1,
             );
@@ -307,7 +307,7 @@ class _XpChart extends StatelessWidget {
         ),
         titlesData: FlTitlesData(
           show: true,
-          bottomTitles: AxisTitles(
+          bottomTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
           leftTitles: AxisTitles(
@@ -316,7 +316,7 @@ class _XpChart extends StatelessWidget {
               getTitlesWidget: (value, meta) {
                 return Text(
                   '${value.toInt()}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                   ),
@@ -324,10 +324,10 @@ class _XpChart extends StatelessWidget {
               },
             ),
           ),
-          topTitles: AxisTitles(
+          topTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          rightTitles: AxisTitles(
+          rightTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
@@ -338,12 +338,12 @@ class _XpChart extends StatelessWidget {
               return FlSpot(entry.key.toDouble(), entry.value.toDouble());
             }).toList(),
             isCurved: true,
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: AppColors.primaryGradient,
             ),
             barWidth: 3,
             isStrokeCapRound: true,
-            dotData: FlDotData(show: true),
+            dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(

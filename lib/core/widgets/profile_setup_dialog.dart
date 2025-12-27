@@ -44,8 +44,8 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
   Future<void> _saveProfile() async {
     if (_nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please enter your name'),
+        const SnackBar(
+          content: Text('Please enter your name'),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -149,11 +149,11 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 prefixIcon: const Icon(Icons.person_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: BorderSide(color: AppColors.glassBorder),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: BorderSide(color: AppColors.glassBorder),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
@@ -187,7 +187,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
               const SizedBox(height: AppSpacing.md),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(
+                child: const Text(
                   'Cancel',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),

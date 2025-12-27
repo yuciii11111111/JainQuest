@@ -46,7 +46,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     final progress = ref.watch(progressProvider);
     final lessonBadges = ref.watch(badgesProvider);
     // Get all badges from gamification system
-    final allBadges = BadgeDefinitions.allBadges;
+    const allBadges = BadgeDefinitions.allBadges;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundBase,
@@ -513,13 +513,13 @@ class _StatsTab extends StatelessWidget {
                       label: 'Points',
                       color: AppColors.achievementGold,
                     ),
-                    _StatItem(
+                    const _StatItem(
                       icon: Icons.public_rounded,
                       value: '#1,438',
                       label: 'World',
                       color: AppColors.highlight,
                     ),
-                    _StatItem(
+                    const _StatItem(
                       icon: Icons.location_on_rounded,
                       value: '#56',
                       label: 'Local',
@@ -528,7 +528,7 @@ class _StatsTab extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Divider(color: AppColors.backgroundElevated, thickness: 1),
+                const Divider(color: AppColors.backgroundElevated, thickness: 1),
                 const SizedBox(height: AppSpacing.md),
                 _DetailRow(
                   icon: Icons.check_circle_rounded,

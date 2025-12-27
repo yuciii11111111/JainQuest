@@ -53,7 +53,7 @@ class PracticeHubScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.lock_rounded,
                       size: 48,
                       color: AppColors.textSecondary,
@@ -82,7 +82,7 @@ class PracticeHubScreen extends ConsumerWidget {
                 title: 'Review',
                 description: 'Revisit questions from completed lessons using spaced repetition',
                 color: AppColors.primary,
-                rewards: ['Earn XP', 'Refill hearts'],
+                rewards: const ['Earn XP', 'Refill hearts'],
                 onTap: () {
                   ref.read(practiceProvider.notifier).startPractice(PracticeMode.review);
                   Navigator.of(context).push(
@@ -99,7 +99,7 @@ class PracticeHubScreen extends ConsumerWidget {
                 title: 'Target Weak Spots',
                 description: 'Focus on questions you\'ve answered incorrectly before',
                 color: AppColors.secondary,
-                rewards: ['Improve accuracy', 'Refill hearts'],
+                rewards: const ['Improve accuracy', 'Refill hearts'],
                 onTap: () {
                   ref.read(practiceProvider.notifier).startPractice(PracticeMode.targetWeakSpots);
                   Navigator.of(context).push(
@@ -153,7 +153,7 @@ class PracticeHubScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.lightbulb_rounded,
                     color: AppColors.primary,
                     size: 24,
@@ -163,7 +163,7 @@ class PracticeHubScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Tip',
                           style: TextStyle(
                             fontSize: 14,
@@ -276,7 +276,7 @@ class _PracticeModeCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textSecondary,
             ),
