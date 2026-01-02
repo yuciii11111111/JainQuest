@@ -21,7 +21,7 @@ class UnitPathScreen extends ConsumerWidget {
     final unitProgress = progress.completedLessons.length / unit.lessons.length;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundBase,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -53,7 +53,7 @@ class UnitPathScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${(unitProgress * 100).round()}% • ${progress.completedLessons.length}/${unit.lessons.length} lessons',
+                          '${(unitProgress * 100).round()}% - ${progress.completedLessons.length}/${unit.lessons.length} lessons',
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ],
@@ -147,7 +147,7 @@ class UnitPathScreen extends ConsumerWidget {
   }
 }
 
-class _PathStep extends StatelessWidget {
+class _PathStep extends StatefulWidget {
   final Lesson lesson;
   final int index;
   final bool isCompleted;
@@ -163,14 +163,53 @@ class _PathStep extends StatelessWidget {
   });
 
   @override
+  State<_PathStep> createState() => _PathStepState();
+}
+
+class _PathStepState extends State<_PathStep> with SingleTickerProviderStateMixin {
+  late final AnimationController _glowController;
+  late final Animation<double> _glow;
+
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    );
+    _glow = CurvedAnimation(parent: _glowController, curve: Curves.easeInOut);
+    if (widget.isCurrent) {
+      _glowController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _PathStep oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isCurrent != widget.isCurrent) {
+      if (widget.isCurrent) {
+        _glowController.repeat(reverse: true);
+      } else {
+        _glowController.stop();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Color borderColor;
     Widget icon;
 
-    if (isCompleted) {
+    if (widget.isCompleted) {
       borderColor = AppColors.success;
       icon = const Icon(Icons.check_rounded, color: Colors.white);
-    } else if (isCurrent) {
+    } else if (widget.isCurrent) {
       borderColor = AppColors.primary;
       icon = const Icon(Icons.play_arrow_rounded, color: Colors.white);
     } else {
@@ -179,27 +218,46 @@ class _PathStep extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Column(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              gradient: isCompleted || isCurrent ? AppGradients.primary : null,
-              color: isCompleted || isCurrent ? null : AppColors.backgroundElevated,
-              shape: BoxShape.circle,
-              border: Border.all(color: borderColor, width: 3),
-              boxShadow: isCurrent ? AppShadows.glowing : null,
-            ),
-            child: Center(child: icon),
+          AnimatedBuilder(
+            animation: _glow,
+            builder: (context, child) {
+              final glowStrength = widget.isCurrent ? _glow.value : 0.0;
+              return Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  gradient: widget.isCompleted || widget.isCurrent ? AppGradients.primary : null,
+                  color: widget.isCompleted || widget.isCurrent ? null : AppColors.backgroundElevated,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: borderColor, width: 3),
+                  boxShadow: widget.isCurrent
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacityValue(0.35 + glowStrength * 0.35),
+                            blurRadius: 10 + glowStrength * 14,
+                            spreadRadius: 1 + glowStrength * 3,
+                          ),
+                          BoxShadow(
+                            color: AppColors.primary.withOpacityValue(0.2 + glowStrength * 0.25),
+                            blurRadius: 22 + glowStrength * 18,
+                            spreadRadius: 2 + glowStrength * 4,
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Center(child: icon),
+              );
+            },
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            lesson.title,
+            widget.lesson.title,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: isCompleted || isCurrent ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: widget.isCompleted || widget.isCurrent ? AppColors.textPrimary : AppColors.textSecondary,
                 ),
           ),
         ],

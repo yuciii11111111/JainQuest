@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../home/presentation/home_screen.dart';
+import '../../auth/presentation/login_screen.dart';
+import '../../../core/services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,20 +24,23 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 3),
     )..repeat();
 
-    // Navigate to home after animation
+    // Navigate after animation
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
+        final user = StorageService.getUserProfile();
+        final nextScreen = user.isProfileComplete
+            ? const HomeScreen()
+            : const LoginScreen();
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const HomeScreen(),
+            pageBuilder: (context, animation, secondaryAnimation) => nextScreen,
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
                 opacity: animation,
                 child: child,
               );
             },
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: const Duration(milliseconds: 600),
           ),
         );
       }
@@ -178,16 +183,16 @@ class _FloatingParticle extends StatelessWidget {
             offset: Offset(0, -50 * animation),
             child: Container(
               width: 4,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacityValue(0.6),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacityValue(0.4),
-                  blurRadius: 8,
-                  spreadRadius: 2,
-                ),
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacityValue(0.6),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacityValue(0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
                 ],
               ),
             ),

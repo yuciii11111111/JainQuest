@@ -141,6 +141,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
 
     if (practiceState == null || practiceState.questions.isEmpty) {
       return Scaffold(
+        backgroundColor: Colors.transparent,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -172,6 +173,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
         _showCompletionDialog();
       });
       return const Scaffold(
+        backgroundColor: Colors.transparent,
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -180,7 +182,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     final progress = (practiceState.currentIndex + 1) / practiceState.questions.length;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundBase,
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           // Top bar

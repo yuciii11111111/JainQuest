@@ -10,14 +10,18 @@ import '../../../../core/widgets/gradient_button.dart';
 class QuizScreenWidget extends StatefulWidget {
   final QuizScreen screen;
   final int currentQuestionIndex;
+  final int hearts;
   final Function(bool isCorrect) onAnswer;
+  final VoidCallback onNextQuestion;
   final VoidCallback onComplete;
 
   const QuizScreenWidget({
     super.key,
     required this.screen,
     required this.currentQuestionIndex,
+    required this.hearts,
     required this.onAnswer,
+    required this.onNextQuestion,
     required this.onComplete,
   });
 
@@ -122,12 +126,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
     if (widget.currentQuestionIndex >= widget.screen.questions.length - 1) {
       widget.onComplete();
     } else {
-      // Reset state for next question
-      setState(() {
-        selectedChoiceId = null;
-        showFeedback = false;
-        isCorrectAnswer = null;
-      });
+      widget.onNextQuestion();
     }
   }
 
@@ -178,7 +177,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    const HeartsPill(hearts: 5),
+                    HeartsPill(hearts: widget.hearts),
                   ],
                 ),
               ),

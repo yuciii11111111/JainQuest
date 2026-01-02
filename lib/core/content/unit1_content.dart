@@ -2,7 +2,7 @@ import '../models/lesson_models.dart';
 import '../models/badge_definition.dart';
 
 /// Complete Unit 1 content: Foundations of Jainism
-/// Contains 4 lessons with all screens defined
+/// Contains 6 lessons with all screens defined
 class Unit1Content {
   static const Unit unit = Unit(
     id: 'UNIT_01',
@@ -13,6 +13,8 @@ class Unit1Content {
       _lesson2,
       _lesson3,
       _lesson4,
+      _lesson5,
+      _masterTest,
     ],
   );
 
@@ -75,27 +77,24 @@ class Unit1Content {
         ],
       ),
       youtubeVideo: YoutubeVideoScreen(
-        title: 'Story video reference',
-        note: 'Play a short explainer video. If embedded playback is not available, show search keywords with copy buttons.',
-        searchKeywords: [
-          'What is Jainism explained simply',
-          'Jina meaning explained',
-          'Tirthankara explained for beginners',
-        ],
+        title: 'Story clip',
+        note: 'Watch a short snippet that connects the ideas to a quick story.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 0,
+        clipEndSeconds: 10,
       ),
       explanation: ExplanationScreen(
         sections: [
           ExplanationSection(
             title: 'Core purpose',
-            body: 'The purpose is to reduce harm and attachment so the soul becomes clearer—like cleaning a foggy mirror.',
-            imageIdeas: ['Mirror clarity meter: foggy to clear', 'Before/after lens cleaning diagram'],
+            body: 'The purpose is to reduce harm and attachment so the soul becomes clearer, like cleaning a foggy mirror.',
           ),
           ExplanationSection(
             title: 'Ahimsa in real life',
             body: 'Ahimsa is not only physical non-violence. It includes how we speak, how we react, and how we treat living beings and nature.',
             scientificConnection: 'Pausing before reacting helps the brain\'s self-control systems engage, reducing impulsive behavior.',
             realLifeAnalogy: 'A pause button before replying to an angry message.',
-            imageIdeas: ['Pause button overlay on chat bubble', 'Reaction chain: trigger to pause to response'],
           ),
         ],
       ),
@@ -121,33 +120,6 @@ class Unit1Content {
                 feedbackWrong: '',
               ),
             ],
-          ),
-          QuizQuestion(
-            questionId: 'U01_L01_q2',
-            format: QuestionFormat.multipleChoice,
-            prompt: 'A Tirthankara is best described as:',
-            choices: [
-              Choice(
-                choiceId: 'a',
-                label: 'A teacher who shows the path',
-                isCorrect: true,
-                feedbackCorrect: 'Correct! Tirthankaras are spiritual teachers who re-establish the path.',
-                feedbackWrong: '',
-              ),
-              Choice(
-                choiceId: 'b',
-                label: 'A ruler',
-                isCorrect: false,
-                feedbackCorrect: '',
-                feedbackWrong: 'Not quite. A Tirthankara is a spiritual teacher, not a political leader.',
-              ),
-            ],
-          ),
-          QuizQuestion(
-            questionId: 'U01_L01_q3',
-            format: QuestionFormat.trueFalse,
-            prompt: 'Ahimsa includes actions, speech, and attitude.',
-            answerKey: 'true',
           ),
         ],
       ),
@@ -217,31 +189,28 @@ class Unit1Content {
         ],
       ),
       youtubeVideo: YoutubeVideoScreen(
-        title: 'Story video reference',
-        note: 'Use embedded playback or show keywords to search.',
-        searchKeywords: [
-          'Jiva Ajiva explained simply',
-          'Jain 1 to 5 senses beings',
-        ],
+        title: 'Story clip',
+        note: 'Short clip on living vs non-living in Jain thought.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 12,
+        clipEndSeconds: 22,
       ),
       explanation: ExplanationScreen(
         sections: [
           ExplanationSection(
             title: 'Living (Jiva)',
             body: 'Humans, animals, insects, and plants are living because they have awareness.',
-            imageIdeas: ['Icon grid: human, bird, insect, plant'],
           ),
           ExplanationSection(
             title: 'Non-living (Ajiva)',
             body: 'Objects lack awareness. Jain philosophy also discusses time and space as non-living categories.',
-            imageIdeas: ['Rock, clock, space icons'],
           ),
           ExplanationSection(
             title: 'Senses ladder',
             body: '1-sense: touch. 2: taste. 3: smell. 4: sight. 5: hearing.',
             scientificConnection: 'In biology, living things respond to stimuli; non-living objects do not respond on their own.',
             realLifeAnalogy: 'Signal on vs signal off.',
-            imageIdeas: ['Staircase diagram 1 to 5', 'Signal on/off graphic'],
           ),
         ],
       ),
@@ -265,27 +234,6 @@ class Unit1Content {
                 isCorrect: false,
                 feedbackCorrect: '',
                 feedbackWrong: 'That\'s Ajiva. Jiva means living.',
-              ),
-            ],
-          ),
-          QuizQuestion(
-            questionId: 'U01_L02_q2',
-            format: QuestionFormat.multipleChoice,
-            prompt: 'Humans are generally:',
-            choices: [
-              Choice(
-                choiceId: 'a',
-                label: '5-sense beings',
-                isCorrect: true,
-                feedbackCorrect: 'Correct! Humans have all five senses.',
-                feedbackWrong: '',
-              ),
-              Choice(
-                choiceId: 'b',
-                label: '1-sense beings',
-                isCorrect: false,
-                feedbackCorrect: '',
-                feedbackWrong: '1-sense beings only have touch. Humans have all five.',
               ),
             ],
           ),
@@ -349,26 +297,24 @@ class Unit1Content {
         ],
       ),
       youtubeVideo: YoutubeVideoScreen(
-        title: 'Story video reference',
-        note: 'Embed or show keywords.',
-        searchKeywords: [
-          'Jain soul explained simply',
-          'karma dust on mirror analogy',
-        ],
+        title: 'Story clip',
+        note: 'Short clip on the soul and clarity.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 24,
+        clipEndSeconds: 34,
       ),
       explanation: ExplanationScreen(
         sections: [
           ExplanationSection(
             title: 'Eternal does not mean unchanging body',
             body: 'The body changes like a costume; the soul is the experiencer.',
-            imageIdeas: ['Character skins / costume change diagram'],
           ),
           ExplanationSection(
             title: 'Why binding happens',
             body: 'Karma binds more when actions are mixed with intense anger, ego, greed, or attachment.',
             scientificConnection: 'Strong emotions can hijack decision-making; calm improves self-control.',
             realLifeAnalogy: 'Clean lens vs dirty lens: same world, different clarity.',
-            imageIdeas: ['Blurry vs sharp photo comparison', 'Lens wipe sequence'],
           ),
         ],
       ),
@@ -394,12 +340,6 @@ class Unit1Content {
                 feedbackWrong: 'The soul is eternal, only the body is temporary.',
               ),
             ],
-          ),
-          QuizQuestion(
-            questionId: 'U01_L03_q2',
-            format: QuestionFormat.trueFalse,
-            prompt: 'Infinite qualities means instant superpowers.',
-            answerKey: 'false',
           ),
         ],
       ),
@@ -461,12 +401,12 @@ class Unit1Content {
         ],
       ),
       youtubeVideo: YoutubeVideoScreen(
-        title: 'Story video reference',
-        note: 'Embed or show keywords.',
-        searchKeywords: [
-          'Jain karma pudgal explained',
-          'karma binding Jainism simple',
-        ],
+        title: 'Story clip',
+        note: 'Short clip on karma as subtle matter.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 36,
+        clipEndSeconds: 46,
       ),
       explanation: ExplanationScreen(
         sections: [
@@ -475,12 +415,10 @@ class Unit1Content {
             body: 'The same action can bind differently depending on the emotion behind it.',
             scientificConnection: 'Stress increases impulsive reactions; calm reduces harmful choices.',
             realLifeAnalogy: 'Dust sticks more to wet hands than dry hands.',
-            imageIdeas: ['Wet vs dry hand dust graphic', 'Glue vs no-glue diagram'],
           ),
           ExplanationSection(
             title: 'Pure vs impure states',
             body: 'Pure state: more awareness and less attachment. Impure state: more anger, ego, and craving.',
-            imageIdeas: ['Two sliders: awareness and attachment', 'Clean vs cluttered mind sketch'],
           ),
         ],
       ),
@@ -507,33 +445,287 @@ class Unit1Content {
               ),
             ],
           ),
+        ],
+      ),
+      lessonComplete: LessonCompleteScreen(
+        title: 'Lesson complete',
+        rewardText: 'Badge unlocked: Karma Basics',
+        nextLessonId: 'U01_L05',
+      ),
+    ),
+  );
+
+  // =========================================================================
+  // Lesson 1.5: The Tirthankaras
+  // =========================================================================
+
+  static const _lesson5 = Lesson(
+    lessonId: 'U01_L05',
+    title: 'The Tirthankaras',
+    learningObjectives: [
+      'Define a Tirthankara',
+      'Explain why they are called path-makers',
+      'Name a few well-known Tirthankaras',
+    ],
+    screens: LessonScreens(
+      questionIntro: QuestionIntroScreen(
+        title: 'Warm-up',
+        prompt: 'A Tirthankara is best described as:',
+        choices: [
+          Choice(
+            choiceId: 'a',
+            label: 'A warrior-king',
+            isCorrect: false,
+            feedbackCorrect: 'Correct.',
+            feedbackWrong: 'Not quite. Tirthankaras are teachers, not conquerors.',
+          ),
+          Choice(
+            choiceId: 'b',
+            label: 'A path-maker who teaches liberation',
+            isCorrect: true,
+            feedbackCorrect: 'Correct. A Tirthankara re-shows the path to liberation.',
+            feedbackWrong: 'Incorrect.',
+          ),
+        ],
+      ),
+      shortText: ShortTextScreen(
+        cards: [
+          TextCard(
+            title: 'Who are they?',
+            body: 'Tirthankaras are teachers who re-open the path to liberation in each time cycle.',
+          ),
+          TextCard(
+            title: 'Why the name?',
+            body: 'Tirtha means a crossing. They help souls cross from suffering to freedom.',
+          ),
+          TextCard(
+            title: 'Key examples',
+            body: 'Rishabhanatha (first), Parshvanatha, and Mahavira (24th) are well-known.',
+          ),
+        ],
+      ),
+      youtubeVideo: YoutubeVideoScreen(
+        title: 'Story clip',
+        note: 'Short clip on the Tirthankaras and their role.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 48,
+        clipEndSeconds: 58,
+      ),
+      explanation: ExplanationScreen(
+        sections: [
+          ExplanationSection(
+            title: 'Path-makers',
+            body: 'They rediscover and teach the Jain path when it is forgotten.',
+          ),
+          ExplanationSection(
+            title: 'Why 24?',
+            body: 'In this time cycle, 24 Tirthankaras are described, each renewing the teachings.',
+          ),
+        ],
+      ),
+      quiz: QuizScreen(
+        questions: [
           QuizQuestion(
-            questionId: 'U01_L04_q2',
+            questionId: 'U01_L05_q1',
             format: QuestionFormat.multipleChoice,
-            prompt: 'Binding is stronger when:',
+            prompt: 'A Tirthankara primarily:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Emotion is intense',
+                label: 'Re-shows the path to liberation',
                 isCorrect: true,
-                feedbackCorrect: 'Right! Intense emotions create stronger karmic binding.',
+                feedbackCorrect: 'Correct! Tirthankaras are path-makers.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'You are calm and aware',
+                label: 'Leads armies',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'Calm awareness reduces binding, not increases it.',
+                feedbackWrong: 'Not this. Their role is spiritual teaching.',
               ),
             ],
           ),
         ],
       ),
       lessonComplete: LessonCompleteScreen(
-        title: 'Unit complete',
-        rewardText: 'Badge unlocked: Karma Basics',
-        nextLessonId: 'UNIT_01_CHECKPOINT',
+        title: 'Lesson complete',
+        rewardText: 'Badge unlocked: Tirthankara Guide',
+        nextLessonId: 'U01_MASTER_TEST',
+      ),
+    ),
+  );
+
+  // =========================================================================
+  // Master Test: Mixed Quiz
+  // =========================================================================
+
+  static const _masterTest = Lesson(
+    lessonId: 'U01_MASTER_TEST',
+    title: 'Master Test',
+    learningObjectives: [
+      'Review key ideas from all lessons',
+      'Apply core concepts across topics',
+    ],
+    screens: LessonScreens(
+      questionIntro: QuestionIntroScreen(
+        title: 'Master Test',
+        prompt: 'Ready to mix everything you learned?',
+        choices: [
+          Choice(
+            choiceId: 'a',
+            label: 'Yes, let\'s go',
+            isCorrect: true,
+            feedbackCorrect: 'Great! Let\'s start.',
+            feedbackWrong: '',
+          ),
+          Choice(
+            choiceId: 'b',
+            label: 'Not yet',
+            isCorrect: false,
+            feedbackCorrect: '',
+            feedbackWrong: 'Take a breath and try anyway.',
+          ),
+        ],
+      ),
+      shortText: ShortTextScreen(
+        cards: [
+          TextCard(
+            title: 'Mixed Review',
+            body: 'This quiz blends questions from every course in Unit 1.',
+          ),
+        ],
+      ),
+      youtubeVideo: YoutubeVideoScreen(
+        title: 'Story clip',
+        note: 'Quick recap before the master test.',
+        searchKeywords: [],
+        videoAsset: 'assets/videos/youtubevideo.mp4',
+        clipStartSeconds: 60,
+        clipEndSeconds: 70,
+      ),
+      explanation: ExplanationScreen(
+        sections: [
+          ExplanationSection(
+            title: 'Focus on clarity',
+            body: 'Answer slowly and carefully. This is a summary of your progress.',
+          ),
+        ],
+      ),
+      quiz: QuizScreen(
+        questions: [
+          QuizQuestion(
+            questionId: 'U01_MT_q1',
+            format: QuestionFormat.multipleChoice,
+            prompt: 'A Jina is someone who:',
+            choices: [
+              Choice(
+                choiceId: 'a',
+                label: 'Conquers inner enemies',
+                isCorrect: true,
+                feedbackCorrect: 'Correct! Inner victory is the key.',
+                feedbackWrong: '',
+              ),
+              Choice(
+                choiceId: 'b',
+                label: 'Wins arguments',
+                isCorrect: false,
+                feedbackCorrect: '',
+                feedbackWrong: 'Not quite. Jainism focuses on inner discipline.',
+              ),
+            ],
+          ),
+          QuizQuestion(
+            questionId: 'U01_MT_q2',
+            format: QuestionFormat.multipleChoice,
+            prompt: 'Jiva means:',
+            choices: [
+              Choice(
+                choiceId: 'a',
+                label: 'Living',
+                isCorrect: true,
+                feedbackCorrect: 'Right! Jiva is living.',
+                feedbackWrong: '',
+              ),
+              Choice(
+                choiceId: 'b',
+                label: 'Non-living',
+                isCorrect: false,
+                feedbackCorrect: '',
+                feedbackWrong: 'That\'s Ajiva.',
+              ),
+            ],
+          ),
+          QuizQuestion(
+            questionId: 'U01_MT_q3',
+            format: QuestionFormat.multipleChoice,
+            prompt: 'The soul is described as:',
+            choices: [
+              Choice(
+                choiceId: 'a',
+                label: 'Eternal',
+                isCorrect: true,
+                feedbackCorrect: 'Correct! The soul is eternal.',
+                feedbackWrong: '',
+              ),
+              Choice(
+                choiceId: 'b',
+                label: 'Temporary',
+                isCorrect: false,
+                feedbackCorrect: '',
+                feedbackWrong: 'The soul is eternal; the body changes.',
+              ),
+            ],
+          ),
+          QuizQuestion(
+            questionId: 'U01_MT_q4',
+            format: QuestionFormat.multipleChoice,
+            prompt: 'Karma is best described as:',
+            choices: [
+              Choice(
+                choiceId: 'a',
+                label: 'Subtle matter that can attach',
+                isCorrect: true,
+                feedbackCorrect: 'Correct! Karma is pudgal.',
+                feedbackWrong: '',
+              ),
+              Choice(
+                choiceId: 'b',
+                label: 'Random luck',
+                isCorrect: false,
+                feedbackCorrect: '',
+                feedbackWrong: 'Not in Jain philosophy.',
+              ),
+            ],
+          ),
+          QuizQuestion(
+            questionId: 'U01_MT_q5',
+            format: QuestionFormat.multipleChoice,
+            prompt: 'A Tirthankara is a:',
+            choices: [
+              Choice(
+                choiceId: 'a',
+                label: 'Path-maker who teaches liberation',
+                isCorrect: true,
+                feedbackCorrect: 'Correct! They re-show the path.',
+                feedbackWrong: '',
+              ),
+              Choice(
+                choiceId: 'b',
+                label: 'Warrior-king',
+                isCorrect: false,
+                feedbackCorrect: '',
+                feedbackWrong: 'Not this. Their role is spiritual teaching.',
+              ),
+            ],
+          ),
+        ],
+      ),
+      lessonComplete: LessonCompleteScreen(
+        title: 'Master test complete',
+        rewardText: 'Badge unlocked: Unit Master',
+        nextLessonId: null,
       ),
     ),
   );
@@ -567,5 +759,18 @@ class Unit1Content {
       description: 'Understood the fundamentals of karma',
       trigger: 'complete_U01_L04',
     ),
+    BadgeDefinition(
+      id: 'BADGE_TIRTHANKARA_GUIDE',
+      name: 'Tirthankara Guide',
+      description: 'Learned the role of the Tirthankaras',
+      trigger: 'complete_U01_L05',
+    ),
+    BadgeDefinition(
+      id: 'BADGE_UNIT_MASTER',
+      name: 'Unit Master',
+      description: 'Passed the Unit 1 master test',
+      trigger: 'complete_U01_MASTER_TEST',
+    ),
   ];
 }
+

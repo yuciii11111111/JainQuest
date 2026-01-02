@@ -346,7 +346,7 @@ class _LessonCompleteScreenWidgetState
                 icon: Icons.share_rounded,
                 onPressed: () {
                   Share.share(
-                    'I just earned ${widget.xpEarned} XP in JainQuest! 🎉',
+                    'I just earned ${widget.xpEarned} XP in JainQuest!',
                   );
                 },
                 gradient: AppGradients.accent,
@@ -364,3 +364,4 @@ class _LessonCompleteScreenWidgetState
     );
   }
 }
+

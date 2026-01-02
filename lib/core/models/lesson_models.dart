@@ -158,17 +158,28 @@ class YoutubeVideoScreen extends Equatable {
   final String title;
   final String note;
   final List<String> searchKeywords;
-  final String? videoUrl;
+  final String? videoAsset;
+  final int? clipStartSeconds;
+  final int? clipEndSeconds;
 
   const YoutubeVideoScreen({
     required this.title,
     required this.note,
     required this.searchKeywords,
-    this.videoUrl,
+    this.videoAsset,
+    this.clipStartSeconds,
+    this.clipEndSeconds,
   });
 
   @override
-  List<Object?> get props => [title, note, searchKeywords, videoUrl];
+  List<Object?> get props => [
+        title,
+        note,
+        searchKeywords,
+        videoAsset,
+        clipStartSeconds,
+        clipEndSeconds,
+      ];
 }
 
 // ============================================================================

@@ -25,6 +25,7 @@ class StorageService {
 
     // Open boxes
     _userBox = await Hive.openBox<UserProfile>(_userBoxName);
+
     _progressBox = await Hive.openBox<ProgressState>(_progressBoxName);
     _attemptsBox = await Hive.openBox<AttemptLog>(_attemptsBoxName);
     _notificationBox = await Hive.openBox<NotificationPrefs>(_notificationBoxName);

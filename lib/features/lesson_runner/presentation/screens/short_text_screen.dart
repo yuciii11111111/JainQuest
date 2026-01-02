@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/widgets/typewriter_sequence.dart';
 
 class ShortTextScreenWidget extends StatefulWidget {
   final ShortTextScreen screen;
@@ -30,7 +31,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
   void _nextCard() {
     if (_currentPage < widget.screen.cards.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
       );
     } else {
@@ -126,7 +127,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
                       icon: Icons.arrow_back_rounded,
                       onPressed: () {
                         _pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 400),
                           curve: Curves.easeOutCubic,
                         );
                       },
@@ -175,30 +176,42 @@ class _TextCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
-          Text(
-            card.title,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Divider
-          Container(
-            width: 48,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Body
-          Text(
-            card.body,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.6,
-                ),
+          TypewriterSequence(
+            gap: AppSpacing.lg,
+            items: [
+              TypewriterSequenceItem(
+                text: card.title,
+                style: Theme.of(context).textTheme.headlineMedium,
+                speed: const Duration(milliseconds: 16),
+              ),
+              TypewriterSequenceItem(
+                text: card.body,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      height: 1.6,
+                    ),
+                speed: const Duration(milliseconds: 12),
+              ),
+            ],
+            itemBuilder: (context, child, index, item) {
+              if (index == 0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    child,
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      width: 48,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return child;
+            },
           ),
         ],
       ),

@@ -153,7 +153,7 @@ class AnimatedProgressBar extends StatelessWidget {
     this.height = 8,
     this.backgroundColor,
     this.progressColor,
-    this.duration = const Duration(milliseconds: 300),
+    this.duration = const Duration(milliseconds: 450),
   });
 
   @override

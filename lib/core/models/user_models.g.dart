@@ -28,13 +28,17 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       lastActivityDate: fields[7] as DateTime?,
       streakFreezes: fields[8] as int? ?? 1,
       createdAt: fields[9] as DateTime? ?? DateTime.now(),
+      age: fields[10] as int?,
+      email: fields[11] as String?,
+      password: fields[12] as String?,
+      avatarEmoji: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -54,7 +58,15 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(8)
       ..write(obj.streakFreezes)
       ..writeByte(9)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.age)
+      ..writeByte(11)
+      ..write(obj.email)
+      ..writeByte(12)
+      ..write(obj.password)
+      ..writeByte(13)
+      ..write(obj.avatarEmoji);
   }
 
   @override

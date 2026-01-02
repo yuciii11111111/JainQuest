@@ -16,7 +16,7 @@ class StatsScreen extends ConsumerWidget {
     final progress = ref.watch(progressProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundBase,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Your Stats'),
         backgroundColor: Colors.transparent,

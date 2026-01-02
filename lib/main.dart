@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
@@ -13,7 +16,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Hive for local storage
-  await Hive.initFlutter();
+  final appDir = await getApplicationSupportDirectory();
+  final hiveDir = Directory('${appDir.path}${Platform.pathSeparator}hive_data');
+  await hiveDir.create(recursive: true);
+  await Hive.initFlutter(hiveDir.path);
   await StorageService.init();
   
   // Initialize notifications
@@ -67,6 +73,40 @@ class JainQuestApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      builder: (context, child) {
+        final isDark = themeMode == ThemeMode.dark;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 600),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? const [
+                      Color(0xFF0B1226),
+                      Color(0xFF1B1A3A),
+                      Color(0xFF0B7285),
+                    ]
+                  : const [
+                      Color(0xFFE3F2FD),
+                      Color(0xFFE0E7FF),
+                      Color(0xFFE0F7FA),
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: ShaderMask(
+            shaderCallback: (rect) => LinearGradient(
+              colors: isDark
+                  ? const [Colors.white70, Colors.white24]
+                  : const [Colors.white, Colors.white54],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(rect),
+            blendMode: BlendMode.softLight,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        );
+      },
       home: const SplashScreen(),
     );
   }

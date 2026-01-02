@@ -112,7 +112,7 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.backgroundBase,
+        backgroundColor: Colors.transparent,
         body: Stack(
           children: [
             Column(
@@ -154,13 +154,13 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                 ),
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 500),
                     transitionBuilder: (child, animation) {
                       return FadeTransition(
                         opacity: animation,
                         child: SlideTransition(
                           position: Tween<Offset>(
-                            begin: const Offset(0.05, 0),
+                            begin: const Offset(0.04, 0),
                             end: Offset.zero,
                           ).animate(animation),
                           child: child,
@@ -237,8 +237,12 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
           key: const ValueKey('quiz'),
           screen: state.lesson.screens.quiz,
           currentQuestionIndex: state.currentQuizQuestionIndex,
+          hearts: user.hearts,
           onAnswer: (isCorrect) {
             ref.read(lessonRunnerProvider.notifier).answerQuizQuestion(isCorrect);
+          },
+          onNextQuestion: () {
+            ref.read(lessonRunnerProvider.notifier).advanceQuizQuestion();
           },
           onComplete: () async {
             await ref.read(lessonRunnerProvider.notifier).completeLesson();

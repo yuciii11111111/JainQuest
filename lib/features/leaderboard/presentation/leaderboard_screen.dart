@@ -24,7 +24,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final leaderboardData = _generateMockLeaderboard(user.id);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundBase,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

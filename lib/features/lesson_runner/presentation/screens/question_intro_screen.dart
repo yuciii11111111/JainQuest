@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/widgets/typewriter_sequence.dart';
 
 class QuestionIntroScreenWidget extends StatefulWidget {
   final QuestionIntroScreen screen;
@@ -80,30 +81,40 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
           const SizedBox(height: AppSpacing.lg),
 
           // Title badge
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacityValue(0.1),
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-            ),
-            child: Text(
-              widget.screen.title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+          TypewriterSequence(
+            gap: AppSpacing.lg,
+            items: [
+              TypewriterSequenceItem(
+                text: widget.screen.title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+                speed: const Duration(milliseconds: 16),
               ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Question prompt
-          Text(
-            widget.screen.prompt,
-            style: Theme.of(context).textTheme.headlineSmall,
+              TypewriterSequenceItem(
+                text: widget.screen.prompt,
+                style: Theme.of(context).textTheme.headlineSmall,
+                speed: const Duration(milliseconds: 16),
+              ),
+            ],
+            itemBuilder: (context, child, index, item) {
+              if (index == 0) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacityValue(0.1),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: child,
+                );
+              }
+              return child;
+            },
           ),
           const SizedBox(height: AppSpacing.xl),
 

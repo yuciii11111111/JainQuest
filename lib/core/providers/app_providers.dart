@@ -209,7 +209,7 @@ class LessonRunnerState {
 
   double get quizProgress {
     if (lesson.screens.quiz.questions.isEmpty) return 0;
-    return currentQuizQuestionIndex / lesson.screens.quiz.questions.length;
+    return quizAnswers.length / lesson.screens.quiz.questions.length;
   }
 
   bool get isPerfectQuiz {
@@ -287,7 +287,6 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
       quizAnswers: newAnswers,
       quizXp: state!.quizXp + xpGained,
       totalCorrect: state!.totalCorrect + (isCorrect ? 1 : 0),
-      currentQuizQuestionIndex: state!.currentQuizQuestionIndex + 1,
     );
 
     // Update user XP and hearts
@@ -296,6 +295,17 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     } else {
       ref.read(userProfileProvider.notifier).loseHeart();
     }
+  }
+
+  void advanceQuizQuestion() {
+    if (state == null) return;
+    if (state!.currentQuizQuestionIndex >=
+        state!.lesson.screens.quiz.questions.length - 1) {
+      return;
+    }
+    state = state!.copyWith(
+      currentQuizQuestionIndex: state!.currentQuizQuestionIndex + 1,
+    );
   }
 
   Future<void> completeLesson() async {
@@ -345,6 +355,10 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
         return 'BADGE_SOUL_EXPLORER';
       case 'U01_L04':
         return 'BADGE_KARMA_BASICS';
+      case 'U01_L05':
+        return 'BADGE_TIRTHANKARA_GUIDE';
+      case 'U01_MASTER_TEST':
+        return 'BADGE_UNIT_MASTER';
       default:
         return null;
     }

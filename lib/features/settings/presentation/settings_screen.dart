@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/services/notification_service.dart';
 
@@ -94,19 +95,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final notifPrefs = ref.watch(notificationPrefsProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Header
-            Text(
-              'Settings',
-              style: Theme.of(context).textTheme.displaySmall,
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  color: AppColors.textSecondary,
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  'Settings',
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.xl),
+
+            const _SectionHeader(title: 'Appearance'),
+            const SizedBox(height: AppSpacing.md),
+            _SettingsCard(
+              children: [
+                _SwitchTile(
+                  icon: themeMode == ThemeMode.dark
+                      ? Icons.dark_mode_rounded
+                      : Icons.light_mode_rounded,
+                  title: 'Dark mode',
+                  subtitle: themeMode == ThemeMode.dark ? 'Enabled' : 'Disabled',
+                  value: themeMode == ThemeMode.dark,
+                  onChanged: (value) async {
+                    await ref
+                        .read(themeModeProvider.notifier)
+                        .setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
             // Notifications section
             const _SectionHeader(title: 'Notifications'),
@@ -293,8 +328,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
 
-            const SizedBox(height: AppSpacing.xxl),
-          ],
+              const SizedBox(height: AppSpacing.xxl),
+            ],
+          ),
         ),
       ),
     );

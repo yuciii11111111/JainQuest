@@ -21,7 +21,24 @@ class ProfileSetupDialog extends ConsumerStatefulWidget {
 
 class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  static const List<String> _emojiOptions = [
+    '🧘',
+    '🪷',
+    '🌟',
+    '📿',
+    '🕉️',
+    '🌿',
+    '🔥',
+    '🌙',
+    '🐘',
+    '🦚',
+  ];
+  String? _selectedEmoji;
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -31,6 +48,10 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final user = ref.read(userProfileProvider);
         _nameController.text = user.displayName ?? '';
+        _ageController.text = user.age?.toString() ?? '';
+        _emailController.text = user.email ?? '';
+        _selectedEmoji = user.avatarEmoji;
+        setState(() {});
       });
     }
   }
@@ -38,6 +59,9 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
   @override
   void dispose() {
     _nameController.dispose();
+    _ageController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -53,10 +77,53 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
       return;
     }
 
+    final ageValue = int.tryParse(_ageController.text.trim());
+    if (ageValue == null || ageValue <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid age'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (_emailController.text.trim().isEmpty ||
+        !_emailController.text.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid email'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (widget.isFirstTime && _passwordController.text.trim().length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password must be at least 6 characters'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     final user = ref.read(userProfileProvider);
-    final updatedUser = user.copyWith(displayName: _nameController.text.trim());
+    final updatedUser = user.copyWith(
+      displayName: _nameController.text.trim(),
+      age: ageValue,
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim().isEmpty
+          ? user.password
+          : _passwordController.text.trim(),
+      avatarEmoji: _selectedEmoji ?? user.avatarEmoji,
+    );
     await StorageService.saveUserProfile(updatedUser);
     ref.read(userProfileProvider.notifier).refresh();
 
@@ -67,7 +134,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
       if (widget.isFirstTime) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Welcome to JainQuest, ${_nameController.text.trim()}! 🎉'),
+            content: Text('Welcome to JainQuest, ${_nameController.text.trim()}!'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
@@ -96,10 +163,11 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 shape: BoxShape.circle,
                 boxShadow: AppShadows.glowing,
               ),
-              child: const Icon(
-                Icons.person_add_rounded,
-                size: 40,
-                color: Colors.white,
+              child: Center(
+                child: Text(
+                  _selectedEmoji ?? '🙂',
+                  style: const TextStyle(fontSize: 36),
+                ),
               ),
             )
                 .animate()
@@ -127,7 +195,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
             Text(
               widget.isFirstTime
                   ? 'Let\'s personalize your learning journey'
-                  : 'Change your display name',
+                  : 'Update your details',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -137,6 +205,45 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 .fadeIn(delay: 200.ms, duration: 300.ms),
 
             const SizedBox(height: AppSpacing.xl),
+
+            Text(
+              'Choose your avatar',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              alignment: WrapAlignment.center,
+              children: _emojiOptions.map((emoji) {
+                final isSelected = emoji == _selectedEmoji;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedEmoji = emoji),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primary.withOpacityValue(0.2)
+                          : AppColors.backgroundCard,
+                      borderRadius: BorderRadius.circular(AppRadius.small),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : AppColors.glassBorder,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        emoji,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
             // Name Input
             TextField(
@@ -167,6 +274,112 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
             )
                 .animate()
                 .fadeIn(delay: 300.ms, duration: 300.ms)
+                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // Age Input
+            TextField(
+              controller: _ageController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Age',
+                hintText: 'Enter your age',
+                prefixIcon: const Icon(Icons.cake_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundCard,
+              ),
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+                .animate()
+                .fadeIn(delay: 350.ms, duration: 300.ms)
+                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // Email Input
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'Enter your email',
+                prefixIcon: const Icon(Icons.email_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundCard,
+              ),
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+                .animate()
+                .fadeIn(delay: 400.ms, duration: 300.ms)
+                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // Password Input
+            TextField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
+                labelText: widget.isFirstTime ? 'Password' : 'New password (optional)',
+                hintText: widget.isFirstTime ? 'Set a password' : 'Leave blank to keep',
+                prefixIcon: const Icon(Icons.lock_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_rounded
+                        : Icons.visibility_off_rounded,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundCard,
+              ),
+              style: Theme.of(context).textTheme.bodyLarge,
+              onSubmitted: (_) => _saveProfile(),
+            )
+                .animate()
+                .fadeIn(delay: 450.ms, duration: 300.ms)
                 .slideY(begin: 0.1, end: 0, duration: 300.ms),
 
             const SizedBox(height: AppSpacing.lg),

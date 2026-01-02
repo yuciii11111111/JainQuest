@@ -7,12 +7,16 @@ import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/floating_card.dart';
-import '../../../core/widgets/profile_setup_dialog.dart';
 import '../../../core/gamification/gamification_constants.dart';
+import '../../../core/providers/theme_provider.dart';
+import '../../../core/models/user_models.dart';
+import '../../../core/models/lesson_models.dart';
 import '../../path/presentation/unit_path_screen.dart';
-import '../../profile/presentation/profile_screen.dart';
+import '../../profile/presentation/profile_screen.dart' show ProfileScreen;
 import '../../guru/presentation/guru_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
+import '../../resources/presentation/resources_screen.dart';
+import '../../forum/presentation/forum_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,47 +27,29 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
-  bool _hasCheckedProfile = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Check profile after first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkProfileSetup();
-    });
-  }
-
-  void _checkProfileSetup() {
-    if (_hasCheckedProfile) return;
-    _hasCheckedProfile = true;
-
-    final user = ref.read(userProfileProvider);
-    if (user.displayName == null || user.displayName!.isEmpty) {
-      // Show profile setup dialog after a short delay
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const ProfileSetupDialog(isFirstTime: true),
-          );
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProfileProvider);
     final progress = ref.watch(progressProvider);
+    final unit = ref.watch(unit1Provider);
+    final themeMode = ref.watch(themeModeProvider);
+    final toggleTheme = ref.read(themeModeProvider.notifier).toggleTheme;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundBase,
+      backgroundColor: Colors.transparent,
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          _HomeTab(user: user, progress: progress),
+          _HomeTab(
+            user: user,
+            progress: progress,
+            unit: unit,
+            themeMode: themeMode,
+            onToggleTheme: toggleTheme,
+          ),
+          const ForumScreen(),
+          const ResourcesScreen(),
           const GuruScreen(),
           const ProfileScreen(),
         ],
@@ -116,16 +102,28 @@ class _GlassBottomNav extends StatelessWidget {
                     onTap: () => onTap(0),
                   ),
                   _NavItem(
-                    icon: Icons.auto_awesome_rounded,
-                    label: 'Ask Guru',
+                    icon: Icons.forum_rounded,
+                    label: 'Forum',
                     isSelected: currentIndex == 1,
                     onTap: () => onTap(1),
                   ),
                   _NavItem(
-                    icon: Icons.person_rounded,
-                    label: 'Profile',
+                    icon: Icons.auto_awesome_rounded,
+                    label: 'Resources',
                     isSelected: currentIndex == 2,
                     onTap: () => onTap(2),
+                  ),
+                  _NavItem(
+                    icon: Icons.psychology_rounded,
+                    label: 'Ask Guru',
+                    isSelected: currentIndex == 3,
+                    onTap: () => onTap(3),
+                  ),
+                  _NavItem(
+                    icon: Icons.person_rounded,
+                    label: 'Profile',
+                    isSelected: currentIndex == 4,
+                    onTap: () => onTap(4),
                   ),
                 ],
               ),
@@ -190,13 +188,29 @@ class _NavItem extends StatelessWidget {
 }
 
 class _HomeTab extends StatelessWidget {
-  final dynamic user;
-  final dynamic progress;
+  final UserProfile user;
+  final ProgressState progress;
+  final Unit unit;
+  final ThemeMode themeMode;
+  final VoidCallback onToggleTheme;
 
-  const _HomeTab({required this.user, required this.progress});
+  const _HomeTab({
+    required this.user,
+    required this.progress,
+    required this.unit,
+    required this.themeMode,
+    required this.onToggleTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final List<Lesson> lessons = unit.lessons;
+    final Lesson currentLesson = lessons.firstWhere(
+      (lesson) => progress.isLessonUnlocked(lesson.lessonId) &&
+          !progress.isLessonCompleted(lesson.lessonId),
+      orElse: () => lessons.first,
+    );
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -219,7 +233,7 @@ class _HomeTab extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      'Level ${user.level} • ${LevelSystem.getLevelTitle(user.level)}',
+                      'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -228,6 +242,15 @@ class _HomeTab extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.notifications_rounded),
                   onPressed: () {},
+                  color: AppColors.textSecondary,
+                ),
+                IconButton(
+                  icon: Icon(
+                    themeMode == ThemeMode.dark
+                        ? Icons.wb_sunny_rounded
+                        : Icons.dark_mode_rounded,
+                  ),
+                  onPressed: onToggleTheme,
                   color: AppColors.textSecondary,
                 ),
                 IconButton(
@@ -260,7 +283,7 @@ class _HomeTab extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Level ${user.level} • ${LevelSystem.getLevelTitle(user.level)}',
+                          'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.secondary),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -420,12 +443,14 @@ class _HomeTab extends StatelessWidget {
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                         Text(
-                          'Ahimsa (Non-violence)',
+                          currentLesson.title,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'The supreme principle of Jainism',
+                          (currentLesson.learningObjectives as List).isNotEmpty
+                              ? (currentLesson.learningObjectives as List).first
+                              : 'Continue your learning journey',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -443,23 +468,16 @@ class _HomeTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _JourneyStep(
-                    label: 'What is Jainism?',
-                    isCompleted: progress.completedLessons.contains('lesson1'),
-                    isCurrent: false,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _JourneyStep(
-                    label: 'Ahimsa (Non-violence)',
-                    isCompleted: progress.completedLessons.contains('lesson2'),
-                    isCurrent: true,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  const _JourneyStep(
-                    label: 'The Five Vows',
-                    isCompleted: false,
-                    isCurrent: false,
-                  ),
+                  for (int i = 0; i < lessons.length; i++) ...[
+                    _JourneyStep(
+                      label: lessons[i].title,
+                      isCompleted: progress.isLessonCompleted(lessons[i].lessonId),
+                      isCurrent: progress.isLessonUnlocked(lessons[i].lessonId) &&
+                          !progress.isLessonCompleted(lessons[i].lessonId),
+                    ),
+                    if (i != lessons.length - 1)
+                      const SizedBox(height: AppSpacing.md),
+                  ],
                 ],
               ),
             ),
@@ -533,3 +551,4 @@ class _JourneyStep extends StatelessWidget {
     );
   }
 }
+

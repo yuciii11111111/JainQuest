@@ -77,11 +77,13 @@ class LevelSystem {
   }
 
   static double getLevelProgress(int currentLevel, int totalXp) {
+    if (currentLevel < 1) return 0.0;
     if (currentLevel >= xpGates.length) return 1.0;
-    final currentLevelXp = currentLevel > 1 ? xpGates[currentLevel - 2] : 0;
-    final nextLevelXp = xpGates[currentLevel - 1];
-    final xpInLevel = totalXp - currentLevelXp;
+    final currentLevelXp = xpGates[currentLevel - 1];
+    final nextLevelXp = xpGates[currentLevel];
     final xpNeeded = nextLevelXp - currentLevelXp;
+    if (xpNeeded <= 0) return 0.0;
+    final xpInLevel = totalXp - currentLevelXp;
     return (xpInLevel / xpNeeded).clamp(0.0, 1.0);
   }
 }
@@ -165,4 +167,3 @@ class HeartsSystem {
     return (minutesPassed / heartRegenMinutes).floor().clamp(0, maxHearts);
   }
 }
-

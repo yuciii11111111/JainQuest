@@ -39,6 +39,18 @@ class UserProfile extends Equatable {
   @HiveField(9)
   final DateTime createdAt;
 
+  @HiveField(10)
+  final int? age;
+
+  @HiveField(11)
+  final String? email;
+
+  @HiveField(12)
+  final String? password;
+
+  @HiveField(13)
+  final String? avatarEmoji;
+
   const UserProfile({
     required this.id,
     this.displayName,
@@ -50,6 +62,10 @@ class UserProfile extends Equatable {
     this.lastActivityDate,
     this.streakFreezes = 1,
     required this.createdAt,
+    this.age,
+    this.email,
+    this.password,
+    this.avatarEmoji,
   });
 
   UserProfile copyWith({
@@ -63,6 +79,10 @@ class UserProfile extends Equatable {
     DateTime? lastActivityDate,
     int? streakFreezes,
     DateTime? createdAt,
+    int? age,
+    String? email,
+    String? password,
+    String? avatarEmoji,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -75,6 +95,10 @@ class UserProfile extends Equatable {
       lastActivityDate: lastActivityDate ?? this.lastActivityDate,
       streakFreezes: streakFreezes ?? this.streakFreezes,
       createdAt: createdAt ?? this.createdAt,
+      age: age ?? this.age,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      avatarEmoji: avatarEmoji ?? this.avatarEmoji,
     );
   }
 
@@ -95,6 +119,13 @@ class UserProfile extends Equatable {
     return xpProgressInLevel / neededForThisLevel;
   }
 
+  bool get isProfileComplete {
+    return (displayName?.trim().isNotEmpty ?? false) &&
+        (email?.trim().isNotEmpty ?? false) &&
+        (password?.trim().isNotEmpty ?? false) &&
+        (age ?? 0) > 0;
+  }
+
   @override
   List<Object?> get props => [
         id,
@@ -107,6 +138,10 @@ class UserProfile extends Equatable {
         lastActivityDate,
         streakFreezes,
         createdAt,
+        age,
+        email,
+        password,
+        avatarEmoji,
       ];
 }
 

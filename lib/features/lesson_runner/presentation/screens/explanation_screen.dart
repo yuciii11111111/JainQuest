@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/widgets/typewriter_sequence.dart';
 
 class ExplanationScreenWidget extends StatelessWidget {
   final ExplanationScreen screen;
@@ -124,16 +125,22 @@ class _ExplanationSectionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  section.title,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  section.body,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.6,
-                      ),
+                TypewriterSequence(
+                  gap: AppSpacing.md,
+                  items: [
+                    TypewriterSequenceItem(
+                      text: section.title,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                      speed: const Duration(milliseconds: 16),
+                    ),
+                    TypewriterSequenceItem(
+                      text: section.body,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            height: 1.6,
+                          ),
+                      speed: const Duration(milliseconds: 12),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -157,35 +164,6 @@ class _ExplanationSectionCard extends StatelessWidget {
               color: AppColors.secondary,
             ),
 
-          // Image placeholder
-          if (section.imageIdeas != null && section.imageIdeas!.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.all(AppSpacing.md),
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundBase,
-                borderRadius: BorderRadius.circular(AppRadius.small),
-                border: Border.all(
-                  color: AppColors.glassBorder,
-                  style: BorderStyle.solid,
-                ),
-              ),
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.image_rounded,
-                    size: 48,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Illustration: ${section.imageIdeas!.first}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
