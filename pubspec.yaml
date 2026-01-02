@@ -56,6 +56,11 @@ dependencies:
   uuid: ^4.2.2
   path_provider: ^2.1.2
 
+  #firebase
+  firebase_core:
+  cloud_firestore:
+  firebase_auth:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
