@@ -1,10 +1,652 @@
 import '../models/lesson_models.dart';
 import '../models/badge_definition.dart';
 
+class _LessonSeed {
+  final String lessonId;
+  final String title;
+  final List<String> objectives;
+  final String warmupPrompt;
+  final String warmupCorrect;
+  final String warmupWrong;
+  final String coreIdea;
+  final String whyItMatters;
+  final String practiceTip;
+  final String explanationKey;
+  final String explanationPractice;
+  final String quizPrompt;
+  final String quizCorrect;
+  final String quizWrong;
+  final String nextLessonId;
+
+  const _LessonSeed({
+    required this.lessonId,
+    required this.title,
+    required this.objectives,
+    required this.warmupPrompt,
+    required this.warmupCorrect,
+    required this.warmupWrong,
+    required this.coreIdea,
+    required this.whyItMatters,
+    required this.practiceTip,
+    required this.explanationKey,
+    required this.explanationPractice,
+    required this.quizPrompt,
+    required this.quizCorrect,
+    required this.quizWrong,
+    required this.nextLessonId,
+  });
+}
+
+const List<_LessonSeed> _lessonSeeds = [
+  _LessonSeed(
+    lessonId: 'U01_L06',
+    title: 'Three Jewels (Ratnatraya)',
+    objectives: [
+      'Name the three jewels',
+      'Explain why they work together',
+      'Apply the trio to a daily choice',
+    ],
+    warmupPrompt: 'Which set is called the Three Jewels?',
+    warmupCorrect: 'Right view, right knowledge, right conduct',
+    warmupWrong: 'Wealth, health, fame',
+    coreIdea:
+        'The Three Jewels are right view, right knowledge, and right conduct. They guide how to see, understand, and act.',
+    whyItMatters:
+        'Without all three, growth is uneven. Understanding needs action to become real.',
+    practiceTip:
+        'Before a choice, check if it fits right view, right knowledge, and right conduct.',
+    explanationKey:
+        'Right view is basic belief in non-violence and the soul. Right knowledge is accurate understanding. Right conduct is living those insights.',
+    explanationPractice:
+        'Use the three jewels as a quick compass for everyday decisions.',
+    quizPrompt: 'Which trio makes up the Three Jewels?',
+    quizCorrect: 'Right view, right knowledge, right conduct',
+    quizWrong: 'Faith, luck, ritual',
+    nextLessonId: 'U01_L07',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L07',
+    title: 'Five Great Vows (Mahavrata)',
+    objectives: [
+      'List the five great vows',
+      'Know who takes the Mahavrata',
+      'Describe their purpose',
+    ],
+    warmupPrompt: 'How many great vows are there?',
+    warmupCorrect: 'Five',
+    warmupWrong: 'Three',
+    coreIdea:
+        'Mahavrata are strict vows for monks and nuns: ahimsa, satya, asteya, brahmacharya, aparigraha.',
+    whyItMatters:
+        'They reduce harm and attachment at the deepest level.',
+    practiceTip:
+        'Householders use the same values in lighter, realistic ways.',
+    explanationKey:
+        'The five great vows are full commitments to non-violence, truth, non-stealing, celibacy, and non-attachment.',
+    explanationPractice:
+        'Even small choices can move toward these vows.',
+    quizPrompt: 'Which list matches the five great vows?',
+    quizCorrect:
+        'Ahimsa, satya, asteya, brahmacharya, aparigraha',
+    quizWrong: 'Prayer, fasting, charity, pilgrimage, ritual',
+    nextLessonId: 'U01_L08',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L08',
+    title: 'Anuvrata (Small Vows)',
+    objectives: [
+      'Define anuvrata',
+      'Know who practices them',
+      'Explain their daily value',
+    ],
+    warmupPrompt: 'Anuvrata are mainly for:',
+    warmupCorrect: 'Householders',
+    warmupWrong: 'Only monks',
+    coreIdea:
+        'Anuvrata are smaller vows for laypeople, adapting the same values to daily life.',
+    whyItMatters:
+        'They make spiritual practice practical in family and work life.',
+    practiceTip: 'Set one clear boundary like mindful speech.',
+    explanationKey:
+        'Anuvrata balance spiritual aims with real responsibilities.',
+    explanationPractice:
+        'Consistency matters more than intensity.',
+    quizPrompt: 'Anuvrata are:',
+    quizCorrect: 'Smaller vows for laypeople',
+    quizWrong: 'Secret teachings for scholars',
+    nextLessonId: 'U01_L09',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L09',
+    title: 'Ahimsa in Thought, Speech, Action',
+    objectives: [
+      'Explain ahimsa at three levels',
+      'Recognize intention as part of action',
+      'Practice a simple pause',
+    ],
+    warmupPrompt: 'Ahimsa includes:',
+    warmupCorrect: 'Mind, speech, and body',
+    warmupWrong: 'Only actions',
+    coreIdea:
+        'Non-violence starts in thoughts, shows in speech, and ends in actions.',
+    whyItMatters:
+        'Harm often begins in the mind before it appears outside.',
+    practiceTip:
+        'Pause before reacting and soften inner language.',
+    explanationKey:
+        'Jain ethics treats intention as part of the act.',
+    explanationPractice:
+        'Replace harsh judgment with curiosity.',
+    quizPrompt: 'Ahimsa applies to which levels?',
+    quizCorrect: 'Thought, speech, and action',
+    quizWrong: 'Only physical action',
+    nextLessonId: 'U01_L10',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L10',
+    title: 'Satya (Truthfulness)',
+    objectives: [
+      'Define satya',
+      'Connect truth with non-violence',
+      'Apply kind speech',
+    ],
+    warmupPrompt: 'Satya means:',
+    warmupCorrect: 'Truthfulness with care',
+    warmupWrong: 'Brutal honesty',
+    coreIdea: 'Satya is truthful speech that avoids harm.',
+    whyItMatters:
+        'Truth without kindness can still hurt; Jainism balances both.',
+    practiceTip: 'Speak what is true, useful, and gentle.',
+    explanationKey: 'Satya is aligned with ahimsa.',
+    explanationPractice:
+        'Choose timing and tone that reduce harm.',
+    quizPrompt: 'Satya is best described as:',
+    quizCorrect: 'Truth spoken without harm',
+    quizWrong: 'Saying everything you think',
+    nextLessonId: 'U01_L11',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L11',
+    title: 'Asteya (Non-Stealing)',
+    objectives: [
+      'Define asteya',
+      'Identify subtle forms of stealing',
+      'Practice respect for resources',
+    ],
+    warmupPrompt: 'Asteya encourages:',
+    warmupCorrect: 'Not taking what is not given',
+    warmupWrong: 'Taking only small things',
+    coreIdea: 'Asteya is non-stealing in actions and intentions.',
+    whyItMatters: 'It builds trust and reduces greed.',
+    practiceTip: 'Respect time, credit, and resources.',
+    explanationKey:
+        'Stealing includes subtle forms like plagiarism or wasting others time.',
+    explanationPractice: 'Ask permission and give credit.',
+    quizPrompt: 'Asteya means:',
+    quizCorrect: 'Non-stealing',
+    quizWrong: 'Non-speaking',
+    nextLessonId: 'U01_L12',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L12',
+    title: 'Brahmacharya (Self-Restraint)',
+    objectives: [
+      'Define brahmacharya',
+      'Explain householders practice',
+      'See how restraint protects clarity',
+    ],
+    warmupPrompt: 'Brahmacharya focuses on:',
+    warmupCorrect: 'Self-control in desires',
+    warmupWrong: 'Ignoring relationships',
+    coreIdea:
+        'Brahmacharya is channeling energy wisely, not impulsively.',
+    whyItMatters:
+        'It protects clarity and prevents attachment from driving choices.',
+    practiceTip: 'Notice triggers and choose moderation.',
+    explanationKey:
+        'For monks it is celibacy; for householders it is fidelity and restraint.',
+    explanationPractice:
+        'Respect boundaries in media and conversation.',
+    quizPrompt: 'For householders, brahmacharya is closest to:',
+    quizCorrect: 'Fidelity and restraint',
+    quizWrong: 'Complete avoidance of all contact',
+    nextLessonId: 'U01_L13',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L13',
+    title: 'Aparigraha (Non-Attachment)',
+    objectives: [
+      'Define aparigraha',
+      'Explain attachment vs ownership',
+      'Try a simplicity practice',
+    ],
+    warmupPrompt: 'Aparigraha is:',
+    warmupCorrect: 'Non-attachment',
+    warmupWrong: 'Collecting more',
+    coreIdea: 'Aparigraha means limiting possessions and clinging.',
+    whyItMatters:
+        'Less attachment reduces fear and jealousy.',
+    practiceTip: 'Simplify one area and share what you do not use.',
+    explanationKey: 'Possessions are tools, not identity.',
+    explanationPractice: 'Ask: do I own this, or does it own me?',
+    quizPrompt: 'Aparigraha teaches:',
+    quizCorrect: 'Non-attachment and simplicity',
+    quizWrong: 'Luxury and display',
+    nextLessonId: 'U01_L14',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L14',
+    title: 'Anekantavada (Many-Sided Reality)',
+    objectives: [
+      'Define anekantavada',
+      'Reduce dogmatism',
+      'Apply perspective-taking',
+    ],
+    warmupPrompt: 'Anekantavada teaches:',
+    warmupCorrect: 'Many-sided reality',
+    warmupWrong: 'Only one view',
+    coreIdea:
+        'Reality has many aspects; no single view captures all.',
+    whyItMatters: 'It reduces dogmatism and conflict.',
+    practiceTip: 'Ask what might be true from another angle.',
+    explanationKey: 'Truth is complex, so humility is required.',
+    explanationPractice: 'Listen to others to complete the picture.',
+    quizPrompt: 'Anekantavada is the doctrine of:',
+    quizCorrect: 'Many-sidedness',
+    quizWrong: 'Single absolute view',
+    nextLessonId: 'U01_L15',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L15',
+    title: 'Syadvada (Conditional Truth)',
+    objectives: [
+      'Define syadvada',
+      'Use context in statements',
+      'Avoid extremes',
+    ],
+    warmupPrompt: 'Syadvada is about:',
+    warmupCorrect: 'Conditional statements',
+    warmupWrong: 'No truth at all',
+    coreIdea:
+        'Syadvada uses "in some ways" to express partial truth.',
+    whyItMatters: 'It helps communicate without extremes.',
+    practiceTip: 'Add context before making strong claims.',
+    explanationKey: 'Statements are valid in certain conditions.',
+    explanationPractice: 'Use "from this perspective" to be precise.',
+    quizPrompt: 'Syadvada emphasizes:',
+    quizCorrect: 'Conditional truth',
+    quizWrong: 'Random opinions',
+    nextLessonId: 'U01_L16',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L16',
+    title: 'Nayavada (Viewpoints)',
+    objectives: [
+      'Define nayavada',
+      'Understand partial viewpoints',
+      'Combine perspectives for balance',
+    ],
+    warmupPrompt: 'Nayavada focuses on:',
+    warmupCorrect: 'Viewpoints',
+    warmupWrong: 'Ignoring evidence',
+    coreIdea:
+        'Nayavada is the study of viewpoints to understand reality.',
+    whyItMatters: 'It trains careful thinking and fairness.',
+    practiceTip: 'Separate the part from the whole in arguments.',
+    explanationKey: 'Each naya highlights one aspect, not the whole.',
+    explanationPractice:
+        'Combine viewpoints for fuller understanding.',
+    quizPrompt: 'Nayavada is best described as:',
+    quizCorrect: 'A method of viewpoints',
+    quizWrong: 'A rule of silence',
+    nextLessonId: 'U01_L17',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L17',
+    title: 'Nav Tattva (Nine Realities)',
+    objectives: [
+      'Define nav tattva',
+      'Recognize key categories',
+      'Use them as a learning map',
+    ],
+    warmupPrompt: 'Nav Tattva means:',
+    warmupCorrect: 'Nine realities',
+    warmupWrong: 'Nine rituals',
+    coreIdea:
+        'Nine realities explain how the soul binds and frees from karma.',
+    whyItMatters:
+        'They provide a map of spiritual progress.',
+    practiceTip: 'Identify what increases bondage and what stops it.',
+    explanationKey:
+        'Key categories include jiva, ajiva, asrava, bandha, samvara, nirjara, moksha, punya, papa.',
+    explanationPractice:
+        'Use them to review actions daily.',
+    quizPrompt: 'Nav Tattva refers to:',
+    quizCorrect: 'Nine fundamental realities',
+    quizWrong: 'Nine temple festivals',
+    nextLessonId: 'U01_L18',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L18',
+    title: 'Eight Types of Karma',
+    objectives: [
+      'Know there are eight main karma types',
+      'Connect karma with experience',
+      'Identify clarity-blocking karma',
+    ],
+    warmupPrompt: 'How many main karma types are taught?',
+    warmupCorrect: 'Eight',
+    warmupWrong: 'Four',
+    coreIdea:
+        'Jainism describes eight main karma types affecting knowledge, perception, energy, and more.',
+    whyItMatters: 'It shows why souls experience limits.',
+    practiceTip: 'Notice how emotions cloud clarity.',
+    explanationKey:
+        'Knowledge-obscuring and perception-obscuring karma are key categories.',
+    explanationPractice: 'Cultivate calm to reduce new binding.',
+    quizPrompt: 'Jainism describes how many main karma types?',
+    quizCorrect: 'Eight',
+    quizWrong: 'Ten',
+    nextLessonId: 'U01_L19',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L19',
+    title: 'Leshya (Inner Colorations)',
+    objectives: [
+      'Define leshya',
+      'Link emotions to inner color',
+      'Shift toward brighter states',
+    ],
+    warmupPrompt: 'Leshya refers to:',
+    warmupCorrect: 'Colorations of the soul',
+    warmupWrong: 'Temple architecture',
+    coreIdea:
+        'Leshya are inner colorations shaped by emotions and intentions.',
+    whyItMatters:
+        'They show the quality of your inner state.',
+    practiceTip: 'Shift from harsh to gentle intentions.',
+    explanationKey:
+        'Dark leshya come from anger and greed; bright leshya from compassion.',
+    explanationPractice:
+        'Choose thoughts that lighten your inner color.',
+    quizPrompt: 'Leshya describes:',
+    quizCorrect: 'Inner colorations from emotions',
+    quizWrong: 'Outer clothing rules',
+    nextLessonId: 'U01_L20',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L20',
+    title: 'Samvara (Stoppage)',
+    objectives: [
+      'Define samvara',
+      'Explain how karma inflow stops',
+      'Practice mindful restraint',
+    ],
+    warmupPrompt: 'Samvara means:',
+    warmupCorrect: 'Stopping karma inflow',
+    warmupWrong: 'Increasing karma',
+    coreIdea:
+        'Samvara is the stoppage of new karma through discipline.',
+    whyItMatters:
+        'Without stopping inflow, shedding is slower.',
+    practiceTip:
+        'Use vows and mindfulness to reduce harmful actions.',
+    explanationKey: 'Right conduct seals the leaks.',
+    explanationPractice: 'Track one habit that invites negativity.',
+    quizPrompt: 'Samvara is:',
+    quizCorrect: 'Stoppage of karma inflow',
+    quizWrong: 'Collection of more karma',
+    nextLessonId: 'U01_L21',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L21',
+    title: 'Nirjara (Shedding Karma)',
+    objectives: [
+      'Define nirjara',
+      'Know it removes existing karma',
+      'Connect it with tapas',
+    ],
+    warmupPrompt: 'Nirjara is:',
+    warmupCorrect: 'Shedding karma',
+    warmupWrong: 'Binding karma',
+    coreIdea: 'Nirjara is the removal of existing karma.',
+    whyItMatters: 'It clears the soul over time.',
+    practiceTip: 'Practice forgiveness and austerity.',
+    explanationKey: 'Shedding happens naturally and through tapas.',
+    explanationPractice:
+        'Choose voluntary discipline to speed up clarity.',
+    quizPrompt: 'Nirjara means:',
+    quizCorrect: 'Shedding existing karma',
+    quizWrong: 'Hiding karma',
+    nextLessonId: 'U01_L22',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L22',
+    title: 'Moksha (Liberation)',
+    objectives: [
+      'Define moksha',
+      'Explain freedom from rebirth',
+      'Link daily actions to liberation',
+    ],
+    warmupPrompt: 'Moksha is:',
+    warmupCorrect: 'Liberation',
+    warmupWrong: 'Rebirth',
+    coreIdea:
+        'Moksha is freedom from the cycle of birth and death.',
+    whyItMatters:
+        'It is the ultimate goal of Jain practice.',
+    practiceTip:
+        'Align goals with inner freedom, not just external success.',
+    explanationKey:
+        'Liberation comes when karma is fully shed.',
+    explanationPractice:
+        'Small steps of detachment point toward moksha.',
+    quizPrompt: 'Moksha refers to:',
+    quizCorrect: 'Liberation from rebirth',
+    quizWrong: 'A holy pilgrimage site',
+    nextLessonId: 'U01_L23',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L23',
+    title: 'Gupti (Three Controls)',
+    objectives: [
+      'Define gupti',
+      'Name the three controls',
+      'Practice mindful restraint',
+    ],
+    warmupPrompt: 'Gupti are:',
+    warmupCorrect: 'Controls of mind, speech, body',
+    warmupWrong: 'Festival days',
+    coreIdea: 'Gupti are the three controls that protect conduct.',
+    whyItMatters: 'They prevent impulsive harm.',
+    practiceTip:
+        'Guard one channel for a day: mind, speech, or body.',
+    explanationKey:
+        'Control is not suppression; it is conscious direction.',
+    explanationPractice: 'Slow down before acting.',
+    quizPrompt: 'Gupti refers to control of:',
+    quizCorrect: 'Mind, speech, and body',
+    quizWrong: 'Weather and seasons',
+    nextLessonId: 'U01_L24',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L24',
+    title: 'Samiti (Careful Conduct)',
+    objectives: [
+      'Define samiti',
+      'Know it reduces accidental harm',
+      'Apply mindfulness in routine',
+    ],
+    warmupPrompt: 'Samiti means:',
+    warmupCorrect: 'Careful conduct',
+    warmupWrong: 'Ignoring details',
+    coreIdea:
+        'Samiti are five careful practices to reduce harm.',
+    whyItMatters:
+        'Attention prevents accidental violence.',
+    practiceTip: 'Walk, speak, and handle objects mindfully.',
+    explanationKey:
+        'Examples include careful walking and careful speech.',
+    explanationPractice:
+        'Mindfulness turns routine into compassion.',
+    quizPrompt: 'Samiti refers to:',
+    quizCorrect: 'Careful conduct to avoid harm',
+    quizWrong: 'Fast ritual chanting',
+    nextLessonId: 'U01_L25',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L25',
+    title: 'Tapas (Austerity)',
+    objectives: [
+      'Define tapas',
+      'Differentiate external and internal tapas',
+      'Use discipline wisely',
+    ],
+    warmupPrompt: 'Tapas are:',
+    warmupCorrect: 'Austerities and discipline',
+    warmupWrong: 'Luxury comforts',
+    coreIdea:
+        'Tapas are disciplines that reduce attachment and ego.',
+    whyItMatters: 'They strengthen will and clarity.',
+    practiceTip: 'Try a simple fast or reduced indulgence.',
+    explanationKey: 'There are external and internal tapas.',
+    explanationPractice:
+        'Use discipline for insight, not pride.',
+    quizPrompt: 'Tapas means:',
+    quizCorrect: 'Austerity and disciplined practice',
+    quizWrong: 'Entertainment and festivals',
+    nextLessonId: 'U01_L26',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L26',
+    title: 'Paryushan (Renewal)',
+    objectives: [
+      'Identify Paryushan as a Jain festival',
+      'Connect it with repentance',
+      'Practice forgiveness',
+    ],
+    warmupPrompt: 'Paryushan is:',
+    warmupCorrect: 'A period of reflection and restraint',
+    warmupWrong: 'A harvest festival',
+    coreIdea:
+        'Paryushan is a Jain festival focused on repentance and renewal.',
+    whyItMatters: 'It refreshes vows and relationships.',
+    practiceTip: 'Do pratikraman and ask forgiveness.',
+    explanationKey:
+        'Forgiveness is central: "Micchami Dukkadam".',
+    explanationPractice: 'Clear old resentments.',
+    quizPrompt: 'Paryushan emphasizes:',
+    quizCorrect: 'Reflection, fasting, and forgiveness',
+    quizWrong: 'Competitive sports',
+    nextLessonId: 'U01_L27',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L27',
+    title: 'Samayik (Equanimity)',
+    objectives: [
+      'Define samayik',
+      'Connect it with calm awareness',
+      'Practice brief meditation',
+    ],
+    warmupPrompt: 'Samayik is:',
+    warmupCorrect: 'A practice of equanimity',
+    warmupWrong: 'A business meeting',
+    coreIdea:
+        'Samayik is meditative equanimity, staying balanced.',
+    whyItMatters:
+        'It trains the mind to stay calm amid change.',
+    practiceTip:
+        'Sit quietly and observe thoughts without reacting.',
+    explanationKey:
+        'Equanimity reduces new karma binding.',
+    explanationPractice:
+        'Consistency builds inner stability.',
+    quizPrompt: 'Samayik focuses on:',
+    quizCorrect: 'Equanimity and inner balance',
+    quizWrong: 'Public debates',
+    nextLessonId: 'U01_L28',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L28',
+    title: 'Pratikraman (Self-Review)',
+    objectives: [
+      'Define pratikraman',
+      'See how it reduces ego',
+      'Make a simple review habit',
+    ],
+    warmupPrompt: 'Pratikraman is:',
+    warmupCorrect: 'Self-review and repentance',
+    warmupWrong: 'Celebrating victories',
+    coreIdea:
+        'Pratikraman is a practice of reflecting and correcting mistakes.',
+    whyItMatters:
+        'It prevents repetition and softens ego.',
+    practiceTip: 'Review the day and resolve to improve.',
+    explanationKey:
+        'It includes confession, apology, and resolve.',
+    explanationPractice:
+        'Honest review reduces inner baggage.',
+    quizPrompt: 'Pratikraman is best described as:',
+    quizCorrect: 'Self-review with repentance',
+    quizWrong: 'A travel ceremony',
+    nextLessonId: 'U01_L29',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L29',
+    title: 'Jain Cosmology (Loka)',
+    objectives: [
+      'Identify Jain cosmology as a worldview',
+      'Know the universe is eternal',
+      'Keep focus on ethics',
+    ],
+    warmupPrompt: 'Jain cosmology describes:',
+    warmupCorrect: 'The structure of the universe',
+    warmupWrong: 'Only one planet',
+    coreIdea:
+        'Jain cosmology describes a universe with distinct realms and no creator god.',
+    whyItMatters:
+        'It frames spiritual progress in a vast context.',
+    practiceTip: 'Focus on ethics rather than speculation.',
+    explanationKey:
+        'The loka is finite in shape but eternal in existence.',
+    explanationPractice:
+        'Use cosmology as inspiration for humility.',
+    quizPrompt: 'Jain cosmology teaches that the universe is:',
+    quizCorrect: 'Eternal and structured in realms',
+    quizWrong: 'Created once and then ended',
+    nextLessonId: 'U01_L30',
+  ),
+  _LessonSeed(
+    lessonId: 'U01_L30',
+    title: 'Pancha Parameshti',
+    objectives: [
+      'Name the five supreme beings',
+      'Know their role in the path',
+      'Connect them to the Navkar Mantra',
+    ],
+    warmupPrompt: 'Pancha Parameshti refers to:',
+    warmupCorrect: 'Five supreme beings',
+    warmupWrong: 'Five elements',
+    coreIdea:
+        'The five supreme beings are Arihant, Siddha, Acharya, Upadhyaya, and Sadhu.',
+    whyItMatters:
+        'They represent stages and roles on the path.',
+    practiceTip: 'Offer respect to the qualities they embody.',
+    explanationKey:
+        'Navkar Mantra honors these five, not any one personality.',
+    explanationPractice:
+        'Use their qualities as personal ideals.',
+    quizPrompt: 'Pancha Parameshti are:',
+    quizCorrect: 'Arihant, Siddha, Acharya, Upadhyaya, Sadhu',
+    quizWrong: 'Earth, water, fire, air, space',
+    nextLessonId: 'U01_MASTER_TEST',
+  ),
+];
+
 /// Complete Unit 1 content: Foundations of Jainism
-/// Contains 6 lessons with all screens defined
+/// Contains 30 lessons plus a master test
 class Unit1Content {
-  static const Unit unit = Unit(
+  static final Unit unit = Unit(
     id: 'UNIT_01',
     title: 'Foundations of Jainism',
     level: 'Beginner',
@@ -14,9 +656,12 @@ class Unit1Content {
       _lesson3,
       _lesson4,
       _lesson5,
+      ..._generatedLessons,
       _masterTest,
     ],
   );
+
+  static final List<Lesson> _generatedLessons = _buildGeneratedLessons();
 
   // =========================================================================
   // Lesson 1.1: What is Jainism?
@@ -552,10 +1197,110 @@ class Unit1Content {
       lessonComplete: LessonCompleteScreen(
         title: 'Lesson complete',
         rewardText: 'Badge unlocked: Tirthankara Guide',
-        nextLessonId: 'U01_MASTER_TEST',
+        nextLessonId: 'U01_L06',
       ),
     ),
   );
+
+  static List<Lesson> _buildGeneratedLessons() {
+    return _lessonSeeds
+        .map(
+          (seed) => Lesson(
+            lessonId: seed.lessonId,
+            title: seed.title,
+            learningObjectives: seed.objectives,
+            screens: LessonScreens(
+              questionIntro: QuestionIntroScreen(
+                title: 'Warm-up',
+                prompt: seed.warmupPrompt,
+                choices: [
+                  Choice(
+                    choiceId: 'a',
+                    label: seed.warmupWrong,
+                    isCorrect: false,
+                    feedbackCorrect: 'Correct.',
+                    feedbackWrong: 'Not quite. ${seed.warmupCorrect}.',
+                  ),
+                  Choice(
+                    choiceId: 'b',
+                    label: seed.warmupCorrect,
+                    isCorrect: true,
+                    feedbackCorrect: 'Correct!',
+                    feedbackWrong: 'Incorrect.',
+                  ),
+                ],
+              ),
+              shortText: ShortTextScreen(
+                cards: [
+                  TextCard(
+                    title: 'Core idea',
+                    body: seed.coreIdea,
+                  ),
+                  TextCard(
+                    title: 'Why it matters',
+                    body: seed.whyItMatters,
+                  ),
+                  TextCard(
+                    title: 'Everyday practice',
+                    body: seed.practiceTip,
+                  ),
+                ],
+              ),
+              youtubeVideo: const YoutubeVideoScreen(
+                title: 'Story clip',
+                note: 'Short clip to connect the idea to daily life.',
+                searchKeywords: const [],
+                videoAsset: 'assets/videos/youtubevideo.mp4',
+                clipStartSeconds: 0,
+                clipEndSeconds: 10,
+              ),
+              explanation: ExplanationScreen(
+                sections: [
+                  ExplanationSection(
+                    title: 'Key concept',
+                    body: seed.explanationKey,
+                  ),
+                  ExplanationSection(
+                    title: 'In practice',
+                    body: seed.explanationPractice,
+                  ),
+                ],
+              ),
+              quiz: QuizScreen(
+                questions: [
+                  QuizQuestion(
+                    questionId: '${seed.lessonId}_q1',
+                    format: QuestionFormat.multipleChoice,
+                    prompt: seed.quizPrompt,
+                    choices: [
+                      Choice(
+                        choiceId: 'a',
+                        label: seed.quizCorrect,
+                        isCorrect: true,
+                        feedbackCorrect: 'Correct!',
+                        feedbackWrong: '',
+                      ),
+                      Choice(
+                        choiceId: 'b',
+                        label: seed.quizWrong,
+                        isCorrect: false,
+                        feedbackCorrect: '',
+                        feedbackWrong: 'Not quite. ${seed.quizCorrect}.',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              lessonComplete: LessonCompleteScreen(
+                title: 'Lesson complete',
+                rewardText: 'Lesson complete',
+                nextLessonId: seed.nextLessonId,
+              ),
+            ),
+          ),
+        )
+        .toList();
+  }
 
   // =========================================================================
   // Master Test: Mixed Quiz
