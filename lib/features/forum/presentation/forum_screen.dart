@@ -756,9 +756,13 @@ class ForumProfileScreen extends StatelessWidget {
     final reposted = posts.where((post) => post.isReposted).toList();
     final bookmarked = posts.where((post) => post.isBookmarked).toList();
     final myPosts = posts.where((post) => post.author == 'You').toList();
+    final myReplies = posts
+        .expand((post) => post.replies)
+        .where((reply) => reply.author == 'You')
+        .toList();
 
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -770,6 +774,7 @@ class ForumProfileScreen extends StatelessWidget {
               Tab(text: 'Retweeted'),
               Tab(text: 'Bookmarked'),
               Tab(text: 'My Posts'),
+              Tab(text: 'My Comments'),
             ],
           ),
         ),
@@ -780,6 +785,7 @@ class ForumProfileScreen extends StatelessWidget {
               _ActivityList(posts: reposted, emptyLabel: 'No retweeted posts yet.'),
               _ActivityList(posts: bookmarked, emptyLabel: 'No bookmarked posts yet.'),
               _ActivityList(posts: myPosts, emptyLabel: 'You have not posted yet.'),
+              _ReplyActivityList(replies: myReplies, emptyLabel: 'No comments yet.'),
             ],
           ),
         ),
@@ -818,6 +824,136 @@ class _ActivityList extends StatelessWidget {
         onRepost: () {},
         onBookmark: () {},
         onReply: () {},
+        folderName: 'Forum',
+      ),
+    );
+  }
+}
+
+class _ReplyActivityList extends StatelessWidget {
+  final List<_ForumReply> replies;
+  final String emptyLabel;
+
+  const _ReplyActivityList({
+    required this.replies,
+    required this.emptyLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (replies.isEmpty) {
+      return Center(
+        child: Text(
+          emptyLabel,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      itemCount: replies.length,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+      itemBuilder: (context, index) => _ReplyBubble(reply: replies[index]),
+    );
+  }
+}
+
+class _ForumFolder {
+  final String id;
+  final String name;
+
+  const _ForumFolder({
+    required this.id,
+    required this.name,
+  });
+}
+
+class _FolderStrip extends StatelessWidget {
+  final List<_ForumFolder> folders;
+  final String? activeFolderId;
+  final ValueChanged<String> onSelectFolder;
+  final VoidCallback onShowAll;
+  final VoidCallback onCreateFolder;
+
+  const _FolderStrip({
+    required this.folders,
+    required this.activeFolderId,
+    required this.onSelectFolder,
+    required this.onShowAll,
+    required this.onCreateFolder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _FolderChip(
+                  label: 'All',
+                  isActive: activeFolderId == null,
+                  onTap: onShowAll,
+                ),
+                for (final folder in folders)
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.sm),
+                    child: _FolderChip(
+                      label: folder.name,
+                      isActive: folder.id == activeFolderId,
+                      onTap: () => onSelectFolder(folder.id),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        IconButton(
+          onPressed: onCreateFolder,
+          icon: const Icon(Icons.create_new_folder_rounded),
+          color: AppColors.textSecondary,
+        ),
+      ],
+    );
+  }
+}
+
+class _FolderChip extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _FolderChip({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary : AppColors.backgroundElevated.withOpacityValue(0.7),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(
+            color: isActive ? AppColors.primary : AppColors.glassBorder,
+          ),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: isActive ? Colors.white : AppColors.textSecondary,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+              ),
+        ),
       ),
     );
   }
