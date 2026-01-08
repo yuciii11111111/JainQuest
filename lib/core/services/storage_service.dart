@@ -1,57 +1,103 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/user_models.dart';
 
 class StorageService {
-  static const String _userBoxName = 'user_box';
-  static const String _progressBoxName = 'progress_box';
-  static const String _attemptsBoxName = 'attempts_box';
-  static const String _notificationBoxName = 'notification_box';
-
-  static late Box<UserProfile> _userBox;
-  static late Box<ProgressState> _progressBox;
-  static late Box<AttemptLog> _attemptsBox;
-  static late Box<NotificationPrefs> _notificationBox;
-
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
   static const _uuid = Uuid();
 
+  static late String _userId;
+  static UserProfile _userProfile =
+      UserProfile(id: _uuid.v4(), createdAt: DateTime.now());
+  static ProgressState _progressState = const ProgressState();
+  static NotificationPrefs _notificationPrefs = const NotificationPrefs();
+  static List<AttemptLog> _attemptLogs = [];
+  static ThemeMode _themeMode = ThemeMode.dark;
+
   static Future<void> init() async {
-    // Register adapters
-    Hive.registerAdapter(UserProfileAdapter());
-    Hive.registerAdapter(ProgressStateAdapter());
-    Hive.registerAdapter(LessonProgressAdapter());
-    Hive.registerAdapter(AttemptLogAdapter());
-    Hive.registerAdapter(NotificationPrefsAdapter());
+    final user = _auth.currentUser ?? (await _auth.signInAnonymously()).user;
+    if (user == null) {
+      throw StateError('Unable to initialize anonymous user.');
+    }
+    _userId = user.uid;
 
-    // Open boxes
-    _userBox = await Hive.openBox<UserProfile>(_userBoxName);
-
-    _progressBox = await Hive.openBox<ProgressState>(_progressBoxName);
-    _attemptsBox = await Hive.openBox<AttemptLog>(_attemptsBoxName);
-    _notificationBox = await Hive.openBox<NotificationPrefs>(_notificationBoxName);
-
-    // Initialize default user if needed
-    await _ensureUserExists();
+    await _ensureDocumentsExist();
+    await _loadCachedData();
   }
 
-  static Future<void> _ensureUserExists() async {
-    if (_userBox.isEmpty) {
-      final newUser = UserProfile(
-        id: _uuid.v4(),
-        createdAt: DateTime.now(),
-      );
-      await _userBox.put('current_user', newUser);
+  static DocumentReference<Map<String, dynamic>> _userDoc() {
+    return _firestore.collection('users').doc(_userId);
+  }
+
+  static DocumentReference<Map<String, dynamic>> _progressDoc() {
+    return _userDoc().collection('progress').doc('state');
+  }
+
+  static DocumentReference<Map<String, dynamic>> _notificationDoc() {
+    return _userDoc().collection('notifications').doc('prefs');
+  }
+
+  static DocumentReference<Map<String, dynamic>> _settingsDoc() {
+    return _userDoc().collection('settings').doc('theme');
+  }
+
+  static CollectionReference<Map<String, dynamic>> _attemptsCollection() {
+    return _userDoc().collection('attempts');
+  }
+
+  static Future<void> _ensureDocumentsExist() async {
+    final userSnap = await _userDoc().get();
+    if (!userSnap.exists) {
+      final newUser = UserProfile(id: _userId, createdAt: DateTime.now());
+      await _userDoc().set(newUser.toMap());
     }
 
-    if (_progressBox.isEmpty) {
-      const defaultProgress = ProgressState();
-      await _progressBox.put('current_progress', defaultProgress);
+    final progressSnap = await _progressDoc().get();
+    if (!progressSnap.exists) {
+      await _progressDoc().set(const ProgressState().toMap());
     }
 
-    if (_notificationBox.isEmpty) {
-      const defaultPrefs = NotificationPrefs();
-      await _notificationBox.put('notification_prefs', defaultPrefs);
+    final prefsSnap = await _notificationDoc().get();
+    if (!prefsSnap.exists) {
+      await _notificationDoc().set(const NotificationPrefs().toMap());
     }
+
+    final themeSnap = await _settingsDoc().get();
+    if (!themeSnap.exists) {
+      await _settingsDoc().set({'isDarkMode': true});
+    }
+  }
+
+  static Future<void> _loadCachedData() async {
+    final userSnap = await _userDoc().get();
+    if (userSnap.exists && userSnap.data() != null) {
+      _userProfile =
+          UserProfile.fromMap(userSnap.data()!, fallbackId: _userId);
+    }
+
+    final progressSnap = await _progressDoc().get();
+    if (progressSnap.exists && progressSnap.data() != null) {
+      _progressState = ProgressState.fromMap(progressSnap.data()!);
+    }
+
+    final prefsSnap = await _notificationDoc().get();
+    if (prefsSnap.exists && prefsSnap.data() != null) {
+      _notificationPrefs = NotificationPrefs.fromMap(prefsSnap.data()!);
+    }
+
+    final themeSnap = await _settingsDoc().get();
+    if (themeSnap.exists && themeSnap.data() != null) {
+      final isDark = themeSnap.data()!['isDarkMode'] as bool? ?? true;
+      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    }
+
+    final attemptsSnap = await _attemptsCollection().get();
+    _attemptLogs = attemptsSnap.docs
+        .map((doc) => AttemptLog.fromMap(doc.data(), fallbackId: doc.id))
+        .toList();
   }
 
   // =========================================================================
@@ -59,12 +105,12 @@ class StorageService {
   // =========================================================================
 
   static UserProfile getUserProfile() {
-    return _userBox.get('current_user') ??
-        UserProfile(id: _uuid.v4(), createdAt: DateTime.now());
+    return _userProfile;
   }
 
   static Future<void> saveUserProfile(UserProfile profile) async {
-    await _userBox.put('current_user', profile);
+    _userProfile = profile;
+    await _userDoc().set(profile.toMap(), SetOptions(merge: true));
   }
 
   static Future<UserProfile> addXp(int xp) async {
@@ -168,11 +214,12 @@ class StorageService {
   // =========================================================================
 
   static ProgressState getProgressState() {
-    return _progressBox.get('current_progress') ?? const ProgressState();
+    return _progressState;
   }
 
   static Future<void> saveProgressState(ProgressState progress) async {
-    await _progressBox.put('current_progress', progress);
+    _progressState = progress;
+    await _progressDoc().set(progress.toMap(), SetOptions(merge: true));
   }
 
   static Future<ProgressState> completeLesson(
@@ -244,15 +291,19 @@ class StorageService {
   // =========================================================================
 
   static Future<void> logAttempt(AttemptLog attempt) async {
-    await _attemptsBox.put(attempt.id, attempt);
+    _attemptLogs.removeWhere((log) => log.id == attempt.id);
+    _attemptLogs.add(attempt);
+    await _attemptsCollection()
+        .doc(attempt.id)
+        .set(attempt.toMap(), SetOptions(merge: true));
   }
 
   static List<AttemptLog> getAttemptLogs() {
-    return _attemptsBox.values.toList();
+    return List<AttemptLog>.from(_attemptLogs);
   }
 
   static List<AttemptLog> getAttemptsForQuestion(String questionId) {
-    return _attemptsBox.values
+    return _attemptLogs
         .where((a) => a.questionId == questionId)
         .toList()
       ..sort((a, b) => b.attemptedAt.compareTo(a.attemptedAt));
@@ -260,7 +311,7 @@ class StorageService {
 
   static List<AttemptLog> getQuestionsForReview() {
     final now = DateTime.now();
-    return _attemptsBox.values
+    return _attemptLogs
         .where((a) => a.nextReviewDate != null && a.nextReviewDate!.isBefore(now))
         .toList();
   }
@@ -270,11 +321,28 @@ class StorageService {
   // =========================================================================
 
   static NotificationPrefs getNotificationPrefs() {
-    return _notificationBox.get('notification_prefs') ?? const NotificationPrefs();
+    return _notificationPrefs;
   }
 
   static Future<void> saveNotificationPrefs(NotificationPrefs prefs) async {
-    await _notificationBox.put('notification_prefs', prefs);
+    _notificationPrefs = prefs;
+    await _notificationDoc().set(prefs.toMap(), SetOptions(merge: true));
+  }
+
+  // =========================================================================
+  // Theme
+  // =========================================================================
+
+  static ThemeMode getThemeMode() {
+    return _themeMode;
+  }
+
+  static Future<void> saveThemeMode(ThemeMode mode) async {
+    _themeMode = mode;
+    await _settingsDoc().set(
+      {'isDarkMode': mode == ThemeMode.dark},
+      SetOptions(merge: true),
+    );
   }
 
   // =========================================================================
@@ -282,9 +350,26 @@ class StorageService {
   // =========================================================================
 
   static Future<void> resetAllProgress() async {
-    await _userBox.clear();
-    await _progressBox.clear();
-    await _attemptsBox.clear();
-    await _ensureUserExists();
+    final newUser = UserProfile(id: _userId, createdAt: DateTime.now());
+    const defaultProgress = ProgressState();
+    const defaultPrefs = NotificationPrefs();
+
+    final batch = _firestore.batch();
+    batch.set(_userDoc(), newUser.toMap());
+    batch.set(_progressDoc(), defaultProgress.toMap());
+    batch.set(_notificationDoc(), defaultPrefs.toMap());
+    batch.set(_settingsDoc(), {'isDarkMode': _themeMode == ThemeMode.dark});
+
+    final attemptsSnap = await _attemptsCollection().get();
+    for (final doc in attemptsSnap.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+
+    _userProfile = newUser;
+    _progressState = defaultProgress;
+    _notificationPrefs = defaultPrefs;
+    _attemptLogs = [];
   }
 }

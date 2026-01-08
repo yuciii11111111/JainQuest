@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jainquest/firebase_options.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
@@ -18,11 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize Hive for local storage
-  final appDir = await getApplicationSupportDirectory();
-  final hiveDir = Directory('${appDir.path}${Platform.pathSeparator}hive_data');
-  await hiveDir.create(recursive: true);
-  await Hive.initFlutter(hiveDir.path);
+  // Initialize Firestore-backed storage
   await StorageService.init();
 
   // Initialize notifications

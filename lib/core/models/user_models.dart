@@ -1,54 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
-part 'user_models.g.dart';
+DateTime? _readDateTime(dynamic value) {
+  if (value == null) return null;
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.tryParse(value);
+  return null;
+}
 
 // ============================================================================
 // User Profile
 // ============================================================================
 
-@HiveType(typeId: 0)
 class UserProfile extends Equatable {
-  @HiveField(0)
   final String id;
 
-  @HiveField(1)
   final String? displayName;
 
-  @HiveField(2)
   final int totalXp;
 
-  @HiveField(3)
   final int level;
 
-  @HiveField(4)
   final int currentStreak;
 
-  @HiveField(5)
   final int longestStreak;
 
-  @HiveField(6)
   final int hearts;
 
-  @HiveField(7)
   final DateTime? lastActivityDate;
 
-  @HiveField(8)
   final int streakFreezes;
 
-  @HiveField(9)
   final DateTime createdAt;
 
-  @HiveField(10)
   final int? age;
 
-  @HiveField(11)
   final String? email;
 
-  @HiveField(12)
   final String? password;
 
-  @HiveField(13)
   final String? avatarEmoji;
 
   const UserProfile({
@@ -126,6 +118,44 @@ class UserProfile extends Equatable {
         (age ?? 0) > 0;
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'displayName': displayName,
+      'totalXp': totalXp,
+      'level': level,
+      'currentStreak': currentStreak,
+      'longestStreak': longestStreak,
+      'hearts': hearts,
+      'lastActivityDate': lastActivityDate,
+      'streakFreezes': streakFreezes,
+      'createdAt': createdAt,
+      'age': age,
+      'email': email,
+      'password': password,
+      'avatarEmoji': avatarEmoji,
+    };
+  }
+
+  factory UserProfile.fromMap(Map<String, dynamic> data, {String? fallbackId}) {
+    return UserProfile(
+      id: (data['id'] as String?) ?? fallbackId ?? const Uuid().v4(),
+      displayName: data['displayName'] as String?,
+      totalXp: (data['totalXp'] as num?)?.toInt() ?? 0,
+      level: (data['level'] as num?)?.toInt() ?? 1,
+      currentStreak: (data['currentStreak'] as num?)?.toInt() ?? 0,
+      longestStreak: (data['longestStreak'] as num?)?.toInt() ?? 0,
+      hearts: (data['hearts'] as num?)?.toInt() ?? 5,
+      lastActivityDate: _readDateTime(data['lastActivityDate']),
+      streakFreezes: (data['streakFreezes'] as num?)?.toInt() ?? 1,
+      createdAt: _readDateTime(data['createdAt']) ?? DateTime.now(),
+      age: (data['age'] as num?)?.toInt(),
+      email: data['email'] as String?,
+      password: data['password'] as String?,
+      avatarEmoji: data['avatarEmoji'] as String?,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,
@@ -149,18 +179,13 @@ class UserProfile extends Equatable {
 // Progress State
 // ============================================================================
 
-@HiveType(typeId: 1)
 class ProgressState extends Equatable {
-  @HiveField(0)
   final Map<String, LessonProgress> lessonProgress;
 
-  @HiveField(1)
   final List<String> completedLessons;
 
-  @HiveField(2)
   final List<String> unlockedLessons;
 
-  @HiveField(3)
   final List<String> earnedBadges;
 
   const ProgressState({
@@ -188,6 +213,48 @@ class ProgressState extends Equatable {
   bool isLessonUnlocked(String lessonId) => unlockedLessons.contains(lessonId);
   bool hasBadge(String badgeId) => earnedBadges.contains(badgeId);
 
+  Map<String, dynamic> toMap() {
+    final progressMap = <String, dynamic>{};
+    lessonProgress.forEach((key, value) {
+      progressMap[key] = value.toMap();
+    });
+    return {
+      'lessonProgress': progressMap,
+      'completedLessons': completedLessons,
+      'unlockedLessons': unlockedLessons,
+      'earnedBadges': earnedBadges,
+    };
+  }
+
+  factory ProgressState.fromMap(Map<String, dynamic> data) {
+    final rawProgress =
+        (data['lessonProgress'] as Map<String, dynamic>?) ?? {};
+    final lessonProgress = <String, LessonProgress>{};
+    rawProgress.forEach((key, value) {
+      if (value is Map) {
+        lessonProgress[key] = LessonProgress.fromMap(
+          Map<String, dynamic>.from(value as Map),
+        );
+      }
+    });
+
+    return ProgressState(
+      lessonProgress: lessonProgress,
+      completedLessons: (data['completedLessons'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      unlockedLessons: (data['unlockedLessons'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const ['U01_L01'],
+      earnedBadges: (data['earnedBadges'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+    );
+  }
+
   @override
   List<Object?> get props => [
         lessonProgress,
@@ -201,30 +268,21 @@ class ProgressState extends Equatable {
 // Lesson Progress
 // ============================================================================
 
-@HiveType(typeId: 2)
 class LessonProgress extends Equatable {
-  @HiveField(0)
   final String lessonId;
 
-  @HiveField(1)
   final bool isCompleted;
 
-  @HiveField(2)
   final int timesCompleted;
 
-  @HiveField(3)
   final int bestScore;
 
-  @HiveField(4)
   final int totalXpEarned;
 
-  @HiveField(5)
   final DateTime? firstCompletedAt;
 
-  @HiveField(6)
   final DateTime? lastCompletedAt;
 
-  @HiveField(7)
   final DateTime? lastReplayBonusAt;
 
   const LessonProgress({
@@ -267,6 +325,32 @@ class LessonProgress extends Equatable {
     return hoursSinceLastBonus >= 12;
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'lessonId': lessonId,
+      'isCompleted': isCompleted,
+      'timesCompleted': timesCompleted,
+      'bestScore': bestScore,
+      'totalXpEarned': totalXpEarned,
+      'firstCompletedAt': firstCompletedAt,
+      'lastCompletedAt': lastCompletedAt,
+      'lastReplayBonusAt': lastReplayBonusAt,
+    };
+  }
+
+  factory LessonProgress.fromMap(Map<String, dynamic> data) {
+    return LessonProgress(
+      lessonId: data['lessonId'] as String? ?? '',
+      isCompleted: data['isCompleted'] as bool? ?? false,
+      timesCompleted: (data['timesCompleted'] as num?)?.toInt() ?? 0,
+      bestScore: (data['bestScore'] as num?)?.toInt() ?? 0,
+      totalXpEarned: (data['totalXpEarned'] as num?)?.toInt() ?? 0,
+      firstCompletedAt: _readDateTime(data['firstCompletedAt']),
+      lastCompletedAt: _readDateTime(data['lastCompletedAt']),
+      lastReplayBonusAt: _readDateTime(data['lastReplayBonusAt']),
+    );
+  }
+
   @override
   List<Object?> get props => [
         lessonId,
@@ -284,30 +368,21 @@ class LessonProgress extends Equatable {
 // Attempt Log (for spaced repetition)
 // ============================================================================
 
-@HiveType(typeId: 3)
 class AttemptLog extends Equatable {
-  @HiveField(0)
   final String id;
 
-  @HiveField(1)
   final String questionId;
 
-  @HiveField(2)
   final String lessonId;
 
-  @HiveField(3)
   final bool isCorrect;
 
-  @HiveField(4)
   final int responseTimeMs;
 
-  @HiveField(5)
   final DateTime attemptedAt;
 
-  @HiveField(6)
   final int spacedRepetitionInterval;
 
-  @HiveField(7)
   final DateTime? nextReviewDate;
 
   const AttemptLog({
@@ -351,6 +426,33 @@ class AttemptLog extends Equatable {
     return SpacedRepetitionGrade.good;
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'questionId': questionId,
+      'lessonId': lessonId,
+      'isCorrect': isCorrect,
+      'responseTimeMs': responseTimeMs,
+      'attemptedAt': attemptedAt,
+      'spacedRepetitionInterval': spacedRepetitionInterval,
+      'nextReviewDate': nextReviewDate,
+    };
+  }
+
+  factory AttemptLog.fromMap(Map<String, dynamic> data, {String? fallbackId}) {
+    return AttemptLog(
+      id: data['id'] as String? ?? fallbackId ?? const Uuid().v4(),
+      questionId: data['questionId'] as String? ?? '',
+      lessonId: data['lessonId'] as String? ?? '',
+      isCorrect: data['isCorrect'] as bool? ?? false,
+      responseTimeMs: (data['responseTimeMs'] as num?)?.toInt() ?? 0,
+      attemptedAt: _readDateTime(data['attemptedAt']) ?? DateTime.now(),
+      spacedRepetitionInterval:
+          (data['spacedRepetitionInterval'] as num?)?.toInt() ?? 1,
+      nextReviewDate: _readDateTime(data['nextReviewDate']),
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,
@@ -374,33 +476,23 @@ enum SpacedRepetitionGrade {
 // Notification Preferences
 // ============================================================================
 
-@HiveType(typeId: 4)
 class NotificationPrefs extends Equatable {
-  @HiveField(0)
   final bool enableNotifications;
 
-  @HiveField(1)
   final String quietHoursStart;
 
-  @HiveField(2)
   final String quietHoursEnd;
 
-  @HiveField(3)
   final List<int> reminderDays; // 1-7 for Mon-Sun
 
-  @HiveField(4)
   final String reminderTime;
 
-  @HiveField(5)
   final bool learningReminders;
 
-  @HiveField(6)
   final bool ahimsaPrompts;
 
-  @HiveField(7)
   final bool reflectionPrompts;
 
-  @HiveField(8)
   final bool streakRiskAlerts;
 
   const NotificationPrefs({
@@ -436,6 +528,37 @@ class NotificationPrefs extends Equatable {
       ahimsaPrompts: ahimsaPrompts ?? this.ahimsaPrompts,
       reflectionPrompts: reflectionPrompts ?? this.reflectionPrompts,
       streakRiskAlerts: streakRiskAlerts ?? this.streakRiskAlerts,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'enableNotifications': enableNotifications,
+      'quietHoursStart': quietHoursStart,
+      'quietHoursEnd': quietHoursEnd,
+      'reminderDays': reminderDays,
+      'reminderTime': reminderTime,
+      'learningReminders': learningReminders,
+      'ahimsaPrompts': ahimsaPrompts,
+      'reflectionPrompts': reflectionPrompts,
+      'streakRiskAlerts': streakRiskAlerts,
+    };
+  }
+
+  factory NotificationPrefs.fromMap(Map<String, dynamic> data) {
+    return NotificationPrefs(
+      enableNotifications: data['enableNotifications'] as bool? ?? true,
+      quietHoursStart: data['quietHoursStart'] as String? ?? '22:00',
+      quietHoursEnd: data['quietHoursEnd'] as String? ?? '07:00',
+      reminderDays: (data['reminderDays'] as List?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const [1, 2, 3, 4, 5, 6, 7],
+      reminderTime: data['reminderTime'] as String? ?? '19:30',
+      learningReminders: data['learningReminders'] as bool? ?? true,
+      ahimsaPrompts: data['ahimsaPrompts'] as bool? ?? true,
+      reflectionPrompts: data['reflectionPrompts'] as bool? ?? true,
+      streakRiskAlerts: data['streakRiskAlerts'] as bool? ?? true,
     );
   }
 
