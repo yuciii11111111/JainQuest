@@ -9,26 +9,26 @@ class AppColors {
   AppColors._();
 
   // Backgrounds
-  static const Color backgroundBase = Color(0xFF0D0B1E);
-  static const Color backgroundCard = Color(0xFF1A1730);
-  static const Color backgroundElevated = Color(0xFF252142);
+  static const Color backgroundBase = Color(0xFF0E0B22);
+  static const Color backgroundCard = Color(0xFF1D1938);
+  static const Color backgroundElevated = Color(0xFF2A2351);
 
   // Text
   static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF9CA3AF);
-  static const Color textMuted = Color(0xFF6B7280);
+  static const Color textSecondary = Color(0xFFC7BEEA);
+  static const Color textMuted = Color(0xFF8C82B6);
 
   // Gradients
   static const List<Color> primaryGradient = [
-    Color(0xFF8B5CF6), // Purple
-    Color(0xFF6366F1), // Indigo
-    Color(0xFF4F46E5), // Deep Indigo
+    Color(0xFF6F5BFA), // Electric Lavender
+    Color(0xFF5B74FF), // Periwinkle
+    Color(0xFF4354D6), // Deep Indigo
   ];
 
   static const List<Color> accentGradient = [
-    Color(0xFFF472B6), // Pink
-    Color(0xFFEC4899), // Rose
-    Color(0xFFDB2777), // Deep Rose
+    Color(0xFFC084FC), // Soft Violet
+    Color(0xFFD977FF), // Orchid
+    Color(0xFFF472D0), // Neon Pink
   ];
 
   static const List<Color> successGradient = [
@@ -44,9 +44,9 @@ class AppColors {
   ];
 
   // Solid Accents
-  static const Color primary = Color(0xFF8B5CF6);
-  static const Color secondary = Color(0xFFF472B6);
-  static const Color highlight = Color(0xFF06B6D4);
+  static const Color primary = Color(0xFF6F5BFA);
+  static const Color secondary = Color(0xFFC084FC);
+  static const Color highlight = Color(0xFF7DD3FC);
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color danger = Color(0xFFEF4444);
@@ -54,12 +54,12 @@ class AppColors {
 
   // Glassmorphism
   static const Color glassOverlay = Color(0x1AFFFFFF);
-  static const Color glassBorder = Color(0x33FFFFFF);
-  static const double glassBlur = 20.0;
+  static const Color glassBorder = Color(0x4DFFFFFF);
+  static const double glassBlur = 24.0;
 
   // Light Mode (Optional)
-  static const Color lightBackground = Color(0xFFF8FAFC);
-  static const Color lightCard = Color(0xFFFFFFFF);
+  static const Color lightBackground = Color(0xFFF3F0FF);
+  static const Color lightCard = Color(0xFFFBFAFF);
 }
 
 // ============================================================================
@@ -100,27 +100,27 @@ class AppShadows {
 
   static List<BoxShadow> get glassCard => [
         BoxShadow(
-          color: Colors.black.withOpacityValue(0.3),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
+          color: const Color(0xFF0B0918).withOpacityValue(0.55),
+          blurRadius: 24,
+          offset: const Offset(0, 10),
         ),
         BoxShadow(
-          color: Colors.black.withOpacityValue(0.1),
-          blurRadius: 6,
-          offset: const Offset(0, 2),
+          color: const Color(0xFF2F2B6D).withOpacityValue(0.45),
+          blurRadius: 16,
+          offset: const Offset(0, 6),
         ),
       ];
 
   static List<BoxShadow> get glowing => [
         BoxShadow(
-          color: AppColors.primary.withOpacityValue(0.5),
-          blurRadius: 20,
-          spreadRadius: 2,
+          color: AppColors.primary.withOpacityValue(0.6),
+          blurRadius: 28,
+          spreadRadius: 1,
         ),
         BoxShadow(
-          color: AppColors.primary.withOpacityValue(0.3),
-          blurRadius: 40,
-          spreadRadius: 4,
+          color: AppColors.secondary.withOpacityValue(0.35),
+          blurRadius: 46,
+          spreadRadius: 3,
         ),
       ];
 

@@ -11,6 +11,7 @@ import '../../../core/gamification/gamification_constants.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/models/user_models.dart';
 import '../../../core/models/lesson_models.dart';
+import '../../../core/guide/guide_keys.dart';
 import '../../path/presentation/unit_path_screen.dart';
 import '../../profile/presentation/profile_screen.dart' show ProfileScreen;
 import '../../guru/presentation/guru_screen.dart';
@@ -27,6 +28,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
+  final GlobalKey _continueLearningKey = GuideKeys.continueLearningButton;
+  final GlobalKey _currentLessonKey = GuideKeys.currentLessonCard;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +50,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             unit: unit,
             themeMode: themeMode,
             onToggleTheme: toggleTheme,
+            continueLearningKey: _continueLearningKey,
+            currentLessonKey: _currentLessonKey,
           ),
           const ForumScreen(),
           const ResourcesScreen(),
@@ -193,6 +198,8 @@ class _HomeTab extends StatelessWidget {
   final Unit unit;
   final ThemeMode themeMode;
   final VoidCallback onToggleTheme;
+  final GlobalKey continueLearningKey;
+  final GlobalKey currentLessonKey;
 
   const _HomeTab({
     required this.user,
@@ -200,6 +207,8 @@ class _HomeTab extends StatelessWidget {
     required this.unit,
     required this.themeMode,
     required this.onToggleTheme,
+    required this.continueLearningKey,
+    required this.currentLessonKey,
   });
 
   @override
@@ -404,6 +413,7 @@ class _HomeTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             GradientButton(
+              key: continueLearningKey,
               label: 'Continue Learning',
               icon: Icons.play_arrow_rounded,
               onPressed: () {
@@ -415,6 +425,7 @@ class _HomeTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             FloatingCard(
+              key: currentLessonKey,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const UnitPathScreen()),

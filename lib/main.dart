@@ -8,6 +8,9 @@ import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/widgets/animated_gradient_background.dart';
+import 'core/widgets/guided_tour_overlay.dart';
+import 'core/widgets/video_background.dart';
 import 'features/splash/presentation/splash_screen.dart';
 
 void main() async {
@@ -68,35 +71,24 @@ class JainQuestApp extends ConsumerWidget {
       themeMode: themeMode,
       builder: (context, child) {
         final isDark = themeMode == ThemeMode.dark;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 600),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? const [
-                      Color(0xFF0B1226),
-                      Color(0xFF1B1A3A),
-                      Color(0xFF0B7285),
-                    ]
-                  : const [
-                      Color(0xFFE3F2FD),
-                      Color(0xFFE0E7FF),
-                      Color(0xFFE0F7FA),
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        return VideoBackground(
+          child: AnimatedGradientBackground(
+            child: ShaderMask(
+              shaderCallback: (rect) => LinearGradient(
+                colors: isDark
+                    ? const [Colors.white70, Colors.white24]
+                    : const [Colors.white, Colors.white54],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(rect),
+              blendMode: BlendMode.softLight,
+              child: Stack(
+                children: [
+                  child ?? const SizedBox.shrink(),
+                  const GuidedTourOverlay(),
+                ],
+              ),
             ),
-          ),
-          child: ShaderMask(
-            shaderCallback: (rect) => LinearGradient(
-              colors: isDark
-                  ? const [Colors.white70, Colors.white24]
-                  : const [Colors.white, Colors.white54],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(rect),
-            blendMode: BlendMode.softLight,
-            child: child ?? const SizedBox.shrink(),
           ),
         );
       },

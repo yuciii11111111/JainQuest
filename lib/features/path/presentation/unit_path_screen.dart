@@ -7,6 +7,7 @@ import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/models/lesson_models.dart';
+import '../../../core/guide/guide_keys.dart';
 import '../../lesson_runner/presentation/lesson_runner_screen.dart';
 
 class UnitPathScreen extends ConsumerWidget {
@@ -112,6 +113,7 @@ class UnitPathScreen extends ConsumerWidget {
                 children: [
                   for (var i = 0; i < unit.lessons.length; i++) ...[
                     _PathStep(
+                      key: i == 0 ? GuideKeys.firstPathStep : null,
                       lesson: unit.lessons[i],
                       index: i,
                       isCompleted: progress.isLessonCompleted(unit.lessons[i].lessonId),
@@ -155,6 +157,7 @@ class _PathStep extends StatefulWidget {
   final VoidCallback? onTap;
 
   const _PathStep({
+    super.key,
     required this.lesson,
     required this.index,
     required this.isCompleted,

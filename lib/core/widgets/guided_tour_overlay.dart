@@ -1,0 +1,319 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../guide/guide_keys.dart';
+import '../providers/app_providers.dart';
+import '../theme/app_theme.dart';
+import '../../features/path/presentation/unit_path_screen.dart';
+import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
+import 'floating_guide_overlay.dart';
+
+class GuidedTourOverlay extends StatefulWidget {
+  const GuidedTourOverlay({super.key});
+
+  @override
+  State<GuidedTourOverlay> createState() => _GuidedTourOverlayState();
+}
+
+class _GuidedTourOverlayState extends State<GuidedTourOverlay>
+    with SingleTickerProviderStateMixin {
+  static const _guideAsset = 'assets/images/duo_guide.png';
+
+  late final AnimationController _pulseController;
+  int _currentIndex = 0;
+  bool _tourActive = true;
+  Rect? _targetRect;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  List<_TourStep> _stepsFor(BuildContext context) {
+    final container = ProviderScope.containerOf(context, listen: false);
+
+    return [
+      _TourStep(
+        key: GuideKeys.continueLearningButton,
+        title: 'Start your first course',
+        message: 'Tap Continue Learning to open your path.',
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const UnitPathScreen()),
+          );
+        },
+      ),
+      _TourStep(
+        key: GuideKeys.firstPathStep,
+        title: 'Your first lesson',
+        message: 'Tap the first lesson to begin.',
+        onTap: () {
+          final unit = container.read(unit1Provider);
+          if (unit.lessons.isEmpty) {
+            return;
+          }
+          container.read(lessonRunnerProvider.notifier).startLesson(unit.lessons.first);
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const LessonRunnerScreen()),
+          );
+        },
+      ),
+      _TourStep(
+        key: GuideKeys.currentLessonCard,
+        title: 'Pick up where you left off',
+        message: 'Tap the Current Lesson card anytime.',
+        onTap: () {},
+      ),
+    ];
+  }
+
+  void _scheduleTargetUpdate() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final rect = _calculateTargetRect();
+      if (rect != _targetRect) {
+        setState(() => _targetRect = rect);
+      }
+    });
+  }
+
+  Rect? _calculateTargetRect() {
+    final steps = _stepsFor(context);
+    if (_currentIndex >= steps.length) {
+      return null;
+    }
+    final targetContext = steps[_currentIndex].key.currentContext;
+    if (targetContext == null) {
+      return null;
+    }
+    final renderBox = targetContext.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) {
+      return null;
+    }
+    final topLeft = renderBox.localToGlobal(Offset.zero);
+    return topLeft & renderBox.size;
+  }
+
+  Future<void> _handleStepTap(_TourStep step) async {
+    step.onTap();
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _currentIndex = (_currentIndex + 1) % _stepsFor(context).length;
+      _targetRect = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_tourActive) {
+      return const FloatingGuideOverlay();
+    }
+
+    _scheduleTargetUpdate();
+    final steps = _stepsFor(context);
+    final step = steps[_currentIndex];
+    final targetRect = _targetRect;
+
+    if (targetRect == null) {
+      return const SizedBox.shrink();
+    }
+
+    final overlayRect = targetRect.inflate(14);
+    final screenSize = MediaQuery.of(context).size;
+    final tooltipWidth = min(260.0, screenSize.width - 32);
+    final tooltipHeight = 96.0;
+    final placeBelow = overlayRect.center.dy < screenSize.height * 0.55;
+    final tooltipLeft = (overlayRect.center.dx - tooltipWidth / 2)
+        .clamp(16.0, screenSize.width - tooltipWidth - 16.0);
+    final tooltipTop = placeBelow
+        ? overlayRect.bottom + 16
+        : overlayRect.top - tooltipHeight - 16;
+    final guideOffset = placeBelow
+        ? Offset(tooltipLeft - 40, tooltipTop - 28)
+        : Offset(tooltipLeft - 36, tooltipTop + tooltipHeight - 24);
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: CustomPaint(
+            painter: _SpotlightPainter(
+              target: overlayRect,
+              radius: 20,
+              color: Colors.black.withOpacityValue(0.7),
+            ),
+          ),
+        ),
+        Positioned(
+          left: overlayRect.left,
+          top: overlayRect.top,
+          width: overlayRect.width,
+          height: overlayRect.height,
+          child: AnimatedBuilder(
+            animation: _pulseController,
+            builder: (context, child) {
+              final pulse = 1 + (_pulseController.value * 0.12);
+              return Transform.scale(
+                scale: pulse,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: AppColors.highlight.withOpacityValue(0.9),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.highlight.withOpacityValue(0.5),
+                        blurRadius: 24,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Positioned(
+          left: overlayRect.left,
+          top: overlayRect.top,
+          width: overlayRect.width,
+          height: overlayRect.height,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _handleStepTap(step),
+              borderRadius: BorderRadius.circular(22),
+            ),
+          ),
+        ),
+        Positioned(
+          left: tooltipLeft,
+          top: tooltipTop,
+          width: tooltipWidth,
+          height: tooltipHeight,
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundCard.withOpacityValue(0.85),
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              border: Border.all(color: AppColors.glassBorder),
+              boxShadow: AppShadows.glassCard,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(color: AppColors.textPrimary),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  step.message,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          left: guideOffset.dx,
+          top: guideOffset.dy,
+          child: AnimatedBuilder(
+            animation: _pulseController,
+            builder: (context, child) {
+              final bob = sin(_pulseController.value * pi) * 6;
+              return Transform.translate(offset: Offset(0, bob), child: child);
+            },
+            child: Image.asset(
+              _guideAsset,
+              width: 80,
+              height: 80,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 16,
+          top: 40,
+          child: TextButton(
+            onPressed: () => setState(() => _tourActive = false),
+            child: Text(
+              'Skip',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TourStep {
+  final GlobalKey key;
+  final String title;
+  final String message;
+  final VoidCallback onTap;
+
+  const _TourStep({
+    required this.key,
+    required this.title,
+    required this.message,
+    required this.onTap,
+  });
+}
+
+class _SpotlightPainter extends CustomPainter {
+  final Rect target;
+  final double radius;
+  final Color color;
+
+  const _SpotlightPainter({
+    required this.target,
+    required this.radius,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final background = Path()..addRect(Offset.zero & size);
+    final hole = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(target, Radius.circular(radius)),
+      );
+    final overlay = Path.combine(
+      PathOperation.difference,
+      background,
+      hole,
+    );
+    canvas.drawPath(overlay, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SpotlightPainter oldDelegate) {
+    return oldDelegate.target != target || oldDelegate.color != color;
+  }
+}
