@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 
 // ============================================================================
@@ -23,8 +22,9 @@ class StatsPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pillColor = color ?? AppColors.textPrimary;
-    final bgColor = backgroundColor ?? AppColors.backgroundCard;
+    final scheme = Theme.of(context).colorScheme;
+    final pillColor = color ?? scheme.onSurface;
+    final bgColor = backgroundColor ?? scheme.surface;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -34,8 +34,7 @@ class StatsPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(color: AppColors.glassBorder),
-        boxShadow: AppShadows.glassCard,
+        border: Border.all(color: scheme.outline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -71,7 +70,6 @@ class XpPill extends StatelessWidget {
       icon: Icons.star_rounded,
       value: '$xp XP',
       color: AppColors.achievementGold,
-      backgroundColor: AppColors.backgroundCard,
     );
   }
 }
@@ -91,7 +89,6 @@ class HeartsPill extends StatelessWidget {
       icon: Icons.favorite_rounded,
       value: '$hearts',
       color: AppColors.danger,
-      backgroundColor: AppColors.backgroundCard,
     );
   }
 }
@@ -111,7 +108,6 @@ class StreakPill extends StatelessWidget {
       icon: Icons.local_fire_department_rounded,
       value: '$streak',
       color: AppColors.warning,
-      backgroundColor: AppColors.backgroundCard,
     );
   }
 }
@@ -131,13 +127,12 @@ class LevelPill extends StatelessWidget {
       icon: Icons.shield_rounded,
       value: 'Lvl $level',
       color: AppColors.primary,
-      backgroundColor: AppColors.backgroundCard,
     );
   }
 }
 
 // ============================================================================
-// Animated Progress Bar
+// Progress Bar
 // ============================================================================
 
 class AnimatedProgressBar extends StatelessWidget {
@@ -145,7 +140,6 @@ class AnimatedProgressBar extends StatelessWidget {
   final double height;
   final Color? backgroundColor;
   final Color? progressColor;
-  final Duration duration;
 
   const AnimatedProgressBar({
     super.key,
@@ -153,7 +147,6 @@ class AnimatedProgressBar extends StatelessWidget {
     this.height = 8,
     this.backgroundColor,
     this.progressColor,
-    this.duration = const Duration(milliseconds: 450),
   });
 
   @override
@@ -161,23 +154,18 @@ class AnimatedProgressBar extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.backgroundElevated,
+        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Stack(
             children: [
-              AnimatedContainer(
-                duration: duration,
-                curve: Curves.easeOutCubic,
+              Container(
                 width: constraints.maxWidth * progress.clamp(0.0, 1.0),
                 height: height,
                 decoration: BoxDecoration(
-                  gradient: progressColor != null
-                      ? null
-                      : AppGradients.primary,
-                  color: progressColor,
+                  color: progressColor ?? AppColors.primary,
                   borderRadius: BorderRadius.circular(height / 2),
                 ),
               ),
@@ -337,23 +325,23 @@ class ChoiceButton extends StatelessWidget {
 
     switch (state) {
       case ChoiceState.normal:
-        backgroundColor = AppColors.backgroundCard;
-        borderColor = AppColors.glassBorder;
-        textColor = AppColors.textPrimary;
+        backgroundColor = Theme.of(context).colorScheme.surface;
+        borderColor = Theme.of(context).colorScheme.outline;
+        textColor = Theme.of(context).colorScheme.onSurface;
         break;
       case ChoiceState.selected:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = Theme.of(context).colorScheme.surface;
         borderColor = AppColors.primary;
-        textColor = AppColors.textPrimary;
+        textColor = Theme.of(context).colorScheme.onSurface;
         break;
       case ChoiceState.correct:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = Theme.of(context).colorScheme.surface;
         borderColor = AppColors.success;
         textColor = AppColors.success;
         trailingIcon = Icons.check_circle_rounded;
         break;
       case ChoiceState.incorrect:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = Theme.of(context).colorScheme.surface;
         borderColor = AppColors.danger;
         textColor = AppColors.danger;
         trailingIcon = Icons.cancel_rounded;
@@ -367,9 +355,7 @@ class ChoiceButton extends StatelessWidget {
               onTap?.call();
             }
           : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
+      child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: backgroundColor,
@@ -418,13 +404,12 @@ class FeedbackBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
           color: isCorrect ? AppColors.success : AppColors.danger,
           width: 2,
         ),
-        boxShadow: AppShadows.glassCard,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,10 +485,9 @@ class ContentCard extends StatelessWidget {
     return Container(
       padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.glassBorder),
-        boxShadow: AppShadows.glassCard,
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,6 +540,7 @@ class MascotWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     // In production, replace with Lottie animation
     IconData icon;
     Color color;
@@ -571,7 +556,7 @@ class MascotWidget extends StatelessWidget {
         break;
       case MascotState.wrong:
         icon = Icons.sentiment_dissatisfied_rounded;
-        color = AppColors.textSecondary;
+        color = scheme.onSurfaceVariant;
         break;
       case MascotState.streak:
         icon = Icons.local_fire_department_rounded;
@@ -583,56 +568,23 @@ class MascotWidget extends StatelessWidget {
         break;
     }
 
-    final isCelebrating = state == MascotState.correct || state == MascotState.complete;
-    
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: isCelebrating
-            ? LinearGradient(
-                colors: [
-                  color.withOpacityValue(0.3),
-                  color.withOpacityValue(0.1),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: isCelebrating ? null : color.withOpacityValue(0.1),
+        color: color.withOpacityValue(0.12),
         shape: BoxShape.circle,
         border: Border.all(
           color: color.withOpacityValue(0.3),
           width: 2,
         ),
-        boxShadow: isCelebrating
-            ? [
-                BoxShadow(
-                  color: color.withOpacityValue(0.5),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ]
-            : null,
       ),
       child: Icon(
         icon,
         size: size * 0.6,
         color: color,
       ),
-    )
-        .animate(target: isCelebrating ? 1 : 0)
-        .scale(
-          duration: 300.ms,
-          begin: const Offset(1.0, 1.0),
-          end: const Offset(1.2, 1.2),
-        )
-        .then()
-        .scale(
-          duration: 300.ms,
-          begin: const Offset(1.2, 1.2),
-          end: const Offset(1.0, 1.0),
-        );
+    );
   }
 }
 
@@ -654,6 +606,7 @@ class BadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Opacity(
       opacity: isEarned ? 1.0 : 0.3,
       child: Column(
@@ -663,19 +616,19 @@ class BadgeWidget extends StatelessWidget {
             width: size,
             height: size,
             decoration: BoxDecoration(
-              gradient: isEarned ? AppGradients.accent : null,
-              color: isEarned ? null : AppColors.backgroundElevated,
+              color: isEarned
+                  ? AppColors.secondary.withOpacityValue(0.12)
+                  : Theme.of(context).colorScheme.surfaceVariant,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isEarned ? AppColors.secondary : AppColors.glassBorder,
+                color: isEarned ? AppColors.secondary : Theme.of(context).colorScheme.outline,
                 width: 3,
               ),
-              boxShadow: isEarned ? AppShadows.glowing : null,
             ),
             child: Icon(
               Icons.workspace_premium_rounded,
               size: size * 0.5,
-              color: isEarned ? AppColors.secondary : AppColors.textSecondary,
+              color: isEarned ? AppColors.secondary : scheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -689,7 +642,7 @@ class BadgeWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isEarned ? AppColors.textPrimary : AppColors.textSecondary,
+                color: isEarned ? scheme.onSurface : scheme.onSurfaceVariant,
               ),
             ),
           ),

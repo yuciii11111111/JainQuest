@@ -30,10 +30,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
 
   void _nextCard() {
     if (_currentPage < widget.screen.cards.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOutCubic,
-      );
+      _pageController.jumpToPage(_currentPage + 1);
     } else {
       widget.onContinue();
     }
@@ -41,6 +38,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final cards = widget.screen.cards;
 
     return Column(
@@ -63,7 +61,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
                   decoration: BoxDecoration(
                     color: index <= _currentPage
                         ? AppColors.primary
-                        : AppColors.glassBorder,
+                        : scheme.outline,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -77,10 +75,10 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.schedule_rounded,
                 size: 16,
-                color: AppColors.textSecondary,
+                color: scheme.onSurfaceVariant,
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
@@ -126,10 +124,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
                       label: 'Back',
                       icon: Icons.arrow_back_rounded,
                       onPressed: () {
-                        _pageController.previousPage(
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeOutCubic,
-                        );
+                        _pageController.jumpToPage(_currentPage - 1);
                       },
                     ),
                   ),
@@ -162,16 +157,9 @@ class _TextCardWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.glassBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacityValue(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
@@ -211,16 +210,14 @@ class _StatTile extends StatelessWidget {
           ),
         ],
       ),
-    )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1));
+    );
   }
 }
 
 class _WeeklyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final data = [2, 4, 3, 5, 4, 6, 5]; // Mock data
 
     return BarChart(
@@ -238,8 +235,8 @@ class _WeeklyChart extends StatelessWidget {
                 if (value.toInt() >= 0 && value.toInt() < days.length) {
                   return Text(
                     days[value.toInt()],
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: scheme.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   );
@@ -266,11 +263,7 @@ class _WeeklyChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.toDouble(),
-                gradient: const LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: AppColors.primaryGradient,
-                ),
+                color: AppColors.primary,
                 width: 20,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(4),
@@ -280,16 +273,14 @@ class _WeeklyChart extends StatelessWidget {
           );
         }).toList(),
       ),
-    )
-        .animate()
-        .fadeIn(delay: 200.ms, duration: 500.ms)
-        .slideY(begin: 0.1, end: 0, duration: 500.ms);
+    );
   }
 }
 
 class _XpChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final data = [0, 50, 120, 200, 300, 450, 600, 800]; // Mock data
 
     return LineChart(
@@ -299,8 +290,8 @@ class _XpChart extends StatelessWidget {
           drawVerticalLine: false,
           horizontalInterval: 200,
           getDrawingHorizontalLine: (value) {
-            return const FlLine(
-              color: AppColors.backgroundElevated,
+            return FlLine(
+              color: scheme.outline,
               strokeWidth: 1,
             );
           },
@@ -316,8 +307,8 @@ class _XpChart extends StatelessWidget {
               getTitlesWidget: (value, meta) {
                 return Text(
                   '${value.toInt()}',
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: scheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 );
@@ -338,30 +329,17 @@ class _XpChart extends StatelessWidget {
               return FlSpot(entry.key.toDouble(), entry.value.toDouble());
             }).toList(),
             isCurved: true,
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-            ),
+            color: AppColors.primary,
             barWidth: 3,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
               show: true,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primary.withOpacityValue(0.3),
-                  AppColors.primary.withOpacityValue(0.0),
-                ],
-              ),
+              color: AppColors.primary.withOpacityValue(0.15),
             ),
           ),
         ],
       ),
-    )
-        .animate()
-        .fadeIn(delay: 300.ms, duration: 500.ms)
-        .slideY(begin: 0.1, end: 0, duration: 500.ms);
+    );
   }
 }
-

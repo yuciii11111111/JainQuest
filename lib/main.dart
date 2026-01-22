@@ -70,24 +70,13 @@ class JainQuestApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       builder: (context, child) {
-        final isDark = themeMode == ThemeMode.dark;
         return VideoBackground(
           child: AnimatedGradientBackground(
-            child: ShaderMask(
-              shaderCallback: (rect) => LinearGradient(
-                colors: isDark
-                    ? const [Colors.white70, Colors.white24]
-                    : const [Colors.white, Colors.white54],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(rect),
-              blendMode: BlendMode.softLight,
-              child: Stack(
-                children: [
-                  child ?? const SizedBox.shrink(),
-                  const GuidedTourOverlay(),
-                ],
-              ),
+            child: Stack(
+              children: [
+                child ?? const SizedBox.shrink(),
+                const GuidedTourOverlay(),
+              ],
             ),
           ),
         );

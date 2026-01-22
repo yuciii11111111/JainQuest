@@ -70,6 +70,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -100,7 +101,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         Text(
                           'Read a knowledgeable book teaching the fundamentals of Jainism in great depth',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _darkMode ? Colors.white70 : AppColors.textSecondary,
+                                color: _darkMode ? Colors.white70 : scheme.onSurfaceVariant,
                               ),
                         ),
                       ],
@@ -159,44 +160,24 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       },
                       itemCount: _pages.length,
                       itemBuilder: (context, index) {
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (child, anim) {
-                            final rotate = Tween(begin: 0.05, end: 0.0).animate(anim);
-                            return AnimatedBuilder(
-                              animation: rotate,
-                              child: child,
-                              builder: (context, widget) {
-                                return Transform(
-                                  transform: Matrix4.rotationY(rotate.value),
-                                  alignment: Alignment.center,
-                                  child: widget,
-                                );
-                              },
-                            );
-                          },
-                          child: Padding(
-                            key: ValueKey(index),
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: _darkMode ? const Color(0xFF0F0F16) : AppColors.backgroundCard,
-                                borderRadius: BorderRadius.circular(AppRadius.card),
-                                border: Border.all(color: AppColors.glassBorder),
-                                boxShadow: AppShadows.glassCard,
-                              ),
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: SingleChildScrollView(
-                                child: TypewriterText(
-                                  text: _pages[index],
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        height: 1.7,
-                                        fontSize: _fontSize,
-                                        color: _darkMode ? Colors.white70 : null,
-                                      ),
-                                  speed: const Duration(milliseconds: 12),
-                                  punctuationDelay: const Duration(milliseconds: 180),
-                                ),
+                        return Padding(
+                          key: ValueKey(index),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _darkMode ? const Color(0xFF0F0F16) : scheme.surface,
+                              borderRadius: BorderRadius.circular(AppRadius.card),
+                              border: Border.all(color: scheme.outline),
+                            ),
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            child: SingleChildScrollView(
+                              child: TypewriterText(
+                                text: _pages[index],
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      height: 1.7,
+                                      fontSize: _fontSize,
+                                      color: _darkMode ? Colors.white70 : null,
+                                    ),
                               ),
                             ),
                           ),
@@ -216,10 +197,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         icon: Icons.chevron_left_rounded,
                         onPressed: _currentPage > 0
                             ? () {
-                                _pageController.previousPage(
-                                  duration: const Duration(milliseconds: 350),
-                                  curve: Curves.easeOutCubic,
-                                );
+                                _pageController.jumpToPage(_currentPage - 1);
                               }
                             : null,
                       ),
@@ -231,10 +209,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         icon: Icons.chevron_right_rounded,
                         onPressed: _currentPage < _pages.length - 1
                             ? () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 350),
-                                  curve: Curves.easeOutCubic,
-                                );
+                                _pageController.jumpToPage(_currentPage + 1);
                               }
                             : () => Navigator.of(context).pop(),
                       ),

@@ -108,15 +108,12 @@ class _GuruScreenState extends State<GuruScreen> {
     if (!_scrollController.hasClients) {
       return;
     }
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-    );
+    _scrollController.jumpTo(0);
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final showSuggestions = _messages.length <= 1;
 
     return Scaffold(
@@ -154,7 +151,7 @@ class _GuruScreenState extends State<GuruScreen> {
                     ),
                   IconButton(
                     icon: const Icon(Icons.refresh_rounded),
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                     onPressed: () {
                       setState(() {
                         _messages
@@ -275,12 +272,13 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isUser = message.isUser;
     final bubbleColor = isUser
         ? AppColors.primary.withOpacityValue(0.2)
-        : AppColors.backgroundCard.withOpacityValue(0.7);
+        : scheme.surfaceVariant.withOpacityValue(0.7);
     final borderColor =
-        message.isError ? AppColors.danger : AppColors.glassBorder;
+        message.isError ? AppColors.danger : scheme.outline;
     final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final margin = isUser
         ? const EdgeInsets.only(left: AppSpacing.xl, bottom: AppSpacing.sm)
@@ -302,7 +300,7 @@ class _ChatBubble extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: message.isError
                       ? AppColors.danger
-                      : AppColors.textPrimary,
+                      : scheme.onSurface,
                 ),
           ),
         ),

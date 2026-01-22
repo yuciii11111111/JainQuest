@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
@@ -75,9 +74,8 @@ class UnitPathScreen extends ConsumerWidget {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        gradient: AppGradients.primary,
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(AppRadius.small),
-                        boxShadow: AppShadows.glowing,
                       ),
                       child: const Icon(Icons.spa_rounded, color: Colors.white, size: 30),
                     ),
@@ -132,7 +130,7 @@ class UnitPathScreen extends ConsumerWidget {
                       Container(
                         width: 2,
                         height: 32,
-                        color: AppColors.backgroundElevated,
+                        color: Theme.of(context).colorScheme.surfaceVariant,
                         margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                       ),
                   ],
@@ -149,7 +147,7 @@ class UnitPathScreen extends ConsumerWidget {
   }
 }
 
-class _PathStep extends StatefulWidget {
+class _PathStep extends StatelessWidget {
   final Lesson lesson;
   final int index;
   final bool isCompleted;
@@ -166,101 +164,45 @@ class _PathStep extends StatefulWidget {
   });
 
   @override
-  State<_PathStep> createState() => _PathStepState();
-}
-
-class _PathStepState extends State<_PathStep> with SingleTickerProviderStateMixin {
-  late final AnimationController _glowController;
-  late final Animation<double> _glow;
-
-  @override
-  void initState() {
-    super.initState();
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
-    _glow = CurvedAnimation(parent: _glowController, curve: Curves.easeInOut);
-    if (widget.isCurrent) {
-      _glowController.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant _PathStep oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isCurrent != widget.isCurrent) {
-      if (widget.isCurrent) {
-        _glowController.repeat(reverse: true);
-      } else {
-        _glowController.stop();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _glowController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Color borderColor;
     Widget icon;
 
-    if (widget.isCompleted) {
+    if (isCompleted) {
       borderColor = AppColors.success;
       icon = const Icon(Icons.check_rounded, color: Colors.white);
-    } else if (widget.isCurrent) {
+    } else if (isCurrent) {
       borderColor = AppColors.primary;
       icon = const Icon(Icons.play_arrow_rounded, color: Colors.white);
     } else {
-      borderColor = AppColors.textMuted;
+      borderColor = Theme.of(context).colorScheme.onSurfaceVariant;
       icon = const Icon(Icons.lock_rounded, color: Colors.white70);
     }
 
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Column(
         children: [
-          AnimatedBuilder(
-            animation: _glow,
-            builder: (context, child) {
-              final glowStrength = widget.isCurrent ? _glow.value : 0.0;
-              return Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: widget.isCompleted || widget.isCurrent ? AppGradients.primary : null,
-                  color: widget.isCompleted || widget.isCurrent ? null : AppColors.backgroundElevated,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: borderColor, width: 3),
-                  boxShadow: widget.isCurrent
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacityValue(0.35 + glowStrength * 0.35),
-                            blurRadius: 10 + glowStrength * 14,
-                            spreadRadius: 1 + glowStrength * 3,
-                          ),
-                          BoxShadow(
-                            color: AppColors.primary.withOpacityValue(0.2 + glowStrength * 0.25),
-                            blurRadius: 22 + glowStrength * 18,
-                            spreadRadius: 2 + glowStrength * 4,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Center(child: icon),
-              );
-            },
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: isCompleted || isCurrent
+                  ? AppColors.primary
+                  : Theme.of(context).colorScheme.surfaceVariant,
+              shape: BoxShape.circle,
+              border: Border.all(color: borderColor, width: 3),
+            ),
+            child: Center(child: icon),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            widget.lesson.title,
+            lesson.title,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: widget.isCompleted || widget.isCurrent ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: isCompleted || isCurrent
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
         ],
@@ -278,7 +220,7 @@ class _BossCheckpoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      borderColor: isUnlocked ? AppColors.warning : AppColors.glassBorder,
+      borderColor: isUnlocked ? AppColors.warning : Theme.of(context).colorScheme.outline,
       borderWidth: isUnlocked ? 2 : 1,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -287,28 +229,21 @@ class _BossCheckpoint extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: isUnlocked ? AppGradients.warm : null,
-              color: isUnlocked ? null : AppColors.backgroundElevated,
+              color: isUnlocked
+                  ? AppColors.warning
+                  : Theme.of(context).colorScheme.surfaceVariant,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isUnlocked ? AppColors.warning : AppColors.glassBorder,
+                color: isUnlocked ? AppColors.warning : Theme.of(context).colorScheme.outline,
                 width: 3,
               ),
-              boxShadow: isUnlocked ? AppShadows.glowing : null,
             ),
             child: Icon(
               isUnlocked ? Icons.emoji_events_rounded : Icons.lock_rounded,
               color: Colors.white,
               size: 32,
             ),
-          )
-              .animate(onPlay: (controller) {
-                if (isUnlocked) controller.repeat();
-              })
-              .shimmer(
-                duration: 2000.ms,
-                color: AppColors.warning.withOpacityValue(0.5),
-              ),
+          ),
           const SizedBox(width: AppSpacing.md),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,7 +251,9 @@ class _BossCheckpoint extends StatelessWidget {
               Text(
                 'Boss Checkpoint',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: isUnlocked ? AppColors.warning : AppColors.textSecondary,
+                      color: isUnlocked
+                          ? AppColors.warning
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
               const SizedBox(height: 4),

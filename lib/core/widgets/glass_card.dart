@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -28,6 +27,10 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final cardColor = scheme.surface;
+    final border = borderColor ?? scheme.outline;
+
     final card = Container(
       width: width,
       height: height,
@@ -35,27 +38,17 @@ class GlassCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
         border: Border.all(
-          color: borderColor ?? AppColors.glassBorder,
+          color: border,
           width: borderWidth,
         ),
-        boxShadow: AppShadows.glassCard,
       ),
-      child: ClipRRect(
-        borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: AppColors.glassBlur,
-            sigmaY: AppColors.glassBlur,
-          ),
-          child: Container(
-            padding: padding ?? const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundCard.withOpacityValue(0.7),
-              borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
-            ),
-            child: child,
-          ),
+      child: Container(
+        padding: padding ?? const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
         ),
+        child: child,
       ),
     );
 
@@ -70,4 +63,3 @@ class GlassCard extends StatelessWidget {
     return card;
   }
 }
-

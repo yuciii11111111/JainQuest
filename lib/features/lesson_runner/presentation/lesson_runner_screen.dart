@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:confetti/confetti.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
@@ -19,20 +18,6 @@ class LessonRunnerScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
-  late ConfettiController _confettiController;
-
-  @override
-  void initState() {
-    super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
-  }
-
-  @override
-  void dispose() {
-    _confettiController.dispose();
-    super.dispose();
-  }
-
   void _showExitDialog() {
     showDialog(
       context: context,
@@ -134,7 +119,7 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                             }
                           },
                           icon: const Icon(Icons.close_rounded),
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         Expanded(
                           child: Padding(
@@ -153,40 +138,9 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                   ),
                 ),
                 Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0.04, 0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: _buildCurrentScreen(lessonState, user),
-                  ),
+                  child: _buildCurrentScreen(lessonState, user),
                 ),
               ],
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
-                shouldLoop: false,
-                colors: const [
-                  AppColors.primary,
-                  AppColors.secondary,
-                  AppColors.success,
-                  Colors.blue,
-                  Colors.purple,
-                ],
-                numberOfParticles: 30,
-              ),
             ),
           ],
         ),
@@ -247,7 +201,6 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
           onComplete: () async {
             await ref.read(lessonRunnerProvider.notifier).completeLesson();
             ref.read(lessonRunnerProvider.notifier).nextScreen();
-            _confettiController.play();
           },
         );
       case LessonScreenType.lessonComplete:

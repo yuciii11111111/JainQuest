@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
@@ -48,13 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _goToHome() async {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 450),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 
@@ -83,6 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -96,23 +90,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  gradient: AppGradients.primary,
+                  color: AppColors.primary,
                   shape: BoxShape.circle,
-                  boxShadow: AppShadows.glowing,
                 ),
                 child: const Icon(
                   Icons.auto_stories_rounded,
                   size: 42,
                   color: Colors.white,
                 ),
-              )
-                  .animate()
-                  .scale(
-                    begin: const Offset(0.9, 0.9),
-                    end: const Offset(1, 1),
-                    duration: 500.ms,
-                    curve: Curves.easeOutBack,
-                  ),
+              ),
               const SizedBox(height: AppSpacing.lg),
               TypewriterSequence(
                 gap: AppSpacing.sm,
@@ -127,7 +113,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TypewriterSequenceItem(
                     text: 'Tell us a bit about you to personalize your path.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: scheme.onSurfaceVariant,
                         ),
                     speed: const Duration(milliseconds: 16),
                   ),

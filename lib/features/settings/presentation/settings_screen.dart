@@ -94,6 +94,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final notifPrefs = ref.watch(notificationPrefsProvider);
     final themeMode = ref.watch(themeModeProvider);
 
@@ -110,7 +111,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_rounded),
-                  color: AppColors.textSecondary,
+                  color: scheme.onSurfaceVariant,
                   onPressed: () => Navigator.of(context).maybePop(),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -344,10 +345,11 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: scheme.onSurfaceVariant,
           ),
     );
   }
@@ -360,11 +362,12 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.glassBorder),
+        border: Border.all(color: scheme.outline),
       ),
       child: Column(children: children),
     );
@@ -484,9 +487,9 @@ class _TapTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),
@@ -509,6 +512,7 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
@@ -517,10 +521,10 @@ class _InfoTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppColors.backgroundBase,
+              color: scheme.surfaceVariant,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.textSecondary, size: 20),
+            child: Icon(icon, color: scheme.onSurfaceVariant, size: 20),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -532,7 +536,7 @@ class _InfoTile extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: scheme.onSurfaceVariant,
                 ),
           ),
         ],

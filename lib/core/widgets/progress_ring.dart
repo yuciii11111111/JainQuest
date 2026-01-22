@@ -1,40 +1,37 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 
 class ProgressRing extends StatelessWidget {
   final double progress; // 0.0 to 1.0
   final double size;
   final double strokeWidth;
-  final Gradient? gradient;
+  final Color? color;
   final Color? backgroundColor;
   final Widget? child;
-  final bool animate;
 
   const ProgressRing({
     super.key,
     required this.progress,
     this.size = 120,
     this.strokeWidth = 8,
-    this.gradient,
+    this.color,
     this.backgroundColor,
     this.child,
-    this.animate = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final clampedProgress = progress.clamp(0.0, 1.0);
-    final gradientToUse = gradient ?? AppGradients.primary;
-    final bgColor = backgroundColor ?? AppColors.backgroundElevated;
+    final colorToUse = color ?? AppColors.primary;
+    final bgColor = backgroundColor ?? Theme.of(context).colorScheme.surfaceVariant;
 
-    Widget ring = CustomPaint(
+    return CustomPaint(
       size: Size(size, size),
       painter: _ProgressRingPainter(
         progress: clampedProgress,
         strokeWidth: strokeWidth,
-        gradient: gradientToUse,
+        color: colorToUse,
         backgroundColor: bgColor,
       ),
       child: child != null
@@ -45,33 +42,19 @@ class ProgressRing extends StatelessWidget {
             )
           : null,
     );
-
-    if (animate) {
-      ring = ring.animate(
-        effects: [
-          const FadeEffect(duration: Duration(milliseconds: 300)),
-          const ScaleEffect(
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          ),
-        ],
-      );
-    }
-
-    return ring;
   }
 }
 
 class _ProgressRingPainter extends CustomPainter {
   final double progress;
   final double strokeWidth;
-  final Gradient gradient;
+  final Color color;
   final Color backgroundColor;
 
   _ProgressRingPainter({
     required this.progress,
     required this.strokeWidth,
-    required this.gradient,
+    required this.color,
     required this.backgroundColor,
   });
 
@@ -92,9 +75,7 @@ class _ProgressRingPainter extends CustomPainter {
     // Progress arc
     if (progress > 0) {
       final progressPaint = Paint()
-        ..shader = gradient.createShader(
-          Rect.fromCircle(center: center, radius: radius),
-        )
+        ..color = color
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;
@@ -116,4 +97,3 @@ class _ProgressRingPainter extends CustomPainter {
         oldDelegate.strokeWidth != strokeWidth;
   }
 }
-

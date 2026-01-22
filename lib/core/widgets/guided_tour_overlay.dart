@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../guide/guide_keys.dart';
@@ -15,11 +16,9 @@ class GuidedTourOverlay extends StatefulWidget {
   State<GuidedTourOverlay> createState() => _GuidedTourOverlayState();
 }
 
-class _GuidedTourOverlayState extends State<GuidedTourOverlay>
-    with SingleTickerProviderStateMixin {
+class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
   static const _guideAsset = 'assets/images/duo_guide.png';
 
-  late final AnimationController _pulseController;
   int _currentIndex = 0;
   bool _tourActive = true;
   Rect? _targetRect;
@@ -27,15 +26,10 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -62,7 +56,9 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
           if (unit.lessons.isEmpty) {
             return;
           }
-          container.read(lessonRunnerProvider.notifier).startLesson(unit.lessons.first);
+          container
+              .read(lessonRunnerProvider.notifier)
+              .startLesson(unit.lessons.first);
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const LessonRunnerScreen()),
           );
@@ -128,6 +124,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
     final steps = _stepsFor(context);
     final step = steps[_currentIndex];
     final targetRect = _targetRect;
+    final scheme = Theme.of(context).colorScheme;
 
     if (targetRect == null) {
       return const SizedBox.shrink();
@@ -163,30 +160,14 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
           top: overlayRect.top,
           width: overlayRect.width,
           height: overlayRect.height,
-          child: AnimatedBuilder(
-            animation: _pulseController,
-            builder: (context, child) {
-              final pulse = 1 + (_pulseController.value * 0.12);
-              return Transform.scale(
-                scale: pulse,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: AppColors.highlight.withOpacityValue(0.9),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.highlight.withOpacityValue(0.5),
-                        blurRadius: 24,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: AppColors.highlight.withOpacityValue(0.9),
+                width: 2,
+              ),
+            ),
           ),
         ),
         Positioned(
@@ -210,10 +191,9 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.backgroundCard.withOpacityValue(0.85),
+              color: scheme.surface.withOpacityValue(0.95),
               borderRadius: BorderRadius.circular(AppRadius.card),
-              border: Border.all(color: AppColors.glassBorder),
-              boxShadow: AppShadows.glassCard,
+              border: Border.all(color: scheme.outline),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +203,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
-                      ?.copyWith(color: AppColors.textPrimary),
+                      ?.copyWith(color: scheme.onSurface),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -231,7 +211,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
-                      ?.copyWith(color: AppColors.textSecondary),
+                      ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -240,17 +220,10 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
         Positioned(
           left: guideOffset.dx,
           top: guideOffset.dy,
-          child: AnimatedBuilder(
-            animation: _pulseController,
-            builder: (context, child) {
-              final bob = sin(_pulseController.value * pi) * 6;
-              return Transform.translate(offset: Offset(0, bob), child: child);
-            },
-            child: Image.asset(
-              _guideAsset,
-              width: 80,
-              height: 80,
-            ),
+          child: Image.asset(
+            _guideAsset,
+            width: 80,
+            height: 80,
           ),
         ),
         Positioned(
@@ -261,7 +234,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay>
             child: Text(
               'Skip',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                   ),
             ),
           ),

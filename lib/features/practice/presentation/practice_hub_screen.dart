@@ -10,6 +10,7 @@ class PracticeHubScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
     final progress = ref.watch(progressProvider);
     final hasCompletedLessons = progress.completedLessons.isNotEmpty;
 
@@ -28,7 +29,7 @@ class PracticeHubScreen extends ConsumerWidget {
             Text(
               'Strengthen your knowledge and earn rewards',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -47,22 +48,22 @@ class PracticeHubScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundCard,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(AppRadius.card),
-                  border: Border.all(color: AppColors.glassBorder),
+                  border: Border.all(color: scheme.outline),
                 ),
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.lock_rounded,
                       size: 48,
-                      color: AppColors.textSecondary,
+                      color: scheme.onSurfaceVariant,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       'Complete lessons to unlock practice',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: scheme.onSurfaceVariant,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -213,17 +214,10 @@ class _PracticeModeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: color.withOpacityValue(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacityValue(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          border: Border.all(color: color.withOpacityValue(0.3)),
+        ),
         child: Row(
           children: [
             Container(
@@ -276,9 +270,9 @@ class _PracticeModeCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ],
         ),
@@ -302,12 +296,13 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-          color: AppColors.backgroundCard,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: AppColors.glassBorder),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: scheme.outline),
       ),
       child: Column(
         children: [

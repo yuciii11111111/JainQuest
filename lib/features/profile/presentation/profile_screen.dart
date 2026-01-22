@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
@@ -44,6 +43,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final user = ref.watch(userProfileProvider);
     final progress = ref.watch(progressProvider);
     final lessonBadges = ref.watch(badgesProvider);
@@ -63,14 +63,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 children: [
                   Text(
                     'Profile',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800),
+                    style: Theme.of(context)
+                        .textTheme
+                        .displaySmall
+                        ?.copyWith(fontWeight: FontWeight.w800),
                   ),
                   IconButton(
                     icon: const Icon(Icons.settings_rounded),
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const SettingsScreen()),
                       );
                     },
                     tooltip: 'Settings',
@@ -94,20 +98,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFFF7EE2), Color(0xFF7B9CFF)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: AppShadows.glowing,
+                            color: AppColors.secondary.withOpacityValue(0.18),
                           ),
                           child: Center(
                             child: Container(
                               width: 86,
                               height: 86,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppColors.backgroundCard,
+                                color: scheme.surface,
                               ),
                               child: _ProfileAvatar(emoji: user.avatarEmoji),
                             ),
@@ -122,7 +121,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                             onPressed: () {
                               showDialog(
                                 context: context,
-                                builder: (context) => const ProfileSetupDialog(isFirstTime: false),
+                                builder: (context) => const ProfileSetupDialog(
+                                    isFirstTime: false),
                               );
                             },
                             child: const Icon(Icons.edit_rounded, size: 18),
@@ -133,12 +133,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       user.displayName ?? 'Learner',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Row(
@@ -159,34 +164,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                         _QuickStat(
                           icon: Icons.place_rounded,
                           label: 'Local',
-                          value: '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
+                          value:
+                              '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
                           color: AppColors.secondary,
                         ),
                       ],
                     ),
                   ],
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms)
-                  .slideY(begin: -0.1, end: 0, duration: 300.ms),
+              ),
             ),
 
             // Tabs
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg, vertical: AppSpacing.md),
               child: GlassCard(
                 padding: EdgeInsets.zero,
                 child: TabBar(
                   controller: _tabController,
                   indicator: BoxDecoration(
-                    gradient: AppGradients.primary,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   dividerColor: Colors.transparent,
                   labelColor: Colors.white,
-                  unselectedLabelColor: AppColors.textSecondary,
+                  unselectedLabelColor: scheme.onSurfaceVariant,
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.w700,
                   ),
@@ -204,7 +208,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _BadgesTab(progress: progress, lessonBadges: lessonBadges, allBadges: allBadges),
+                  _BadgesTab(
+                      progress: progress,
+                      lessonBadges: lessonBadges,
+                      allBadges: allBadges),
                   _StatsTab(user: user, progress: progress),
                 ],
               ),
@@ -231,6 +238,7 @@ class _QuickStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Container(
@@ -245,11 +253,16 @@ class _QuickStat extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.w800),
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
         ),
       ],
     );
@@ -269,7 +282,8 @@ class _ProfileAvatar extends StatelessWidget {
         style: const TextStyle(fontSize: 40),
       );
     }
-    return const Icon(Icons.self_improvement_rounded, size: 48, color: Colors.white);
+    return const Icon(Icons.self_improvement_rounded,
+        size: 48, color: Colors.white);
   }
 }
 
@@ -286,9 +300,10 @@ class _BadgesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     // Combine all badges
     final combinedBadges = <_BadgeDisplay>[];
-    
+
     // Add lesson badges (BadgeDefinition)
     for (final badge in lessonBadges) {
       final isEarned = progress.earnedBadges.contains(badge.id);
@@ -299,12 +314,12 @@ class _BadgesTab extends StatelessWidget {
         isEarned: isEarned,
       ));
     }
-    
+
     // Add gamification badges (Badge)
     for (final badge in allBadges) {
       // Skip if already added as lesson badge
       if (combinedBadges.any((b) => b.id == badge.id)) continue;
-      
+
       final isEarned = progress.earnedBadges.contains(badge.id);
       combinedBadges.add(_BadgeDisplay(
         id: badge.id,
@@ -327,7 +342,7 @@ class _BadgesTab extends StatelessWidget {
           Text(
             '${combinedBadges.where((b) => b.isEarned).length} of ${combinedBadges.length} earned',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -357,14 +372,16 @@ class _BadgesTab extends StatelessWidget {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          gradient: badge.isEarned ? AppGradients.accent : null,
-                          color: badge.isEarned ? null : AppColors.backgroundElevated,
+                          color: badge.isEarned
+                              ? AppColors.secondary.withOpacityValue(0.16)
+                              : scheme.surfaceVariant,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: badge.isEarned ? AppColors.secondary : AppColors.glassBorder,
+                            color: badge.isEarned
+                                ? AppColors.secondary
+                                : scheme.outline,
                             width: 2,
                           ),
-                          boxShadow: badge.isEarned ? AppShadows.glowing : null,
                         ),
                         child: Stack(
                           alignment: Alignment.center,
@@ -372,12 +389,14 @@ class _BadgesTab extends StatelessWidget {
                             Icon(
                               Icons.workspace_premium_rounded,
                               size: 26,
-                              color: badge.isEarned ? Colors.white : AppColors.textMuted,
+                              color: badge.isEarned
+                                  ? AppColors.secondary
+                                  : scheme.onSurfaceVariant,
                             ),
                             if (!badge.isEarned)
                               Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.backgroundBase.withOpacityValue(0.7),
+                                  color: scheme.surface.withOpacityValue(0.7),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -392,17 +411,16 @@ class _BadgesTab extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: badge.isEarned
-                                  ? AppColors.textPrimary
-                                  : AppColors.textMuted,
-                              fontWeight: badge.isEarned ? FontWeight.w600 : FontWeight.w400,
+                                  ? scheme.onSurface
+                                  : scheme.onSurfaceVariant,
+                              fontWeight: badge.isEarned
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
                             ),
                       ),
                     ],
                   ),
-                )
-                    .animate(delay: (index * 50).ms)
-                    .fadeIn(duration: 300.ms)
-                    .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
+                ),
               );
             },
           ),
@@ -414,71 +432,78 @@ class _BadgesTab extends StatelessWidget {
   void _showBadgeDetails(BuildContext context, _BadgeDisplay badge) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: GlassCard(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: badge.isEarned ? AppGradients.accent : null,
-                  color: badge.isEarned ? null : AppColors.backgroundElevated,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: badge.isEarned ? AppColors.secondary : AppColors.glassBorder,
-                    width: 4,
-                  ),
-                  boxShadow: badge.isEarned ? AppShadows.glowing : null,
-                ),
-                child: Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 50,
-                  color: badge.isEarned ? Colors.white : AppColors.textMuted,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                badge.name,
-                style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                badge.description,
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              if (!badge.isEarned)
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: GlassCard(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacityValue(0.1),
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                    border: Border.all(color: AppColors.warning.withOpacityValue(0.3)),
+                    color: badge.isEarned
+                        ? AppColors.secondary.withOpacityValue(0.16)
+                        : scheme.surfaceVariant,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color:
+                          badge.isEarned ? AppColors.secondary : scheme.outline,
+                      width: 4,
+                    ),
                   ),
-                  child: Text(
-                    'Locked - Complete challenges to unlock',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.warning,
-                        ),
-                    textAlign: TextAlign.center,
+                  child: Icon(
+                    Icons.workspace_premium_rounded,
+                    size: 50,
+                    color: badge.isEarned
+                        ? AppColors.secondary
+                        : scheme.onSurfaceVariant,
                   ),
                 ),
-              const SizedBox(height: AppSpacing.lg),
-              GradientButton(
-                label: 'Close',
-                onPressed: () => Navigator.of(context).pop(),
-                width: double.infinity,
-              ),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  badge.name,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  badge.description,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                if (!badge.isEarned)
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withOpacityValue(0.1),
+                      borderRadius: BorderRadius.circular(AppRadius.small),
+                      border: Border.all(
+                          color: AppColors.warning.withOpacityValue(0.3)),
+                    ),
+                    child: Text(
+                      'Locked - Complete challenges to unlock',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.warning,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                const SizedBox(height: AppSpacing.lg),
+                GradientButton(
+                  label: 'Close',
+                  onPressed: () => Navigator.of(context).pop(),
+                  width: double.infinity,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -508,8 +533,10 @@ class _StatsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final totalLessonsCompleted = progress.completedLessons.length;
-    final levelProgress = LevelSystem.getLevelProgress(user.level, user.totalXp);
+    final levelProgress =
+        LevelSystem.getLevelProgress(user.level, user.totalXp);
     final dayLabels = _buildWeekdayLabels();
     final activityCounts = _buildWeeklyLessonCounts(progress);
     final trendPoints = List.generate(
@@ -531,8 +558,10 @@ class _StatsTab extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Progress', style: Theme.of(context).textTheme.titleMedium),
-                    Text('${(levelProgress * 100).round()}%', style: Theme.of(context).textTheme.titleMedium),
+                    Text('Progress',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    Text('${(levelProgress * 100).round()}%',
+                        style: Theme.of(context).textTheme.titleMedium),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -542,18 +571,24 @@ class _StatsTab extends StatelessWidget {
                       progress: levelProgress,
                       size: 120,
                       strokeWidth: 10,
-                      gradient: AppGradients.primary,
-                      backgroundColor: AppColors.backgroundElevated,
+                      color: AppColors.primary,
+                      backgroundColor: scheme.surfaceVariant,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             '${(levelProgress * 100).round()}%',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                           Text(
                             'Level ${user.level}',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -565,14 +600,16 @@ class _StatsTab extends StatelessWidget {
                         children: [
                           Text(
                             'Keep going to reach the next level.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                    ),
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _DetailRow(
                             label: 'XP to next level',
-                            value: '${LevelSystem.getXpNeededForNextLevel(user.level, user.totalXp)}',
+                            value:
+                                '${LevelSystem.getXpNeededForNextLevel(user.level, user.totalXp)}',
                             icon: Icons.trending_up,
                           ),
                         ],
@@ -590,7 +627,8 @@ class _StatsTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Activity', style: Theme.of(context).textTheme.titleMedium),
+                Text('Activity',
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.md),
                 SizedBox(
                   height: 200,
@@ -605,12 +643,15 @@ class _StatsTab extends StatelessWidget {
                           sideTitles: SideTitles(
                             showTitles: true,
                             getTitlesWidget: (value, meta) {
-                              if (value.toInt() < 0 || value.toInt() >= dayLabels.length) {
+                              if (value.toInt() < 0 ||
+                                  value.toInt() >= dayLabels.length) {
                                 return const SizedBox.shrink();
                               }
                               return Padding(
                                 padding: const EdgeInsets.only(top: 8),
-                                child: Text(dayLabels[value.toInt()], style: Theme.of(context).textTheme.labelSmall),
+                                child: Text(dayLabels[value.toInt()],
+                                    style:
+                                        Theme.of(context).textTheme.labelSmall),
                               );
                             },
                             interval: 1,
@@ -619,14 +660,16 @@ class _StatsTab extends StatelessWidget {
                         leftTitles: const AxisTitles(
                           sideTitles: SideTitles(showTitles: false),
                         ),
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
+                        topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false)),
                       ),
                       gridData: FlGridData(
                         show: true,
                         drawVerticalLine: false,
-                        getDrawingHorizontalLine: (value) => const FlLine(
-                          color: AppColors.backgroundElevated,
+                        getDrawingHorizontalLine: (value) => FlLine(
+                          color: scheme.outline,
                           strokeWidth: 1,
                         ),
                       ),
@@ -634,17 +677,23 @@ class _StatsTab extends StatelessWidget {
                         handleBuiltInTouches: true,
                         touchTooltipData: LineTouchTooltipData(
                           tooltipRoundedRadius: 12,
-                          tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          tooltipPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           getTooltipItems: (touchedSpots) {
                             return touchedSpots.map((spot) {
-                              final index = spot.x.toInt().clamp(0, activityCounts.length - 1);
+                              final index = spot.x
+                                  .toInt()
+                                  .clamp(0, activityCounts.length - 1);
                               final count = activityCounts[index];
                               final label = count == 1 ? 'lesson' : 'lessons';
                               return LineTooltipItem(
                                 '$count $label',
-                                Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: AppColors.textPrimary,
-                                    ) ??
+                                Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: scheme.onSurface,
+                                        ) ??
                                     const TextStyle(color: Colors.white),
                               );
                             }).toList();
@@ -660,14 +709,7 @@ class _StatsTab extends StatelessWidget {
                           barWidth: 3,
                           belowBarData: BarAreaData(
                             show: true,
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.primary.withOpacityValue(0.35),
-                                AppColors.primary.withOpacityValue(0.05),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
+                            color: AppColors.primary.withOpacityValue(0.12),
                           ),
                           dotData: const FlDotData(show: true),
                         ),
@@ -750,17 +792,18 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 20, color: AppColors.textSecondary),
+          Icon(icon, size: 20, color: scheme.onSurfaceVariant),
           const SizedBox(width: AppSpacing.sm),
         ],
         Expanded(
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: scheme.onSurfaceVariant,
                 ),
           ),
         ),

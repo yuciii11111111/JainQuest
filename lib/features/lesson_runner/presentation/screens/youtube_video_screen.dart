@@ -194,9 +194,9 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
-                      color: AppColors.backgroundCard,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(AppRadius.card),
-                      border: Border.all(color: AppColors.glassBorder),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,9 +221,9 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                 else
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.backgroundCard,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(AppRadius.card),
-                      border: Border.all(color: AppColors.glassBorder),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: Column(
                       children: [
@@ -246,10 +246,10 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                           VideoProgressIndicator(
                             _controller!,
                             allowScrubbing: true,
-                            colors: const VideoProgressColors(
+                            colors: VideoProgressColors(
                               playedColor: AppColors.primary,
-                              bufferedColor: AppColors.backgroundElevated,
-                              backgroundColor: AppColors.backgroundBase,
+                              bufferedColor: Theme.of(context).colorScheme.surfaceVariant,
+                              backgroundColor: Theme.of(context).colorScheme.surface,
                             ),
                           ),
                         Padding(
@@ -287,7 +287,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.backgroundBase,
+                      color: Theme.of(context).colorScheme.surfaceVariant,
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Text(

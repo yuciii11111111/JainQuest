@@ -136,6 +136,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final practiceState = ref.watch(practiceProvider);
     final user = ref.watch(userProfileProvider);
 
@@ -146,10 +147,10 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.quiz_rounded,
                 size: 64,
-                color: AppColors.textSecondary,
+                color: scheme.onSurfaceVariant,
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
@@ -198,7 +199,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                       Navigator.of(context).pop();
                     },
                     icon: const Icon(Icons.close_rounded),
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                   ),
                   Expanded(
                     child: Padding(

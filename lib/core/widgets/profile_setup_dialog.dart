@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../providers/app_providers.dart';
 import '../services/storage_service.dart';
@@ -146,6 +145,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
@@ -159,9 +159,8 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                gradient: AppGradients.primary,
+                color: AppColors.primary,
                 shape: BoxShape.circle,
-                boxShadow: AppShadows.glowing,
               ),
               child: Center(
                 child: Text(
@@ -169,14 +168,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                   style: const TextStyle(fontSize: 36),
                 ),
               ),
-            )
-                .animate()
-                .scale(
-                  begin: const Offset(0.8, 0.8),
-                  end: const Offset(1, 1),
-                  duration: 400.ms,
-                  curve: Curves.easeOutBack,
-                ),
+            ),
 
             const SizedBox(height: AppSpacing.lg),
 
@@ -185,10 +177,7 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
               widget.isFirstTime ? 'Welcome to JainQuest!' : 'Update Profile',
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
-            )
-                .animate()
-                .fadeIn(delay: 100.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.sm),
 
@@ -197,12 +186,10 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                   ? 'Let\'s personalize your learning journey'
                   : 'Update your details',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: scheme.onSurfaceVariant,
                   ),
               textAlign: TextAlign.center,
-            )
-                .animate()
-                .fadeIn(delay: 200.ms, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.xl),
 
@@ -219,17 +206,16 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 final isSelected = emoji == _selectedEmoji;
                 return GestureDetector(
                   onTap: () => setState(() => _selectedEmoji = emoji),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                  child: Container(
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primary.withOpacityValue(0.2)
-                          : AppColors.backgroundCard,
+                          : scheme.surface,
                       borderRadius: BorderRadius.circular(AppRadius.small),
                       border: Border.all(
-                        color: isSelected ? AppColors.primary : AppColors.glassBorder,
+                        color: isSelected ? AppColors.primary : scheme.outline,
                         width: isSelected ? 2 : 1,
                       ),
                     ),
@@ -256,25 +242,22 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 prefixIcon: const Icon(Icons.person_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
                   borderSide: const BorderSide(color: AppColors.primary, width: 2),
                 ),
                 filled: true,
-                fillColor: AppColors.backgroundCard,
+                fillColor: scheme.surface,
               ),
               style: Theme.of(context).textTheme.bodyLarge,
               onSubmitted: (_) => _saveProfile(),
-            )
-                .animate()
-                .fadeIn(delay: 300.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.md),
 
@@ -288,24 +271,21 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 prefixIcon: const Icon(Icons.cake_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
                   borderSide: const BorderSide(color: AppColors.primary, width: 2),
                 ),
                 filled: true,
-                fillColor: AppColors.backgroundCard,
+                fillColor: scheme.surface,
               ),
               style: Theme.of(context).textTheme.bodyLarge,
-            )
-                .animate()
-                .fadeIn(delay: 350.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.md),
 
@@ -319,24 +299,21 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 prefixIcon: const Icon(Icons.email_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
                   borderSide: const BorderSide(color: AppColors.primary, width: 2),
                 ),
                 filled: true,
-                fillColor: AppColors.backgroundCard,
+                fillColor: scheme.surface,
               ),
               style: Theme.of(context).textTheme.bodyLarge,
-            )
-                .animate()
-                .fadeIn(delay: 400.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.md),
 
@@ -362,25 +339,22 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.glassBorder),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.button),
                   borderSide: const BorderSide(color: AppColors.primary, width: 2),
                 ),
                 filled: true,
-                fillColor: AppColors.backgroundCard,
+                fillColor: scheme.surface,
               ),
               style: Theme.of(context).textTheme.bodyLarge,
               onSubmitted: (_) => _saveProfile(),
-            )
-                .animate()
-                .fadeIn(delay: 450.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             const SizedBox(height: AppSpacing.lg),
 
@@ -391,18 +365,15 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
               onPressed: _isLoading ? null : _saveProfile,
               isLoading: _isLoading,
               width: double.infinity,
-            )
-                .animate()
-                .fadeIn(delay: 400.ms, duration: 300.ms)
-                .slideY(begin: 0.1, end: 0, duration: 300.ms),
+            ),
 
             if (!widget.isFirstTime) ...[
               const SizedBox(height: AppSpacing.md),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: scheme.onSurfaceVariant),
                 ),
               ),
             ],
@@ -412,4 +383,3 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
     );
   }
 }
-

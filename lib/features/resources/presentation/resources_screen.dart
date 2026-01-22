@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/gradient_button.dart';
@@ -68,10 +67,7 @@ class ResourcesScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 350.ms)
-                  .slideY(begin: 0.08, end: 0, duration: 350.ms),
+              ),
               const SizedBox(height: AppSpacing.lg),
               Text('Quick Guides', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
@@ -110,9 +106,10 @@ class ResourcesScreen extends StatelessWidget {
   }
 
   void _openGuide(BuildContext context, String title, String body) {
+    final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.backgroundCard,
+      backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
       ),
@@ -180,9 +177,8 @@ class _ResourceTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              gradient: AppGradients.primary,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(AppRadius.small),
-              boxShadow: AppShadows.glowing,
             ),
             child: Icon(icon, color: Colors.white),
           ),

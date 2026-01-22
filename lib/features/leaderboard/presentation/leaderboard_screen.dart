@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
@@ -18,6 +17,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final user = ref.watch(userProfileProvider);
     
     // Mock leaderboard data - in production, this would come from a provider
@@ -122,7 +122,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             child: Text(
                               '${index + 4}',
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: scheme.onSurfaceVariant,
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -133,7 +133,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             radius: 24,
                             backgroundColor: isCurrentUser
                                 ? AppColors.primary
-                                : AppColors.backgroundElevated,
+                                : scheme.surfaceVariant,
                             child: Text(
                               entry.name[0].toUpperCase(),
                               style: const TextStyle(
@@ -153,7 +153,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                         color: isCurrentUser
                                             ? AppColors.primary
-                                            : AppColors.textPrimary,
+                                            : scheme.onSurface,
                                         fontWeight: FontWeight.w700,
                                       ),
                                 ),
@@ -171,7 +171,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                               vertical: AppSpacing.xs,
                             ),
                             decoration: BoxDecoration(
-                              gradient: AppGradients.primary,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(AppRadius.pill),
                             ),
                             child: Text(
@@ -185,10 +185,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           ),
                         ],
                       ),
-                    )
-                        .animate(delay: (index * 50).ms)
-                        .fadeIn(duration: 300.ms)
-                        .slideX(begin: 0.1, end: 0, duration: 300.ms),
+                    ),
                   );
                 },
                 childCount: leaderboardData.length - 3,
@@ -247,20 +244,20 @@ class _ToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          gradient: isSelected ? AppGradients.primary : null,
+          color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
+            color: isSelected ? Colors.white : scheme.onSurfaceVariant,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
@@ -280,6 +277,7 @@ class _Podium extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     if (top3.length < 3) {
       return const SizedBox.shrink();
     }
@@ -293,7 +291,7 @@ class _Podium extends StatelessWidget {
             entry: top3[1],
             place: 2,
             height: 100,
-            color: AppColors.textSecondary,
+            color: scheme.onSurfaceVariant,
             isCurrentUser: top3[1].id == currentUserId,
           ),
         ),
@@ -320,10 +318,7 @@ class _Podium extends StatelessWidget {
           ),
         ),
       ],
-    )
-        .animate()
-        .fadeIn(duration: 500.ms)
-        .slideY(begin: 0.2, end: 0, duration: 500.ms, curve: Curves.easeOutCubic);
+    );
   }
 }
 
@@ -344,6 +339,7 @@ class _PodiumPlace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         // Avatar
@@ -351,14 +347,12 @@ class _PodiumPlace extends StatelessWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            gradient: place == 1 ? AppGradients.primary : null,
-            color: place == 1 ? null : AppColors.backgroundCard,
+            color: place == 1 ? AppColors.primary : scheme.surface,
             shape: BoxShape.circle,
             border: Border.all(
               color: color,
               width: 3,
             ),
-            boxShadow: place == 1 ? AppShadows.glowing : null,
           ),
           child: Center(
             child: place == 1
@@ -378,7 +372,7 @@ class _PodiumPlace extends StatelessWidget {
         Text(
           entry.name,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: isCurrentUser ? AppColors.primary : AppColors.textPrimary,
+                color: isCurrentUser ? AppColors.primary : scheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
           maxLines: 1,
@@ -395,18 +389,10 @@ class _PodiumPlace extends StatelessWidget {
         Container(
           height: height,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                color,
-                color.withOpacityValue(0.7),
-              ],
-            ),
+            color: color.withOpacityValue(0.85),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppRadius.card),
             ),
-            boxShadow: AppShadows.glassCard,
           ),
           child: Center(
             child: Text(
@@ -445,9 +431,8 @@ class _YourRankCard extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              gradient: AppGradients.primary,
+              color: AppColors.primary,
               shape: BoxShape.circle,
-              boxShadow: AppShadows.glowing,
             ),
             child: Center(
               child: Text(
@@ -486,10 +471,6 @@ class _YourRankCard extends StatelessWidget {
           ),
         ],
       ),
-    )
-        .animate()
-        .fadeIn(delay: 200.ms, duration: 300.ms)
-        .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
+    );
   }
 }
-

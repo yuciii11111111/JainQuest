@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
-import 'package:confetti/confetti.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -33,19 +32,6 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
   String? selectedChoiceId;
   bool showFeedback = false;
   bool? isCorrectAnswer;
-  late ConfettiController _confettiController;
-
-  @override
-  void initState() {
-    super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
-  }
-
-  @override
-  void dispose() {
-    _confettiController.dispose();
-    super.dispose();
-  }
 
   @override
   void didUpdateWidget(QuizScreenWidget oldWidget) {
@@ -106,17 +92,12 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
       if (await Vibration.hasVibrator() ?? false) {
         if (isCorrect) {
           Vibration.vibrate(pattern: [0, 50, 100, 50]);
-          // Trigger confetti for correct answer
-          _confettiController.play();
         } else {
           Vibration.vibrate(duration: 200);
         }
       }
     } catch (_) {
       // Ignore vibration errors
-      if (isCorrect) {
-        _confettiController.play();
-      }
     }
 
     widget.onAnswer(isCorrect);
@@ -157,7 +138,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                     IconButton(
                       icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.of(context).maybePop(),
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     Expanded(
                       child: Column(
@@ -186,9 +167,8 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  gradient: AppGradients.primary,
+                  color: AppColors.primary,
                   shape: BoxShape.circle,
-                  boxShadow: AppShadows.glowing,
                 ),
                 child: const Icon(Icons.emoji_emotions_rounded, color: Colors.white, size: 38),
               ),
@@ -242,24 +222,6 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                       ),
               ),
             ],
-          ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: const [
-              AppColors.primary,
-              AppColors.secondary,
-              AppColors.success,
-              Colors.blue,
-              Colors.purple,
-              Colors.green,
-            ],
-            numberOfParticles: 50,
-            gravity: 0.1,
           ),
         ),
       ],
@@ -374,18 +336,19 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     Color borderColor;
     Color textColor;
-    Color bgColor = AppColors.backgroundCard;
+    Color bgColor = scheme.surface;
 
     switch (state) {
       case ChoiceState.normal:
-        borderColor = AppColors.glassBorder;
-        textColor = AppColors.textPrimary;
+        borderColor = scheme.outline;
+        textColor = scheme.onSurface;
         break;
       case ChoiceState.selected:
         borderColor = AppColors.primary;
-        textColor = AppColors.textPrimary;
+        textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
         borderColor = AppColors.success;
@@ -399,8 +362,7 @@ class _OptionTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
         decoration: BoxDecoration(
           color: bgColor,
@@ -458,6 +420,7 @@ class _TrueFalseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     Color backgroundColor;
     Color borderColor;
     Color textColor;
@@ -465,23 +428,23 @@ class _TrueFalseButton extends StatelessWidget {
 
     switch (state) {
       case ChoiceState.normal:
-        backgroundColor = AppColors.backgroundCard;
-        borderColor = AppColors.glassBorder;
-        textColor = AppColors.textPrimary;
+        backgroundColor = scheme.surface;
+        borderColor = scheme.outline;
+        textColor = scheme.onSurface;
         break;
       case ChoiceState.selected:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = scheme.surface;
         borderColor = AppColors.primary;
-        textColor = AppColors.textPrimary;
+        textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = scheme.surface;
         borderColor = AppColors.success;
         textColor = AppColors.success;
         icon = Icons.check_circle_rounded;
         break;
       case ChoiceState.incorrect:
-        backgroundColor = AppColors.backgroundCard;
+        backgroundColor = scheme.surface;
         borderColor = AppColors.danger;
         textColor = AppColors.danger;
         icon = Icons.cancel_rounded;
@@ -490,8 +453,7 @@ class _TrueFalseButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,

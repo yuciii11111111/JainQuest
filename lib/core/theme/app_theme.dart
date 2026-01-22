@@ -58,8 +58,13 @@ class AppColors {
   static const double glassBlur = 24.0;
 
   // Light Mode (Optional)
-  static const Color lightBackground = Color(0xFFF3F0FF);
-  static const Color lightCard = Color(0xFFFBFAFF);
+  static const Color lightBackground = Color(0xFFF6F4EF);
+  static const Color lightCard = Color(0xFFFCFBF8);
+  static const Color lightElevated = Color(0xFFF0EEE7);
+  static const Color lightTextPrimary = Color(0xFF1E1B16);
+  static const Color lightTextSecondary = Color(0xFF5E564B);
+  static const Color lightTextMuted = Color(0xFF8A8174);
+  static const Color lightBorder = Color(0xFFE3DED2);
 }
 
 // ============================================================================
@@ -98,39 +103,9 @@ class AppRadius {
 class AppShadows {
   AppShadows._();
 
-  static List<BoxShadow> get glassCard => [
-        BoxShadow(
-          color: const Color(0xFF0B0918).withOpacityValue(0.55),
-          blurRadius: 24,
-          offset: const Offset(0, 10),
-        ),
-        BoxShadow(
-          color: const Color(0xFF2F2B6D).withOpacityValue(0.45),
-          blurRadius: 16,
-          offset: const Offset(0, 6),
-        ),
-      ];
-
-  static List<BoxShadow> get glowing => [
-        BoxShadow(
-          color: AppColors.primary.withOpacityValue(0.6),
-          blurRadius: 28,
-          spreadRadius: 1,
-        ),
-        BoxShadow(
-          color: AppColors.secondary.withOpacityValue(0.35),
-          blurRadius: 46,
-          spreadRadius: 3,
-        ),
-      ];
-
-  static List<BoxShadow> get floating => [
-        BoxShadow(
-          color: Colors.black.withOpacityValue(0.4),
-          blurRadius: 30,
-          offset: const Offset(0, 12),
-        ),
-      ];
+  static List<BoxShadow> get glassCard => const [];
+  static List<BoxShadow> get glowing => const [];
+  static List<BoxShadow> get floating => const [];
 }
 
 // ============================================================================
@@ -192,16 +167,20 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: Colors.transparent,
+      scaffoldBackgroundColor: AppColors.backgroundBase,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.backgroundCard,
+        surfaceVariant: AppColors.backgroundElevated,
+        outline: AppColors.glassBorder,
+        onSurfaceVariant: AppColors.textSecondary,
         error: AppColors.danger,
         onPrimary: AppColors.textPrimary,
         onSecondary: AppColors.textPrimary,
         onSurface: AppColors.textPrimary,
         onError: AppColors.textPrimary,
+        onBackground: AppColors.textPrimary,
       ),
 
       // Typography
@@ -362,17 +341,21 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: Colors.transparent,
+      scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.lightCard,
+        surfaceVariant: AppColors.lightElevated,
+        outline: AppColors.lightBorder,
         error: AppColors.danger,
         onPrimary: AppColors.textPrimary,
         onSecondary: AppColors.textPrimary,
-        onSurface: const Color(0xFF1F2937),
+        onSurface: AppColors.lightTextPrimary,
+        onSurfaceVariant: AppColors.lightTextSecondary,
         onError: AppColors.textPrimary,
+        onBackground: AppColors.lightTextPrimary,
       ),
 
       // Typography
@@ -380,93 +363,93 @@ class AppTheme {
         displayLarge: GoogleFonts.nunito(
           fontSize: 32,
           fontWeight: FontWeight.w800,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.2,
           letterSpacing: -0.5,
         ),
         displayMedium: GoogleFonts.nunito(
           fontSize: 28,
           fontWeight: FontWeight.w800,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.25,
           letterSpacing: -0.5,
         ),
         displaySmall: GoogleFonts.nunito(
           fontSize: 24,
           fontWeight: FontWeight.w800,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.3,
         ),
         headlineLarge: GoogleFonts.nunito(
           fontSize: 22,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.3,
         ),
         headlineMedium: GoogleFonts.nunito(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.35,
         ),
         headlineSmall: GoogleFonts.nunito(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.4,
         ),
         titleLarge: GoogleFonts.nunito(
           fontSize: 16,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.4,
         ),
         titleMedium: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.45,
         ),
         titleSmall: GoogleFonts.nunito(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF6B7280),
+          color: AppColors.lightTextSecondary,
           height: 1.45,
         ),
         bodyLarge: GoogleFonts.nunito(
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.5,
         ),
         bodyMedium: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           height: 1.5,
         ),
         bodySmall: GoogleFonts.nunito(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF6B7280),
+          color: AppColors.lightTextSecondary,
           height: 1.5,
         ),
         labelLarge: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
           letterSpacing: 0.5,
         ),
         labelMedium: GoogleFonts.nunito(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF6B7280),
+          color: AppColors.lightTextSecondary,
           letterSpacing: 0.4,
         ),
         labelSmall: GoogleFonts.nunito(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: const Color(0xFF6B7280),
+          color: AppColors.lightTextSecondary,
           letterSpacing: 0.3,
         ),
       ),
@@ -480,9 +463,9 @@ class AppTheme {
         titleTextStyle: GoogleFonts.nunito(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF1F2937),
+          color: AppColors.lightTextPrimary,
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF1F2937)),
+        iconTheme: const IconThemeData(color: AppColors.lightTextPrimary),
       ),
 
       // Cards
@@ -517,12 +500,12 @@ class AppTheme {
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
-        linearTrackColor: Color(0xFFE5E7EB),
+        linearTrackColor: AppColors.lightBorder,
       ),
 
       // Divider
       dividerTheme: const DividerThemeData(
-        color: Color(0xFFE5E7EB),
+        color: AppColors.lightBorder,
         thickness: 1,
         space: AppSpacing.md,
       ),
