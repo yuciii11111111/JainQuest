@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
@@ -11,6 +12,7 @@ import '../../../core/widgets/progress_ring.dart';
 import '../../../core/gamification/gamification_constants.dart';
 import '../../../core/models/badge_definition.dart';
 import '../../../core/models/user_models.dart' as user_models;
+import '../../auth/presentation/create_account_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 
 // Import types directly for convenience
@@ -25,20 +27,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const CreateAccountScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -53,170 +49,149 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Profile',
-                    style: Theme.of(context)
-                        .textTheme
-                        .displaySmall
-                        ?.copyWith(fontWeight: FontWeight.w800),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.settings_rounded),
-                    color: scheme.onSurfaceVariant,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (_) => const SettingsScreen()),
-                      );
-                    },
-                    tooltip: 'Settings',
-                  ),
-                ],
-              ),
-            ),
-
-            // Avatar & Stats Card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: GlassCard(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+          child: Column(
+            children: [
+              // Header
+              Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.secondary.withOpacityValue(0.18),
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 86,
-                              height: 86,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: scheme.surface,
-                              ),
-                              child: _ProfileAvatar(emoji: user.avatarEmoji),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 4,
-                          top: 4,
-                          child: FloatingActionButton.small(
-                            heroTag: 'editProfile',
-                            backgroundColor: AppColors.primary,
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const ProfileSetupDialog(
-                                    isFirstTime: false),
-                              );
-                            },
-                            child: const Icon(Icons.edit_rounded, size: 18),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
                     Text(
-                      user.displayName ?? 'Learner',
+                      'Profile',
                       style: Theme.of(context)
                           .textTheme
-                          .headlineMedium
+                          .displaySmall
                           ?.copyWith(fontWeight: FontWeight.w800),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
+                    IconButton(
+                      icon: const Icon(Icons.settings_rounded),
+                      color: scheme.onSurfaceVariant,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const SettingsScreen()),
+                        );
+                      },
+                      tooltip: 'Settings',
+                    ),
+                  ],
+                ),
+              ),
+
+              // Avatar & Stats Card
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: GlassCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.secondary.withOpacityValue(0.18),
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: 86,
+                                height: 86,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: scheme.surface,
+                                ),
+                                child: _ProfileAvatar(emoji: user.avatarEmoji),
+                              ),
+                            ),
                           ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _QuickStat(
-                          icon: Icons.star_rounded,
-                          label: 'Points',
-                          value: '${user.totalXp}',
-                          color: AppColors.achievementGold,
-                        ),
-                        _QuickStat(
-                          icon: Icons.public_rounded,
-                          label: 'World',
-                          value: '#${(5000 - user.totalXp).clamp(1, 9999)}',
-                          color: AppColors.highlight,
-                        ),
-                        _QuickStat(
-                          icon: Icons.place_rounded,
-                          label: 'Local',
-                          value:
-                              '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
-                          color: AppColors.secondary,
-                        ),
-                      ],
-                    ),
-                  ],
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: FloatingActionButton.small(
+                              heroTag: 'editProfile',
+                              backgroundColor: AppColors.primary,
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      const ProfileSetupDialog(
+                                          isFirstTime: false),
+                                );
+                              },
+                              child: const Icon(Icons.edit_rounded, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        user.displayName ?? 'Learner',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _QuickStat(
+                            icon: Icons.star_rounded,
+                            label: 'Points',
+                            value: '${user.totalXp}',
+                            color: AppColors.achievementGold,
+                          ),
+                          _QuickStat(
+                            icon: Icons.public_rounded,
+                            label: 'World',
+                            value: '#${(5000 - user.totalXp).clamp(1, 9999)}',
+                            color: AppColors.highlight,
+                          ),
+                          _QuickStat(
+                            icon: Icons.place_rounded,
+                            label: 'Local',
+                            value:
+                                '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
+                            color: AppColors.secondary,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-              child: GlassCard(
-                padding: EdgeInsets.zero,
-                child: TabBar(
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: Colors.transparent,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: scheme.onSurfaceVariant,
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
-                  tabs: const [
-                    Tab(text: 'Badges'),
-                    Tab(text: 'Stats'),
-                  ],
+              _BadgesTab(
+                progress: progress,
+                lessonBadges: lessonBadges,
+                allBadges: allBadges,
+              ),
+              _StatsTab(user: user, progress: progress),
+              const SizedBox(height: AppSpacing.sm),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: GradientButton(
+                  label: 'Sign out',
+                  icon: Icons.logout_rounded,
+                  onPressed: _signOut,
+                  width: double.infinity,
                 ),
               ),
-            ),
-
-            // Tab Content
-            Expanded(
-              flex: 2,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _BadgesTab(
-                      progress: progress,
-                      lessonBadges: lessonBadges,
-                      allBadges: allBadges),
-                  _StatsTab(user: user, progress: progress),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -329,7 +304,7 @@ class _BadgesTab extends StatelessWidget {
       ));
     }
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,7 +521,7 @@ class _StatsTab extends StatelessWidget {
     final maxCount = activityCounts.reduce((a, b) => a > b ? a : b);
     final chartMaxY = (maxCount == 0 ? 1 : maxCount + 1).toDouble();
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
@@ -676,7 +651,7 @@ class _StatsTab extends StatelessWidget {
                       lineTouchData: LineTouchData(
                         handleBuiltInTouches: true,
                         touchTooltipData: LineTouchTooltipData(
-                          tooltipRoundedRadius: 12,
+                          tooltipBorderRadius: BorderRadius.circular(12),
                           tooltipPadding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
                           getTooltipItems: (touchedSpots) {

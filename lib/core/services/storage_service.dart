@@ -10,6 +10,7 @@ class StorageService {
   static const _uuid = Uuid();
 
   static late String _userId;
+  static bool _isInitialized = false;
   static UserProfile _userProfile =
       UserProfile(id: _uuid.v4(), createdAt: DateTime.now());
   static ProgressState _progressState = const ProgressState();
@@ -17,16 +18,20 @@ class StorageService {
   static List<AttemptLog> _attemptLogs = [];
   static ThemeMode _themeMode = ThemeMode.dark;
 
-  static Future<void> init() async {
-    final user = _auth.currentUser ?? (await _auth.signInAnonymously()).user;
-    if (user == null) {
-      throw StateError('Unable to initialize anonymous user.');
+  static Future<void> init({User? user}) async {
+    final currentUser = user ?? _auth.currentUser;
+    if (currentUser == null) {
+      return;
     }
-    _userId = user.uid;
+    _userId = currentUser.uid;
+    _userProfile = UserProfile(id: _userId, createdAt: DateTime.now());
 
     await _ensureDocumentsExist();
     await _loadCachedData();
+    _isInitialized = true;
   }
+
+  static bool get isInitialized => _isInitialized;
 
   static DocumentReference<Map<String, dynamic>> _userDoc() {
     return _firestore.collection('users').doc(_userId);
@@ -51,7 +56,11 @@ class StorageService {
   static Future<void> _ensureDocumentsExist() async {
     final userSnap = await _userDoc().get();
     if (!userSnap.exists) {
-      final newUser = UserProfile(id: _userId, createdAt: DateTime.now());
+      final newUser = UserProfile(
+        id: _userId,
+        createdAt: DateTime.now(),
+        showGuidedTour: true,
+      );
       await _userDoc().set(newUser.toMap());
     }
 
@@ -111,6 +120,11 @@ class StorageService {
   static Future<void> saveUserProfile(UserProfile profile) async {
     _userProfile = profile;
     await _userDoc().set(profile.toMap(), SetOptions(merge: true));
+  }
+
+  static Future<void> markGuidedTourSeen() async {
+    final updatedUser = _userProfile.copyWith(showGuidedTour: false);
+    await saveUserProfile(updatedUser);
   }
 
   static Future<UserProfile> addXp(int xp) async {

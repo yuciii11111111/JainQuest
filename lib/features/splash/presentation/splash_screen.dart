@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../home/presentation/home_screen.dart';
-import '../../auth/presentation/login_screen.dart';
+import '../../auth/presentation/create_account_screen.dart';
 import '../../../core/services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,12 +18,20 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
-        final user = StorageService.getUserProfile();
-        final nextScreen =
-            user.isProfileComplete ? const HomeScreen() : const LoginScreen();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => nextScreen),
-        );
+        final authUser = FirebaseAuth.instance.currentUser;
+        if (authUser == null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const CreateAccountScreen()),
+          );
+          return;
+        }
+
+        StorageService.init(user: authUser).then((_) {
+          if (!mounted) return;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        });
       }
     });
   }

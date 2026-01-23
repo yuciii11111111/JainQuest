@@ -59,9 +59,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             },
           ),
-          const ForumScreen(),
           const ResourcesScreen(),
           const GuruScreen(),
+          const ForumScreen(),
           const ProfileScreen(),
         ],
       ),

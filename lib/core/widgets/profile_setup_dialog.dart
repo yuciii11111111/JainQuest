@@ -22,7 +22,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   static const List<String> _emojiOptions = [
     '🧘',
     '🪷',
@@ -37,7 +36,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
   ];
   String? _selectedEmoji;
   bool _isLoading = false;
-  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -60,7 +58,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
     _nameController.dispose();
     _ageController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -100,17 +97,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
       return;
     }
 
-    if (widget.isFirstTime && _passwordController.text.trim().length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password must be at least 6 characters'),
-          backgroundColor: AppColors.danger,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     final user = ref.read(userProfileProvider);
@@ -118,9 +104,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
       displayName: _nameController.text.trim(),
       age: ageValue,
       email: _emailController.text.trim(),
-      password: _passwordController.text.trim().isEmpty
-          ? user.password
-          : _passwordController.text.trim(),
       avatarEmoji: _selectedEmoji ?? user.avatarEmoji,
     );
     await StorageService.saveUserProfile(updatedUser);
@@ -313,47 +296,6 @@ class _ProfileSetupDialogState extends ConsumerState<ProfileSetupDialog> {
                 fillColor: scheme.surface,
               ),
               style: Theme.of(context).textTheme.bodyLarge,
-            ),
-
-            const SizedBox(height: AppSpacing.md),
-
-            // Password Input
-            TextField(
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              decoration: InputDecoration(
-                labelText: widget.isFirstTime ? 'Password' : 'New password (optional)',
-                hintText: widget.isFirstTime ? 'Set a password' : 'Leave blank to keep',
-                prefixIcon: const Icon(Icons.lock_rounded),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: BorderSide(color: scheme.outline),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: BorderSide(color: scheme.outline),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                ),
-                filled: true,
-                fillColor: scheme.surface,
-              ),
-              style: Theme.of(context).textTheme.bodyLarge,
-              onSubmitted: (_) => _saveProfile(),
             ),
 
             const SizedBox(height: AppSpacing.lg),

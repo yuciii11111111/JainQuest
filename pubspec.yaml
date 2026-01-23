@@ -11,47 +11,47 @@ dependencies:
     sdk: flutter
   
   # State Management
-  flutter_riverpod: ^2.4.9
-  riverpod_annotation: ^2.3.3
+  flutter_riverpod: 
+  riverpod_annotation: 
   
   # Remote Storage
   
   # Animations
-  lottie: ^3.0.0
-  confetti: ^0.7.0
-  flutter_animate: ^4.3.0
+  lottie: 
+  confetti: 
+  flutter_animate: 
   
   # Notifications
-  flutter_local_notifications: ^17.0.0
-  timezone: ^0.9.2
+  flutter_local_notifications: 
+  timezone: 
   
   # UI Components
-  google_fonts: ^6.1.0
-  flutter_svg: ^2.0.9
-  cached_network_image: ^3.3.1
-  shimmer: ^3.0.0
+  google_fonts:
+  flutter_svg: 
+  cached_network_image: 
+  shimmer: 
   
   # Charts & Analytics
-  fl_chart: ^0.66.0
+  fl_chart: 
   
   # Effects
-  blur: ^3.0.0
+  blur: 
   
   # Haptics & Feedback
-  vibration: ^1.8.4
+  vibration: 
   
   # Sharing
-  share_plus: ^7.2.1
+  share_plus:
   
   # Video/External Links
-  url_launcher: ^6.2.2
-  video_player: ^2.8.2
+  url_launcher: 
+  video_player: 
   
   # Utilities
-  intl: ^0.19.0
-  equatable: ^2.0.5
-  uuid: ^4.2.2
-  google_generative_ai: ^0.4.6
+  intl: 
+  equatable: 
+  uuid: 
+  google_generative_ai: 
 
   #firebase
   firebase_core:

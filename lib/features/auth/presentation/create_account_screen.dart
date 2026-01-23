@@ -1,35 +1,42 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/models/user_models.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/glass_card.dart';
-import '../../../core/widgets/profile_setup_dialog.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
 import '../../home/presentation/home_screen.dart';
-import 'create_account_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class CreateAccountScreen extends ConsumerStatefulWidget {
+  const CreateAccountScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<CreateAccountScreen> createState() => _CreateAccountScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _ageController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -56,35 +63,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final result = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
       final user = result.user;
       if (user == null) {
-        throw StateError('Unable to log in.');
+        throw StateError('Unable to create account.');
       }
 
       await StorageService.init(user: user);
-      ref.read(userProfileProvider.notifier).refresh();
 
-      final profile = StorageService.getUserProfile();
-      if (!profile.isProfileComplete && mounted) {
-        await showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const ProfileSetupDialog(isFirstTime: true),
-        );
-      }
+      final ageValue = int.tryParse(_ageController.text.trim());
+      final profile = UserProfile(
+        id: user.uid,
+        createdAt: DateTime.now(),
+        displayName: _nameController.text.trim(),
+        age: ageValue,
+        email: _emailController.text.trim(),
+        showGuidedTour: true,
+      );
+
+      await StorageService.saveUserProfile(profile);
+      ref.read(userProfileProvider.notifier).refresh();
 
       if (mounted) {
         await _goToHome();
       }
     } on FirebaseAuthException catch (error) {
-      _showError(error.message ?? 'Unable to log in.');
+      _showError(error.message ?? 'Unable to create account.');
     } catch (_) {
-      _showError('Unable to log in. Please try again.');
+      _showError('Unable to create account. Please try again.');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -123,14 +134,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 gap: AppSpacing.sm,
                 items: [
                   TypewriterSequenceItem(
-                    text: 'Welcome back',
+                    text: 'Create your JainQuest account',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                           fontWeight: FontWeight.w900,
                         ),
                     speed: const Duration(milliseconds: 18),
                   ),
                   TypewriterSequenceItem(
-                    text: 'Log in to continue your learning path.',
+                    text: 'Start your journey with a personalized path.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
@@ -145,6 +156,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      TextFormField(
+                        controller: _nameController,
+                        textCapitalization: TextCapitalization.words,
+                        decoration: const InputDecoration(
+                          labelText: 'Full name',
+                          prefixIcon: Icon(Icons.person_rounded),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextFormField(
+                        controller: _ageController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Age',
+                          prefixIcon: Icon(Icons.cake_rounded),
+                        ),
+                        validator: (value) {
+                          final parsed = int.tryParse(value?.trim() ?? '');
+                          if (parsed == null || parsed <= 0) {
+                            return 'Enter a valid age';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -187,13 +229,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        obscureText: _obscureConfirmPassword,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm password',
+                          prefixIcon: const Icon(Icons.lock_outline_rounded),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Confirm your password';
+                          }
+                          if (value.trim() != _passwordController.text.trim()) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
               GradientButton(
-                label: 'Log in',
+                label: 'Create account',
                 icon: Icons.arrow_forward_rounded,
                 onPressed: _isLoading ? null : _submit,
                 isLoading: _isLoading,
@@ -204,20 +277,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'New here?',
+                    'Already have an account?',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) => const CreateAccountScreen(),
-                        ),
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     },
-                    child: const Text('Create an account'),
+                    child: const Text('Log in'),
                   ),
                 ],
               ),

@@ -39,9 +39,9 @@ class UserProfile extends Equatable {
 
   final String? email;
 
-  final String? password;
-
   final String? avatarEmoji;
+
+  final bool showGuidedTour;
 
   const UserProfile({
     required this.id,
@@ -56,8 +56,8 @@ class UserProfile extends Equatable {
     required this.createdAt,
     this.age,
     this.email,
-    this.password,
     this.avatarEmoji,
+    this.showGuidedTour = false,
   });
 
   UserProfile copyWith({
@@ -73,8 +73,8 @@ class UserProfile extends Equatable {
     DateTime? createdAt,
     int? age,
     String? email,
-    String? password,
     String? avatarEmoji,
+    bool? showGuidedTour,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -89,8 +89,8 @@ class UserProfile extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       age: age ?? this.age,
       email: email ?? this.email,
-      password: password ?? this.password,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
+      showGuidedTour: showGuidedTour ?? this.showGuidedTour,
     );
   }
 
@@ -114,7 +114,6 @@ class UserProfile extends Equatable {
   bool get isProfileComplete {
     return (displayName?.trim().isNotEmpty ?? false) &&
         (email?.trim().isNotEmpty ?? false) &&
-        (password?.trim().isNotEmpty ?? false) &&
         (age ?? 0) > 0;
   }
 
@@ -132,8 +131,8 @@ class UserProfile extends Equatable {
       'createdAt': createdAt,
       'age': age,
       'email': email,
-      'password': password,
       'avatarEmoji': avatarEmoji,
+      'showGuidedTour': showGuidedTour,
     };
   }
 
@@ -151,8 +150,8 @@ class UserProfile extends Equatable {
       createdAt: _readDateTime(data['createdAt']) ?? DateTime.now(),
       age: (data['age'] as num?)?.toInt(),
       email: data['email'] as String?,
-      password: data['password'] as String?,
       avatarEmoji: data['avatarEmoji'] as String?,
+      showGuidedTour: data['showGuidedTour'] as bool? ?? false,
     );
   }
 
@@ -170,8 +169,8 @@ class UserProfile extends Equatable {
         createdAt,
         age,
         email,
-        password,
         avatarEmoji,
+        showGuidedTour,
       ];
 }
 

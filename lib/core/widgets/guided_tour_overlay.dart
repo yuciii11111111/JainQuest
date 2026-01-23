@@ -3,20 +3,23 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../guide/guide_keys.dart';
+import '../navigation/app_navigator.dart';
 import '../providers/app_providers.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
+import 'gradient_button.dart';
 import '../../features/path/presentation/unit_path_screen.dart';
 import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
 import 'floating_guide_overlay.dart';
 
-class GuidedTourOverlay extends StatefulWidget {
+class GuidedTourOverlay extends ConsumerStatefulWidget {
   const GuidedTourOverlay({super.key});
 
   @override
-  State<GuidedTourOverlay> createState() => _GuidedTourOverlayState();
+  ConsumerState<GuidedTourOverlay> createState() => _GuidedTourOverlayState();
 }
 
-class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
+class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
   static const _guideAsset = 'assets/images/duo_guide.png';
 
   int _currentIndex = 0;
@@ -35,6 +38,13 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
 
   List<_TourStep> _stepsFor(BuildContext context) {
     final container = ProviderScope.containerOf(context, listen: false);
+    void pushRoute(Widget page) {
+      final navigator = appNavigatorKey.currentState;
+      if (navigator == null) {
+        return;
+      }
+      navigator.push(MaterialPageRoute(builder: (_) => page));
+    }
 
     return [
       _TourStep(
@@ -42,9 +52,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
         title: 'Start your first course',
         message: 'Tap Continue Learning to open your path.',
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const UnitPathScreen()),
-          );
+          pushRoute(const UnitPathScreen());
         },
       ),
       _TourStep(
@@ -59,9 +67,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
           container
               .read(lessonRunnerProvider.notifier)
               .startLesson(unit.lessons.first);
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LessonRunnerScreen()),
-          );
+          pushRoute(const LessonRunnerScreen());
         },
       ),
       _TourStep(
@@ -102,20 +108,37 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
     return topLeft & renderBox.size;
   }
 
-  Future<void> _handleStepTap(_TourStep step) async {
+  Future<void> _advanceStep(_TourStep step) async {
     step.onTap();
     await Future<void>.delayed(const Duration(milliseconds: 350));
     if (!mounted) {
       return;
     }
+    final steps = _stepsFor(context);
+    final isLastStep = _currentIndex >= steps.length - 1;
+    if (isLastStep) {
+      await StorageService.markGuidedTourSeen();
+      ref.read(userProfileProvider.notifier).refresh();
+      if (!mounted) return;
+      setState(() {
+        _tourActive = false;
+        _targetRect = null;
+      });
+      return;
+    }
     setState(() {
-      _currentIndex = (_currentIndex + 1) % _stepsFor(context).length;
+      _currentIndex = (_currentIndex + 1) % steps.length;
       _targetRect = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProfileProvider);
+    if (!user.showGuidedTour) {
+      return const SizedBox.shrink();
+    }
+
     if (!_tourActive) {
       return const FloatingGuideOverlay();
     }
@@ -125,6 +148,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
     final step = steps[_currentIndex];
     final targetRect = _targetRect;
     final scheme = Theme.of(context).colorScheme;
+    final isLastStep = _currentIndex >= steps.length - 1;
 
     if (targetRect == null) {
       return const SizedBox.shrink();
@@ -178,7 +202,7 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => _handleStepTap(step),
+              onTap: null,
               borderRadius: BorderRadius.circular(22),
             ),
           ),
@@ -230,12 +254,31 @@ class _GuidedTourOverlayState extends State<GuidedTourOverlay> {
           right: 16,
           top: 40,
           child: TextButton(
-            onPressed: () => setState(() => _tourActive = false),
+            onPressed: () async {
+              await StorageService.markGuidedTourSeen();
+              ref.read(userProfileProvider.notifier).refresh();
+              if (!mounted) return;
+              setState(() => _tourActive = false);
+            },
             child: Text(
               'Skip',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: 24,
+          child: SafeArea(
+            top: false,
+            child: GradientButton(
+              label: isLastStep ? 'Finish' : 'Next',
+              icon: isLastStep ? Icons.check_rounded : Icons.arrow_forward_rounded,
+              onPressed: () => _advanceStep(step),
+              width: double.infinity,
             ),
           ),
         ),

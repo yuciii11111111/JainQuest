@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,14 +12,18 @@ import 'core/providers/theme_provider.dart';
 import 'core/widgets/animated_gradient_background.dart';
 import 'core/widgets/guided_tour_overlay.dart';
 import 'core/widgets/video_background.dart';
+import 'core/navigation/app_navigator.dart';
 import 'features/splash/presentation/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize Firestore-backed storage
-  await StorageService.init();
+  // Initialize Firestore-backed storage when a user is already signed in.
+  final currentUser = FirebaseAuth.instance.currentUser;
+  if (currentUser != null) {
+    await StorageService.init(user: currentUser);
+  }
 
   // Initialize notifications
   await NotificationService.init();
@@ -66,6 +71,7 @@ class JainQuestApp extends ConsumerWidget {
     return MaterialApp(
       title: 'JainQuest',
       debugShowCheckedModeBanner: false,
+      navigatorKey: appNavigatorKey,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
