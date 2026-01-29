@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
+import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/models/lesson_models.dart';
@@ -114,6 +115,7 @@ class UnitPathScreen extends ConsumerWidget {
                       key: i == 0 ? GuideKeys.firstPathStep : null,
                       lesson: unit.lessons[i],
                       index: i,
+                      alignLeft: i.isEven,
                       isCompleted: progress.isLessonCompleted(unit.lessons[i].lessonId),
                       isCurrent: progress.isLessonUnlocked(unit.lessons[i].lessonId) &&
                           !progress.isLessonCompleted(unit.lessons[i].lessonId),
@@ -127,11 +129,9 @@ class UnitPathScreen extends ConsumerWidget {
                           : null,
                     ),
                     if (i != unit.lessons.length - 1)
-                      Container(
-                        width: 2,
-                        height: 32,
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      _PathConnector(
+                        alignLeft: i.isEven,
+                        nextAlignLeft: (i + 1).isEven,
                       ),
                   ],
                 ],
@@ -152,6 +152,7 @@ class _PathStep extends StatelessWidget {
   final int index;
   final bool isCompleted;
   final bool isCurrent;
+  final bool alignLeft;
   final VoidCallback? onTap;
 
   const _PathStep({
@@ -160,54 +161,181 @@ class _PathStep extends StatelessWidget {
     required this.index,
     required this.isCompleted,
     required this.isCurrent,
+    required this.alignLeft,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor;
-    Widget icon;
+    const double ringSize = 84;
+    const double nodeSize = 60;
+    const double horizontalInset = 12;
+    final scheme = Theme.of(context).colorScheme;
+    final isLocked = !isCompleted && !isCurrent;
 
-    if (isCompleted) {
-      borderColor = AppColors.success;
-      icon = const Icon(Icons.check_rounded, color: Colors.white);
-    } else if (isCurrent) {
-      borderColor = AppColors.primary;
-      icon = const Icon(Icons.play_arrow_rounded, color: Colors.white);
-    } else {
-      borderColor = Theme.of(context).colorScheme.onSurfaceVariant;
-      icon = const Icon(Icons.lock_rounded, color: Colors.white70);
-    }
+    final Color ringColor = isCompleted
+        ? AppColors.success
+        : isCurrent
+            ? AppColors.primary
+            : scheme.outline;
+
+    final IconData icon = _PathIcons.forIndex(index, isLocked: isLocked);
+
+    final Widget node = ProgressRing(
+      progress: isCompleted ? 1.0 : (isCurrent ? 0.7 : 0.0),
+      size: ringSize,
+      strokeWidth: 8,
+      color: ringColor,
+      backgroundColor: scheme.surfaceVariant.withOpacityValue(0.6),
+      child: Container(
+        width: nodeSize,
+        height: nodeSize,
+        decoration: BoxDecoration(
+          color: isLocked ? scheme.surfaceVariant : ringColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: ringColor.withOpacityValue(isLocked ? 0.2 : 0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: isLocked ? scheme.onSurfaceVariant : Colors.white,
+          size: 28,
+        ),
+      ),
+    );
 
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isCompleted || isCurrent
-                  ? AppColors.primary
-                  : Theme.of(context).colorScheme.surfaceVariant,
-              shape: BoxShape.circle,
-              border: Border.all(color: borderColor, width: 3),
-            ),
-            child: Center(child: icon),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            lesson.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: isCompleted || isCurrent
-                      ? Theme.of(context).colorScheme.onSurface
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment:
+              alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                if (!alignLeft) const Expanded(child: SizedBox()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: horizontalInset),
+                  child: node,
                 ),
-          ),
-        ],
+                if (alignLeft) const Expanded(child: SizedBox()),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            SizedBox(
+              width: 180,
+              child: Text(
+                lesson.title,
+                textAlign: alignLeft ? TextAlign.left : TextAlign.right,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: isLocked ? scheme.onSurfaceVariant : scheme.onSurface,
+                    ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+}
+
+class _PathConnector extends StatelessWidget {
+  final bool alignLeft;
+  final bool nextAlignLeft;
+
+  const _PathConnector({
+    required this.alignLeft,
+    required this.nextAlignLeft,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const double height = 52;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(
+        painter: _PathConnectorPainter(
+          alignLeft: alignLeft,
+          nextAlignLeft: nextAlignLeft,
+          color: Theme.of(context).colorScheme.outline.withOpacityValue(0.5),
+        ),
+      ),
+    );
+  }
+}
+
+class _PathConnectorPainter extends CustomPainter {
+  final bool alignLeft;
+  final bool nextAlignLeft;
+  final Color color;
+
+  _PathConnectorPainter({
+    required this.alignLeft,
+    required this.nextAlignLeft,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double ringSize = 84;
+    const double horizontalInset = 12;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round;
+
+    final startX = alignLeft
+        ? horizontalInset + ringSize / 2
+        : size.width - horizontalInset - ringSize / 2;
+    final endX = nextAlignLeft
+        ? horizontalInset + ringSize / 2
+        : size.width - horizontalInset - ringSize / 2;
+
+    final path = Path()
+      ..moveTo(startX, 0)
+      ..cubicTo(
+        startX,
+        size.height * 0.45,
+        endX,
+        size.height * 0.55,
+        endX,
+        size.height,
+      );
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PathConnectorPainter oldDelegate) {
+    return oldDelegate.alignLeft != alignLeft ||
+        oldDelegate.nextAlignLeft != nextAlignLeft ||
+        oldDelegate.color != color;
+  }
+}
+
+class _PathIcons {
+  static const List<IconData> _icons = [
+    Icons.star_rounded,
+    Icons.mic_rounded,
+    Icons.videocam_rounded,
+    Icons.auto_awesome_rounded,
+    Icons.menu_book_rounded,
+    Icons.emoji_events_rounded,
+  ];
+
+  static IconData forIndex(int index, {required bool isLocked}) {
+    if (isLocked) {
+      return Icons.lock_rounded;
+    }
+    return _icons[index % _icons.length];
   }
 }
 

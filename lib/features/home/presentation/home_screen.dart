@@ -104,20 +104,20 @@ class _GlassBottomNav extends StatelessWidget {
               onTap: () => onTap(0),
             ),
             _NavItem(
-              icon: Icons.forum_rounded,
-              label: 'Forum',
+              icon: Icons.auto_awesome_rounded,
+              label: 'Resources',
               isSelected: currentIndex == 1,
               onTap: () => onTap(1),
             ),
             _NavItem(
-              icon: Icons.auto_awesome_rounded,
-              label: 'Resources',
+              icon: Icons.psychology_rounded,
+              label: 'Ask',
               isSelected: currentIndex == 2,
               onTap: () => onTap(2),
             ),
             _NavItem(
-              icon: Icons.psychology_rounded,
-              label: 'Ask Guru',
+              icon: Icons.forum_rounded,
+              label: 'Community',
               isSelected: currentIndex == 3,
               onTap: () => onTap(3),
             ),
@@ -542,8 +542,13 @@ class _JourneyPath extends StatelessWidget {
             alignLeft: i.isEven,
             isLast: i == lessons.length - 1,
             onTap: () => onLessonTap(lessons[i]),
+            index: i,
           ),
-          if (i != lessons.length - 1) const SizedBox(height: AppSpacing.lg),
+          if (i != lessons.length - 1)
+            _JourneyConnector(
+              alignLeft: i.isEven,
+              nextAlignLeft: (i + 1).isEven,
+            ),
         ],
       ],
     );
@@ -558,6 +563,7 @@ class _JourneyNode extends StatelessWidget {
   final bool alignLeft;
   final bool isLast;
   final VoidCallback onTap;
+  final int index;
 
   const _JourneyNode({
     required this.lesson,
@@ -567,70 +573,177 @@ class _JourneyNode extends StatelessWidget {
     required this.alignLeft,
     required this.isLast,
     required this.onTap,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final Color stateColor = isCompleted
+    const double ringSize = 88;
+    const double nodeSize = 60;
+    const double horizontalInset = 12;
+    final isLocked = !isUnlocked;
+    final Color ringColor = isCompleted
         ? AppColors.success
         : isCurrent
             ? AppColors.primary
-            : scheme.onSurfaceVariant;
-    final Color nodeFill = isUnlocked ? scheme.surface : scheme.surfaceVariant;
+            : scheme.outline;
 
-    final node = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: isUnlocked ? onTap : null,
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: nodeFill,
-              shape: BoxShape.circle,
-              border: Border.all(color: stateColor, width: 2),
-            ),
-            child: Icon(
-              isCompleted
-                  ? Icons.check_rounded
-                  : isCurrent
-                      ? Icons.play_arrow_rounded
-                      : Icons.lock_rounded,
-              color: stateColor,
-              size: 28,
-            ),
+    final IconData icon = _JourneyIcons.forIndex(index, isLocked: isLocked);
+
+    final node = GestureDetector(
+      onTap: isUnlocked ? onTap : null,
+      child: ProgressRing(
+        progress: isCompleted ? 1.0 : (isCurrent ? 0.72 : 0.0),
+        size: ringSize,
+        strokeWidth: 8,
+        color: ringColor,
+        backgroundColor: scheme.surfaceVariant.withOpacityValue(0.6),
+        child: Container(
+          width: nodeSize,
+          height: nodeSize,
+          decoration: BoxDecoration(
+            color: isLocked ? scheme.surfaceVariant : ringColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: ringColor.withOpacityValue(isLocked ? 0.18 : 0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            color: isLocked ? scheme.onSurfaceVariant : Colors.white,
+            size: 28,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          width: 160,
-          child: Text(
-            lesson.title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color:
-                      isUnlocked ? scheme.onSurface : scheme.onSurfaceVariant,
-                ),
-          ),
-        ),
-        if (!isLast) ...[
-          const SizedBox(height: AppSpacing.md),
-          Container(
-            width: 2,
-            height: 28,
-            color: scheme.outline,
-          ),
-        ],
-      ],
+      ),
     );
 
     return Row(
       children: [
-        if (!alignLeft) const Spacer(),
-        node,
-        if (alignLeft) const Spacer(),
+        if (!alignLeft) const Expanded(child: SizedBox()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: horizontalInset),
+          child: Column(
+            crossAxisAlignment:
+                alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+            children: [
+              node,
+              const SizedBox(height: AppSpacing.sm),
+              SizedBox(
+                width: 170,
+                child: Text(
+                  lesson.title,
+                  textAlign: alignLeft ? TextAlign.left : TextAlign.right,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: isLocked
+                            ? scheme.onSurfaceVariant
+                            : scheme.onSurface,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (alignLeft) const Expanded(child: SizedBox()),
       ],
     );
+  }
+}
+
+class _JourneyConnector extends StatelessWidget {
+  final bool alignLeft;
+  final bool nextAlignLeft;
+
+  const _JourneyConnector({
+    required this.alignLeft,
+    required this.nextAlignLeft,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const double height = 52;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(
+        painter: _JourneyConnectorPainter(
+          alignLeft: alignLeft,
+          nextAlignLeft: nextAlignLeft,
+          color: Theme.of(context).colorScheme.outline.withOpacityValue(0.45),
+        ),
+      ),
+    );
+  }
+}
+
+class _JourneyConnectorPainter extends CustomPainter {
+  final bool alignLeft;
+  final bool nextAlignLeft;
+  final Color color;
+
+  _JourneyConnectorPainter({
+    required this.alignLeft,
+    required this.nextAlignLeft,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double ringSize = 88;
+    const double horizontalInset = 12;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round;
+
+    final startX = alignLeft
+        ? horizontalInset + ringSize / 2
+        : size.width - horizontalInset - ringSize / 2;
+    final endX = nextAlignLeft
+        ? horizontalInset + ringSize / 2
+        : size.width - horizontalInset - ringSize / 2;
+
+    final path = Path()
+      ..moveTo(startX, 0)
+      ..cubicTo(
+        startX,
+        size.height * 0.45,
+        endX,
+        size.height * 0.55,
+        endX,
+        size.height,
+      );
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _JourneyConnectorPainter oldDelegate) {
+    return oldDelegate.alignLeft != alignLeft ||
+        oldDelegate.nextAlignLeft != nextAlignLeft ||
+        oldDelegate.color != color;
+  }
+}
+
+class _JourneyIcons {
+  static const List<IconData> _icons = [
+    Icons.star_rounded,
+    Icons.mic_rounded,
+    Icons.videocam_rounded,
+    Icons.auto_awesome_rounded,
+    Icons.menu_book_rounded,
+    Icons.emoji_events_rounded,
+  ];
+
+  static IconData forIndex(int index, {required bool isLocked}) {
+    if (isLocked) {
+      return Icons.lock_rounded;
+    }
+    return _icons[index % _icons.length];
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 // ============================================================================
 // Premium Dark Theme Colors
@@ -9,9 +8,9 @@ class AppColors {
   AppColors._();
 
   // Backgrounds
-  static const Color backgroundBase = Color(0xFF0E0B22);
-  static const Color backgroundCard = Color(0xFF1D1938);
-  static const Color backgroundElevated = Color(0xFF2A2351);
+  static const Color backgroundBase = Color(0xFF0B1B3B);
+  static const Color backgroundCard = Color(0xFF0F244F);
+  static const Color backgroundElevated = Color(0xFF132B5A);
 
   // Text
   static const Color textPrimary = Color(0xFFFFFFFF);
@@ -148,6 +147,25 @@ class AppGradients {
   }
 }
 
+// ============================================================================
+// Typography
+// ============================================================================
+
+class AppTypography {
+  AppTypography._();
+
+  static const String fontFamily = 'SF Pro';
+  static const List<String> fontFamilyFallback = [
+    'SF Pro Display',
+    'SF Pro Text',
+    'San Francisco',
+    '.SF Pro Text',
+    '.SF Pro Display',
+    'Helvetica Neue',
+    'Arial',
+  ];
+}
+
 extension ColorOpacityX on Color {
   /// Opacity helper that uses [withValues] to avoid precision loss.
   Color withOpacityValue(double opacity) {
@@ -163,10 +181,116 @@ extension ColorOpacityX on Color {
 class AppTheme {
   AppTheme._();
 
+  static TextTheme _buildTextTheme({
+    required Color primary,
+    required Color secondary,
+    required Color muted,
+  }) {
+    return TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.w800,
+        color: primary,
+        height: 1.2,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        color: primary,
+        height: 1.25,
+        letterSpacing: -0.5,
+      ),
+      displaySmall: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w800,
+        color: primary,
+        height: 1.3,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: primary,
+        height: 1.3,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: primary,
+        height: 1.35,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: primary,
+        height: 1.4,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: primary,
+        height: 1.4,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: primary,
+        height: 1.45,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: secondary,
+        height: 1.45,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: primary,
+        height: 1.5,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: primary,
+        height: 1.5,
+      ),
+      bodySmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: muted,
+        height: 1.5,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: primary,
+        letterSpacing: 0.5,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: secondary,
+        letterSpacing: 0.4,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: muted,
+        letterSpacing: 0.3,
+      ),
+    ).apply(
+      fontFamily: AppTypography.fontFamily,
+      fontFamilyFallback: AppTypography.fontFamilyFallback,
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: AppTypography.fontFamily,
+      fontFamilyFallback: AppTypography.fontFamilyFallback,
       scaffoldBackgroundColor: AppColors.backgroundBase,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
@@ -184,99 +308,10 @@ class AppTheme {
       ),
 
       // Typography
-      textTheme: GoogleFonts.nunitoTextTheme().copyWith(
-        displayLarge: GoogleFonts.nunito(
-          fontSize: 32,
-          fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
-          height: 1.2,
-          letterSpacing: -0.5,
-        ),
-        displayMedium: GoogleFonts.nunito(
-          fontSize: 28,
-          fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
-          height: 1.25,
-          letterSpacing: -0.5,
-        ),
-        displaySmall: GoogleFonts.nunito(
-          fontSize: 24,
-          fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
-          height: 1.3,
-        ),
-        headlineLarge: GoogleFonts.nunito(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          height: 1.3,
-        ),
-        headlineMedium: GoogleFonts.nunito(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          height: 1.35,
-        ),
-        headlineSmall: GoogleFonts.nunito(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          height: 1.4,
-        ),
-        titleLarge: GoogleFonts.nunito(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          height: 1.4,
-        ),
-        titleMedium: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-          height: 1.45,
-        ),
-        titleSmall: GoogleFonts.nunito(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
-          height: 1.45,
-        ),
-        bodyLarge: GoogleFonts.nunito(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textPrimary,
-          height: 1.5,
-        ),
-        bodyMedium: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textPrimary,
-          height: 1.5,
-        ),
-        bodySmall: GoogleFonts.nunito(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
-          height: 1.5,
-        ),
-        labelLarge: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-          letterSpacing: 0.5,
-        ),
-        labelMedium: GoogleFonts.nunito(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.4,
-        ),
-        labelSmall: GoogleFonts.nunito(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.3,
-        ),
+      textTheme: _buildTextTheme(
+        primary: AppColors.textPrimary,
+        secondary: AppColors.textSecondary,
+        muted: AppColors.textMuted,
       ),
 
       // App Bar
@@ -285,7 +320,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.nunito(
+        titleTextStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
@@ -315,7 +350,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
           ),
-          textStyle: GoogleFonts.nunito(
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
@@ -341,6 +376,8 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: AppTypography.fontFamily,
+      fontFamilyFallback: AppTypography.fontFamilyFallback,
       scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
@@ -359,99 +396,10 @@ class AppTheme {
       ),
 
       // Typography
-      textTheme: GoogleFonts.nunitoTextTheme().copyWith(
-        displayLarge: GoogleFonts.nunito(
-          fontSize: 32,
-          fontWeight: FontWeight.w800,
-          color: AppColors.lightTextPrimary,
-          height: 1.2,
-          letterSpacing: -0.5,
-        ),
-        displayMedium: GoogleFonts.nunito(
-          fontSize: 28,
-          fontWeight: FontWeight.w800,
-          color: AppColors.lightTextPrimary,
-          height: 1.25,
-          letterSpacing: -0.5,
-        ),
-        displaySmall: GoogleFonts.nunito(
-          fontSize: 24,
-          fontWeight: FontWeight.w800,
-          color: AppColors.lightTextPrimary,
-          height: 1.3,
-        ),
-        headlineLarge: GoogleFonts.nunito(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: AppColors.lightTextPrimary,
-          height: 1.3,
-        ),
-        headlineMedium: GoogleFonts.nunito(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: AppColors.lightTextPrimary,
-          height: 1.35,
-        ),
-        headlineSmall: GoogleFonts.nunito(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: AppColors.lightTextPrimary,
-          height: 1.4,
-        ),
-        titleLarge: GoogleFonts.nunito(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: AppColors.lightTextPrimary,
-          height: 1.4,
-        ),
-        titleMedium: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.lightTextPrimary,
-          height: 1.45,
-        ),
-        titleSmall: GoogleFonts.nunito(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.lightTextSecondary,
-          height: 1.45,
-        ),
-        bodyLarge: GoogleFonts.nunito(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          color: AppColors.lightTextPrimary,
-          height: 1.5,
-        ),
-        bodyMedium: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: AppColors.lightTextPrimary,
-          height: 1.5,
-        ),
-        bodySmall: GoogleFonts.nunito(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: AppColors.lightTextSecondary,
-          height: 1.5,
-        ),
-        labelLarge: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.lightTextPrimary,
-          letterSpacing: 0.5,
-        ),
-        labelMedium: GoogleFonts.nunito(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.lightTextSecondary,
-          letterSpacing: 0.4,
-        ),
-        labelSmall: GoogleFonts.nunito(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.lightTextSecondary,
-          letterSpacing: 0.3,
-        ),
+      textTheme: _buildTextTheme(
+        primary: AppColors.lightTextPrimary,
+        secondary: AppColors.lightTextSecondary,
+        muted: AppColors.lightTextMuted,
       ),
 
       // App Bar
@@ -460,7 +408,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.nunito(
+        titleTextStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.lightTextPrimary,
@@ -490,7 +438,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.button),
           ),
-          textStyle: GoogleFonts.nunito(
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
