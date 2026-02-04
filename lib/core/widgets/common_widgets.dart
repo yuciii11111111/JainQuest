@@ -449,7 +449,8 @@ class FeedbackBanner extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isCorrect ? AppColors.success : AppColors.danger,
+                  backgroundColor:
+                      isCorrect ? AppColors.success : AppColors.danger,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Continue'),
@@ -621,7 +622,9 @@ class BadgeWidget extends StatelessWidget {
                   : Theme.of(context).colorScheme.surfaceVariant,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isEarned ? AppColors.secondary : Theme.of(context).colorScheme.outline,
+                color: isEarned
+                    ? AppColors.secondary
+                    : Theme.of(context).colorScheme.outline,
                 width: 3,
               ),
             ),
@@ -647,6 +650,69 @@ class BadgeWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+// ============================================================================
+// Social Sign In Button
+// ============================================================================
+
+class SocialSignInButton extends StatelessWidget {
+  final String label;
+  final String iconAsset;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+
+  const SocialSignInButton({
+    super.key,
+    required this.label,
+    required this.iconAsset,
+    this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isNetwork = iconAsset.startsWith('http');
+
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: OutlinedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          side: BorderSide(color: scheme.outline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.button),
+          ),
+          backgroundColor: scheme.surface.withOpacityValue(0.5),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isNetwork)
+                    Image.network(iconAsset, width: 24, height: 24)
+                  else
+                    Image.asset(iconAsset, width: 24, height: 24),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

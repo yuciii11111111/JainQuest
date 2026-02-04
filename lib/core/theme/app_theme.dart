@@ -8,9 +8,13 @@ class AppColors {
   AppColors._();
 
   // Backgrounds
-  static const Color backgroundBase = Color(0xFF0B1B3B);
-  static const Color backgroundCard = Color(0xFF0F244F);
-  static const Color backgroundElevated = Color(0xFF132B5A);
+  // Backgrounds
+  // Transparent base to let animated gradient show through
+  static const Color backgroundBase = Colors.transparent;
+  // Semi-transparent dark green for cards
+  static const Color backgroundCard = Color(0x991A2820);
+  // Slightly lighter for elevated surfaces
+  static const Color backgroundElevated = Color(0xCC2C4334);
 
   // Text
   static const Color textPrimary = Color(0xFFFFFFFF);
@@ -368,6 +372,32 @@ class AppTheme {
         color: AppColors.backgroundElevated,
         thickness: 1,
         space: AppSpacing.md,
+      ),
+
+      // Input Decoration
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.transparent,
+        border: const UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.glassBorder),
+        ),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.glassBorder),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.danger),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 0,
+          vertical: AppSpacing.md,
+        ),
+        labelStyle: const TextStyle(color: AppColors.textSecondary),
+        hintStyle: const TextStyle(color: AppColors.textMuted),
+        prefixIconColor: AppColors.textSecondary,
+        suffixIconColor: AppColors.textSecondary,
       ),
     );
   }

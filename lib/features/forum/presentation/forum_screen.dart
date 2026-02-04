@@ -12,9 +12,6 @@ class ForumScreen extends StatefulWidget {
 }
 
 class _ForumScreenState extends State<ForumScreen> {
-  final TextEditingController _composerController = TextEditingController();
-  final TextEditingController _tagsController = TextEditingController();
-  final FocusNode _composerFocusNode = FocusNode();
   final ForumService _service = ForumService();
 
   String? _activeCategoryId;
@@ -35,51 +32,28 @@ class _ForumScreenState extends State<ForumScreen> {
 
   @override
   void dispose() {
-    _composerController.dispose();
-    _tagsController.dispose();
-    _composerFocusNode.dispose();
     super.dispose();
-  }
-
-  List<String> _parseTags(String raw) {
-    final tags = raw
-        .split(',')
-        .map((tag) => tag.trim())
-        .where((tag) => tag.isNotEmpty)
-        .map((tag) => tag.toLowerCase())
-        .toSet()
-        .toList();
-    return tags;
-  }
-
-  Future<void> _submitPost() async {
-    final text = _composerController.text.trim();
-    if (text.isEmpty) {
-      _showSnack('Write something before posting.');
-      return;
-    }
-
-    final category = _activeCategoryId ?? ForumCategory.presets.first.id;
-    final tags = _parseTags(_tagsController.text);
-
-    try {
-      await _service.createPost(
-        content: text,
-        category: category,
-        tags: tags,
-      );
-      _composerController.clear();
-      _tagsController.clear();
-      _composerFocusNode.unfocus();
-    } catch (error) {
-      _showSnack('Could not post. Try again.');
-    }
   }
 
   void _showSnack(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _openPostComposer() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _PostComposerSheet(
+          service: _service,
+          initialCategory: _activeCategoryId,
+          onError: _showSnack,
+        );
+      },
     );
   }
 
@@ -150,89 +124,6 @@ class _ForumScreenState extends State<ForumScreen> {
                 onShowAll: () => setState(() => _activeCategoryId = null),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: FloatingCard(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: AppColors.primary,
-                          child: Text(_initials('You')),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: scheme.surfaceVariant.withOpacityValue(0.6),
-                              borderRadius: BorderRadius.circular(AppRadius.small),
-                              border: Border.all(color: scheme.outline),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            child: TextField(
-                              controller: _composerController,
-                              focusNode: _composerFocusNode,
-                              maxLines: 4,
-                              minLines: 1,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              decoration: const InputDecoration(
-                                hintText:
-                                    'Share a thought, ask a question, or start a challenge...',
-                                border: InputBorder.none,
-                                isCollapsed: true,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    TextField(
-                      controller: _tagsController,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                        hintText: 'Tags (comma separated)',
-                        filled: true,
-                        fillColor: scheme.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.small),
-                          borderSide: BorderSide(color: scheme.outline),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.small),
-                          borderSide: BorderSide(color: scheme.outline),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        Text(
-                          'Be kind, be curious.',
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
-                        ),
-                        const Spacer(),
-                        ElevatedButton.icon(
-                          onPressed: _submitPost,
-                          icon: const Icon(Icons.send_rounded, size: 18),
-                          label: const Text('Post'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
             Expanded(
               child: StreamBuilder<List<ForumPost>>(
                 stream: _service.watchPosts(category: _activeCategoryId),
@@ -250,9 +141,11 @@ class _ForumScreenState extends State<ForumScreen> {
                     );
                   }
                   return ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     itemCount: posts.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: AppSpacing.md),
                     itemBuilder: (context, index) {
                       final post = posts[index];
                       return _PostCard(
@@ -266,7 +159,8 @@ class _ForumScreenState extends State<ForumScreen> {
                           post: post,
                           currentUserId: _currentUserId,
                           service: _service,
-                          onReply: (reply) => _openReplyComposer(post: post, parent: reply),
+                          onReply: (reply) =>
+                              _openReplyComposer(post: post, parent: reply),
                           onDelete: _deleteReply,
                         ),
                       );
@@ -278,6 +172,11 @@ class _ForumScreenState extends State<ForumScreen> {
             const SizedBox(height: AppSpacing.lg),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openPostComposer,
+        backgroundColor: scheme.primary,
+        child: const Icon(Icons.add_rounded, color: Colors.white),
       ),
     );
   }
@@ -361,7 +260,9 @@ class _CategoryChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary : scheme.surfaceVariant.withOpacityValue(0.7),
+          color: isActive
+              ? AppColors.primary
+              : scheme.surfaceVariant.withOpacityValue(0.7),
           borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(
             color: isActive ? AppColors.primary : scheme.outline,
@@ -456,7 +357,8 @@ class _PostCard extends StatelessWidget {
               children: post.tags
                   .map(
                     (tag) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: scheme.surfaceVariant.withOpacityValue(0.7),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -477,7 +379,9 @@ class _PostCard extends StatelessWidget {
           Row(
             children: [
               _PostMetric(
-                icon: isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                icon: isLiked
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
                 label: '${post.likesCount}',
                 color: isLiked ? AppColors.danger : scheme.onSurfaceVariant,
                 onTap: onLike,
@@ -686,7 +590,10 @@ class _PostMetric extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               label,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(color: color),
             ),
           ],
         ),
@@ -773,6 +680,8 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                 controller: _controller,
                 maxLines: 4,
                 minLines: 1,
+                autofocus: true,
+                style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
                   hintText: 'Write your reply...',
                   filled: true,
@@ -805,15 +714,204 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                           content: text,
                           parentId: widget.parent?.id,
                         );
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                        }
-                      } catch (_) {
-                        widget.onError('Could not reply. Try again.');
+                        if (mounted) Navigator.of(context).pop();
+                      } catch (e) {
+                        widget.onError('Could not post reply.');
                       }
                     },
                     icon: const Icon(Icons.send_rounded, size: 18),
                     label: const Text('Reply'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PostComposerSheet extends StatefulWidget {
+  final ForumService service;
+  final String? initialCategory;
+  final ValueChanged<String> onError;
+
+  const _PostComposerSheet({
+    required this.service,
+    required this.initialCategory,
+    required this.onError,
+  });
+
+  @override
+  State<_PostComposerSheet> createState() => _PostComposerSheetState();
+}
+
+class _PostComposerSheetState extends State<_PostComposerSheet> {
+  late final TextEditingController _contentController;
+  late final TextEditingController _tagsController;
+  String? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _contentController = TextEditingController();
+    _tagsController = TextEditingController();
+    _selectedCategory =
+        widget.initialCategory ?? ForumCategory.presets.first.id;
+  }
+
+  @override
+  void dispose() {
+    _contentController.dispose();
+    _tagsController.dispose();
+    super.dispose();
+  }
+
+  List<String> _parseTags(String raw) {
+    return raw
+        .split(',')
+        .map((tag) => tag.trim())
+        .where((tag) => tag.isNotEmpty)
+        .map((tag) => tag.toLowerCase())
+        .toSet()
+        .toList();
+  }
+
+  Future<void> _submit() async {
+    final text = _contentController.text.trim();
+    if (text.isEmpty) {
+      widget.onError('Write something before posting.');
+      return;
+    }
+
+    try {
+      await widget.service.createPost(
+        content: text,
+        category: _selectedCategory!,
+        tags: _parseTags(_tagsController.text),
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      widget.onError('Could not create post. Try again.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final viewInsets = MediaQuery.of(context).viewInsets;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: viewInsets.bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppRadius.large),
+          ),
+          border: Border(top: BorderSide(color: scheme.outline)),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Create Post',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Category Selector
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: ForumCategory.presets.map((category) {
+                    final isSelected = category.id == _selectedCategory;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.sm),
+                      child: FilterChip(
+                        label: Text(category.label),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _selectedCategory = category.id);
+                          }
+                        },
+                        backgroundColor:
+                            scheme.surfaceVariant.withOpacityValue(0.5),
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : scheme.onSurfaceVariant,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
+                          side: BorderSide(
+                            color:
+                                isSelected ? AppColors.primary : scheme.outline,
+                          ),
+                        ),
+                        showCheckmark: false,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+              TextField(
+                controller: _contentController,
+                maxLines: 5,
+                minLines: 3,
+                autofocus: true,
+                style: Theme.of(context).textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText:
+                      'Share a thought, ask a question, or start a challenge...',
+                  filled: true,
+                  fillColor: scheme.surfaceVariant.withOpacityValue(0.6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextField(
+                controller: _tagsController,
+                style: Theme.of(context).textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: 'Tags (comma separated)',
+                  prefixIcon: Icon(Icons.tag_rounded,
+                      color: scheme.onSurfaceVariant, size: 20),
+                  filled: true,
+                  fillColor: scheme.surfaceVariant.withOpacityValue(0.6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Text(
+                    'Be kind, be curious.',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: _submit,
+                    icon: const Icon(Icons.send_rounded, size: 18),
+                    label: const Text('Post'),
                   ),
                 ],
               ),

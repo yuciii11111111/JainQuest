@@ -1,8 +1,10 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
+import '../../resources/data/resource_data.dart';
 import 'reading_screen.dart';
 
 class ResourcesScreen extends StatelessWidget {
@@ -60,7 +62,8 @@ class ResourcesScreen extends StatelessWidget {
                       icon: Icons.auto_stories_rounded,
                       onPressed: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const ReadingScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const ReadingScreen()),
                         );
                       },
                       width: double.infinity,
@@ -69,7 +72,8 @@ class ResourcesScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Quick Guides', style: Theme.of(context).textTheme.titleLarge),
+              Text('Quick Guides',
+                  style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               _ResourceTile(
                 title: 'Ahimsa in Daily Life',
@@ -98,6 +102,17 @@ class ResourcesScreen extends StatelessWidget {
                     'Strong emotions bind karma quickly. Slow down with breath, gratitude, and gentle speech.'),
               ),
               const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
+              Text('Video Library',
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.sm),
+              ...ResourceData.categories.map((category) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: _CategoryTile(category: category),
+                );
+              }),
+              const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),
@@ -111,7 +126,8 @@ class ResourcesScreen extends StatelessWidget {
       context: context,
       backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
       ),
       builder: (_) {
         return Padding(
@@ -133,7 +149,10 @@ class ResourcesScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 body,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(height: 1.6),
               ),
               const SizedBox(height: AppSpacing.md),
               GradientButton(
@@ -141,7 +160,8 @@ class ResourcesScreen extends StatelessWidget {
                 icon: Icons.auto_stories_rounded,
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReadingScreen()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ReadingScreen()));
                 },
                 width: double.infinity,
               ),
@@ -200,6 +220,74 @@ class _ResourceTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CategoryTile extends StatelessWidget {
+  final ResourceCategory category;
+
+  const _CategoryTile({required this.category});
+
+  Future<void> _launchUrl(BuildContext context, String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open link')),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      child: ExpansionTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacityValue(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(category.icon, color: AppColors.primary),
+        ),
+        title: Text(
+          category.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        childrenPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        children: category.links.map((link) {
+          return ListTile(
+            leading: Icon(
+              link.isSearch ? Icons.search_rounded : Icons.explore_rounded,
+              color: link.isSearch ? scheme.onSurfaceVariant : Colors.redAccent,
+              size: 20,
+            ),
+            title: Text(
+              link.title,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            onTap: () => _launchUrl(context, link.url),
+            dense: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.small),
+            ),
+            contentPadding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+          );
+        }).toList(),
       ),
     );
   }

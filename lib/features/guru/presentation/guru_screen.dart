@@ -73,9 +73,10 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.psychology_rounded,
-                    color: AppColors.highlight,
+                  Image.asset(
+                    'assets/images/duo_guide.png',
+                    height: 32,
+                    width: 32,
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
@@ -95,7 +96,8 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                   IconButton(
                     icon: const Icon(Icons.refresh_rounded),
                     color: scheme.onSurfaceVariant,
-                    onPressed: () => ref.read(guruProvider.notifier).resetChat(),
+                    onPressed: () =>
+                        ref.read(guruProvider.notifier).resetChat(),
                   ),
                 ],
               ),
@@ -119,7 +121,8 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   child: Row(
                     children: _popularQuestions.map((question) {
                       return Padding(

@@ -179,7 +179,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             ),
           ),
         ),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
           left: overlayRect.left,
           top: overlayRect.top,
           width: overlayRect.width,
@@ -194,7 +196,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             ),
           ),
         ),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
           left: overlayRect.left,
           top: overlayRect.top,
           width: overlayRect.width,
@@ -207,7 +211,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             ),
           ),
         ),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOut,
           left: tooltipLeft,
           top: tooltipTop,
           width: tooltipWidth,
@@ -241,7 +247,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             ),
           ),
         ),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOutBack,
           left: guideOffset.dx,
           top: guideOffset.dy,
           child: Image.asset(
@@ -276,7 +284,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             top: false,
             child: GradientButton(
               label: isLastStep ? 'Finish' : 'Next',
-              icon: isLastStep ? Icons.check_rounded : Icons.arrow_forward_rounded,
+              icon: isLastStep
+                  ? Icons.check_rounded
+                  : Icons.arrow_forward_rounded,
               onPressed: () => _advanceStep(step),
               width: double.infinity,
             ),

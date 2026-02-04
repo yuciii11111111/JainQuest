@@ -4,6 +4,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../auth/presentation/create_account_screen.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/widgets/animated_gradient_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,8 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+      body: AnimatedGradientBackground(
         child: Stack(
           children: [
             // Main content

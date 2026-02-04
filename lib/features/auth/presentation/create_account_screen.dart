@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jainquest/core/widgets/animated_mascot.dart';
 import '../../../core/models/user_models.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
@@ -8,14 +9,18 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
+import '../../../core/widgets/profile_setup_dialog.dart';
+import '../../../core/services/auth_service.dart';
 import '../../home/presentation/home_screen.dart';
 import 'login_screen.dart';
+import '../../../core/widgets/common_widgets.dart';
 
 class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
 
   @override
-  ConsumerState<CreateAccountScreen> createState() => _CreateAccountScreenState();
+  ConsumerState<CreateAccountScreen> createState() =>
+      _CreateAccountScreenState();
 }
 
 class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
@@ -43,7 +48,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   Future<void> _goToHome() async {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+          builder: (_) => const HomeScreen(
+                showTutorialOnLoad: true,
+              )),
     );
   }
 
@@ -63,8 +71,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final result = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      final result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -103,6 +110,38 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      final user = await AuthService.signInWithGoogle();
+      if (user != null && mounted) {
+        await StorageService.init(user: user);
+        ref.read(userProfileProvider.notifier).refresh();
+
+        final profile = StorageService.getUserProfile();
+        if (!profile.isProfileComplete && mounted) {
+          await showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const ProfileSetupDialog(isFirstTime: true),
+          );
+        }
+
+        if (mounted) {
+          await _goToHome();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showError('Google sign-in failed. Please try again.');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -116,18 +155,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.lg),
-              Container(
+              const SizedBox(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.auto_stories_rounded,
-                  size: 42,
-                  color: Colors.white,
-                ),
+                child: AnimatedMascot(assetPath: 'assets/images/duo_guide.png'),
               ),
               const SizedBox(height: AppSpacing.lg),
               TypewriterSequence(
@@ -271,6 +302,30 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 onPressed: _isLoading ? null : _submit,
                 isLoading: _isLoading,
                 width: double.infinity,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: scheme.outline)),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Text(
+                      'OR',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ),
+                  Expanded(child: Divider(color: scheme.outline)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              SocialSignInButton(
+                label: 'Continue with Google',
+                iconAsset: 'assets/images/google.png',
+                onPressed: _isLoading ? null : _signInWithGoogle,
+                isLoading: _isLoading,
               ),
               const SizedBox(height: AppSpacing.md),
               Row(

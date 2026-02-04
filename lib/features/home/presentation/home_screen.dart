@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jainquest/features/lesson_runner/presentation/lesson_runner_screen.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
@@ -20,7 +21,12 @@ import '../../resources/presentation/resources_screen.dart';
 import '../../forum/presentation/forum_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final bool showTutorialOnLoad;
+
+  const HomeScreen({
+    super.key,
+    this.showTutorialOnLoad = false,
+  });
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -30,6 +36,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final GlobalKey _continueLearningKey = GuideKeys.continueLearningButton;
   final GlobalKey _currentLessonKey = GuideKeys.currentLessonCard;
+  final GlobalKey _statsKey = GlobalKey();
+  final GlobalKey _askNavKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.showTutorialOnLoad) {
+        _showTutorial();
+      }
+    });
+  }
+
+  void _showTutorial() {
+    // Basic check to not show every time would go here (StorageService)
+    // For this task, we show it to verify the refactor.
+
+    final targets = [
+      TargetFocus(
+        identify: "stats",
+        keyTarget: _statsKey,
+        alignSkip: Alignment.bottomRight,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return _GuideBubble(
+                title: "Track Your Progress",
+                description:
+                    "Keep an eye on your streaks, hearts, and XP here. Consistency is key!",
+                onNext: controller.next,
+              );
+            },
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: "current_lesson",
+        keyTarget: _currentLessonKey,
+        alignSkip: Alignment.bottomRight,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return _GuideBubble(
+                title: "Next Up",
+                description:
+                    "This is your next lesson. Tap to continue your journey!",
+                onNext: controller.next,
+              );
+            },
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: "ask_guru",
+        keyTarget: _askNavKey,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return _GuideBubble(
+                title: "Ask Guru",
+                description:
+                    "Stuck? Have a question about Jainism? Tap here to ask our AI guide.",
+                onNext: controller.next,
+                isLast: true,
+              );
+            },
+          ),
+        ],
+      ),
+    ];
+
+    TutorialCoachMark(
+      targets: targets,
+      colorShadow: Colors.black,
+      textSkip: "SKIP",
+      paddingFocus: 10,
+      opacityShadow: 0.8,
+      onFinish: () {
+        print("Tutorial finished");
+      },
+      onClickTarget: (target) {
+        print('onClickTarget: $target');
+      },
+      onClickTargetWithTapPosition: (target, tapDetails) {
+        print("target: $target");
+        print(
+            "clicked at position local: ${tapDetails.localPosition} - global: ${tapDetails.globalPosition}");
+      },
+      onClickOverlay: (target) {
+        print('onClickOverlay: $target');
+      },
+      onSkip: () {
+        print("skip");
+        return true;
+      },
+    ).show(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +157,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             unit: unit,
             themeMode: themeMode,
             onToggleTheme: toggleTheme,
+            statsKey: _statsKey,
             continueLearningKey: _continueLearningKey,
             currentLessonKey: _currentLessonKey,
+            onShowGuide: _showTutorial,
             onLessonTap: (lesson) {
               ref.read(lessonRunnerProvider.notifier).startLesson(lesson);
               Navigator.of(context).push(
@@ -67,6 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       bottomNavigationBar: _GlassBottomNav(
         currentIndex: _currentIndex,
+        askKey: _askNavKey,
         onTap: (index) => setState(() => _currentIndex = index),
       ),
     );
@@ -75,10 +185,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 class _GlassBottomNav extends StatelessWidget {
   final int currentIndex;
+  final Key? askKey;
   final ValueChanged<int> onTap;
 
   const _GlassBottomNav({
     required this.currentIndex,
+    this.askKey,
     required this.onTap,
   });
 
@@ -110,7 +222,8 @@ class _GlassBottomNav extends StatelessWidget {
               onTap: () => onTap(1),
             ),
             _NavItem(
-              icon: Icons.psychology_rounded,
+              key: askKey,
+              imageAsset: 'assets/images/duo_guide.png',
               label: 'Ask',
               isSelected: currentIndex == 2,
               onTap: () => onTap(2),
@@ -135,17 +248,20 @@ class _GlassBottomNav extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final String? imageAsset;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _NavItem({
-    required this.icon,
+    super.key,
+    this.icon,
+    this.imageAsset,
     required this.label,
     required this.isSelected,
     required this.onTap,
-  });
+  }) : assert(icon != null || imageAsset != null);
 
   @override
   Widget build(BuildContext context) {
@@ -165,11 +281,18 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 24,
-              color: isSelected ? Colors.white : scheme.onSurfaceVariant,
-            ),
+            if (imageAsset != null)
+              Image.asset(
+                imageAsset!,
+                width: 24,
+                height: 24,
+              )
+            else
+              Icon(
+                icon,
+                size: 24,
+                color: isSelected ? Colors.white : scheme.onSurfaceVariant,
+              ),
             const SizedBox(height: 4),
             Text(
               label,
@@ -192,8 +315,10 @@ class _HomeTab extends StatelessWidget {
   final Unit unit;
   final ThemeMode themeMode;
   final VoidCallback onToggleTheme;
+  final Key? statsKey;
   final GlobalKey continueLearningKey;
   final GlobalKey currentLessonKey;
+  final VoidCallback onShowGuide;
   final ValueChanged<Lesson> onLessonTap;
 
   const _HomeTab({
@@ -202,8 +327,10 @@ class _HomeTab extends StatelessWidget {
     required this.unit,
     required this.themeMode,
     required this.onToggleTheme,
+    this.statsKey,
     required this.continueLearningKey,
     required this.currentLessonKey,
+    required this.onShowGuide,
     required this.onLessonTap,
   });
 
@@ -250,6 +377,12 @@ class _HomeTab extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.help_outline_rounded),
+                  onPressed: onShowGuide,
+                  color: scheme.onSurfaceVariant,
+                  tooltip: 'Show Guide',
+                ),
                 IconButton(
                   icon: const Icon(Icons.notifications_rounded),
                   onPressed: () {},
@@ -342,6 +475,7 @@ class _HomeTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Row(
+              key: statsKey,
               children: [
                 Expanded(
                   child: FloatingCard(
@@ -745,5 +879,78 @@ class _JourneyIcons {
       return Icons.lock_rounded;
     }
     return _icons[index % _icons.length];
+  }
+}
+
+class _GuideBubble extends StatelessWidget {
+  final String title;
+  final String description;
+  final VoidCallback onNext;
+  final bool isLast;
+
+  const _GuideBubble({
+    required this.title,
+    required this.description,
+    required this.onNext,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E), // Solid dark background
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Image.asset('assets/images/duo_guide.png', height: 40, width: 40),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: onNext,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shape: const StadiumBorder(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              ),
+              child: Text(isLast ? "Finish" : "Next"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

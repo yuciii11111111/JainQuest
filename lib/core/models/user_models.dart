@@ -208,7 +208,8 @@ class ProgressState extends Equatable {
     );
   }
 
-  bool isLessonCompleted(String lessonId) => completedLessons.contains(lessonId);
+  bool isLessonCompleted(String lessonId) =>
+      completedLessons.contains(lessonId);
   bool isLessonUnlocked(String lessonId) => unlockedLessons.contains(lessonId);
   bool hasBadge(String badgeId) => earnedBadges.contains(badgeId);
 
@@ -226,13 +227,12 @@ class ProgressState extends Equatable {
   }
 
   factory ProgressState.fromMap(Map<String, dynamic> data) {
-    final rawProgress =
-        (data['lessonProgress'] as Map<String, dynamic>?) ?? {};
+    final rawProgress = (data['lessonProgress'] as Map<String, dynamic>?) ?? {};
     final lessonProgress = <String, LessonProgress>{};
     rawProgress.forEach((key, value) {
       if (value is Map) {
         lessonProgress[key] = LessonProgress.fromMap(
-          Map<String, dynamic>.from(value as Map),
+          Map<String, dynamic>.from(value),
         );
       }
     });
@@ -247,10 +247,9 @@ class ProgressState extends Equatable {
               ?.map((e) => e.toString())
               .toList() ??
           const ['U01_L01'],
-      earnedBadges: (data['earnedBadges'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
+      earnedBadges:
+          (data['earnedBadges'] as List?)?.map((e) => e.toString()).toList() ??
+              const [],
     );
   }
 
