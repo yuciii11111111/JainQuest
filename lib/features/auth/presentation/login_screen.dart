@@ -7,9 +7,9 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/glass_card.dart';
-import '../../../core/widgets/profile_setup_dialog.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
 import '../../../core/services/auth_service.dart';
+import '../../profile/presentation/profile_setup_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import 'create_account_screen.dart';
 import '../../../core/widgets/common_widgets.dart';
@@ -38,8 +38,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _goToHome() async {
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
     );
   }
 
@@ -74,11 +75,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final profile = StorageService.getUserProfile();
       if (!profile.isProfileComplete && mounted) {
-        await showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const ProfileSetupDialog(isFirstTime: true),
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const ProfileSetupScreen(isFirstTime: true),
+          ),
         );
+        return;
       }
 
       if (mounted) {
@@ -105,11 +107,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         final profile = StorageService.getUserProfile();
         if (!profile.isProfileComplete && mounted) {
-          await showDialog<void>(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => const ProfileSetupDialog(isFirstTime: true),
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const ProfileSetupScreen(isFirstTime: true),
+            ),
           );
+          return;
         }
 
         if (mounted) {

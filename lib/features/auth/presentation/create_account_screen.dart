@@ -9,7 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
-import '../../../core/widgets/profile_setup_dialog.dart';
+import '../../profile/presentation/profile_setup_screen.dart';
 import '../../../core/services/auth_service.dart';
 import '../../home/presentation/home_screen.dart';
 import 'login_screen.dart';
@@ -47,11 +47,12 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   Future<void> _goToHome() async {
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
           builder: (_) => const HomeScreen(
                 showTutorialOnLoad: true,
               )),
+      (route) => false,
     );
   }
 
@@ -97,7 +98,12 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       ref.read(userProfileProvider.notifier).refresh();
 
       if (mounted) {
-        await _goToHome();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => const ProfileSetupScreen(isFirstTime: true),
+          ),
+          (route) => false,
+        );
       }
     } on FirebaseAuthException catch (error) {
       _showError(error.message ?? 'Unable to create account.');
@@ -120,11 +126,12 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
         final profile = StorageService.getUserProfile();
         if (!profile.isProfileComplete && mounted) {
-          await showDialog<void>(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => const ProfileSetupDialog(isFirstTime: true),
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const ProfileSetupScreen(isFirstTime: true),
+            ),
           );
+          return;
         }
 
         if (mounted) {

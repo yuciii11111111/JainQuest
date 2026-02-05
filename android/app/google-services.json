@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:753911767862:android:b4c251908313391060c997",
+        "mobilesdk_app_id": "1:753911767862:android:7afd9a5d893ffd9160c997",
         "android_client_info": {
-          "package_name": "com.jainquest.jainquest"
+          "package_name": "com.jainquest.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "753911767862-aasihur417tdatd2ercupid6qqop1uu4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC_18HqYBKjb-C12bZHLXNL2T1sLMKZ7nM"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753911767862-aasihur417tdatd2ercupid6qqop1uu4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753911767862-if312oo8or57ldtmnlk7ci2dpqht8id9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.jainquest.jainquest"
+              }
+            }
+          ]
         }
       }
     }

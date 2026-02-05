@@ -6,7 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
-import '../../../core/widgets/profile_setup_dialog.dart';
+import '../../profile/presentation/profile_setup_screen.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/gamification/gamification_constants.dart';
@@ -117,11 +117,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               heroTag: 'editProfile',
                               backgroundColor: AppColors.primary,
                               onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) =>
-                                      const ProfileSetupDialog(
-                                          isFirstTime: false),
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ProfileSetupScreen(
+                                            isFirstTime: false),
+                                  ),
                                 );
                               },
                               child: const Icon(Icons.edit_rounded, size: 18),
