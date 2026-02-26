@@ -5,10 +5,6 @@ class AuthService {
   AuthService._();
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId:
-        '753911767862-aasihur417tdatd2ercupid6qqop1uu4.apps.googleusercontent.com',
-  );
 
   static Future<User?> signInWithGoogle() async {
     try {
@@ -42,7 +38,7 @@ class AuthService {
   }
 
   static Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    await GoogleSignIn().signOut();
     await _auth.signOut();
   }
 }
