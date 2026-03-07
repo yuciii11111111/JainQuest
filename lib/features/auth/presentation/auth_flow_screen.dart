@@ -9,6 +9,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/liquid_glass.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../profile/presentation/profile_setup_screen.dart';
 
@@ -266,6 +267,10 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
                     fontSize: 56,
                   ),
             ),
+            if (_intent == AuthIntent.signIn) ...[
+              const SizedBox(height: AppSpacing.md),
+              _LoginIconRow(colorScheme: scheme),
+            ],
             const Spacer(),
             Container(
               width: double.infinity,
@@ -491,6 +496,47 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         _CleanPrimaryButton(
           label: 'Continue with the app',
           onPressed: _continueAfterWelcome,
+        ),
+      ],
+    );
+  }
+}
+
+class _LoginIconRow extends StatelessWidget {
+  final ColorScheme colorScheme;
+
+  const _LoginIconRow({required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        LiquidGlassIconBubble(
+          icon: Icons.shield_rounded,
+          size: 42,
+          iconSize: 20,
+          iconColor: colorScheme.onSurface,
+          tintColor: colorScheme.primary,
+          tintOpacity: 0.12,
+        ),
+        const SizedBox(width: AppSpacing.md),
+        LiquidGlassIconBubble(
+          icon: Icons.auto_awesome_rounded,
+          size: 48,
+          iconSize: 24,
+          iconColor: colorScheme.onSurface,
+          tintColor: colorScheme.secondary,
+          tintOpacity: 0.14,
+        ),
+        const SizedBox(width: AppSpacing.md),
+        LiquidGlassIconBubble(
+          icon: Icons.menu_book_rounded,
+          size: 42,
+          iconSize: 20,
+          iconColor: colorScheme.onSurface,
+          tintColor: colorScheme.tertiary,
+          tintOpacity: 0.12,
         ),
       ],
     );

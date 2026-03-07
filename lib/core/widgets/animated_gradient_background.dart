@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -6,8 +7,15 @@ import '../theme/app_theme.dart';
 
 class AnimatedGradientBackground extends StatefulWidget {
   final Widget child;
+  final bool forceDark;
+  final Duration initialCycleDelay;
 
-  const AnimatedGradientBackground({super.key, required this.child});
+  const AnimatedGradientBackground({
+    super.key,
+    required this.child,
+    this.forceDark = false,
+    this.initialCycleDelay = Duration.zero,
+  });
 
   @override
   State<AnimatedGradientBackground> createState() =>
@@ -17,6 +25,7 @@ class AnimatedGradientBackground extends StatefulWidget {
 class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  Timer? _startTimer;
   static const List<List<Color>> _lightPalettes = [
     [
       AppColors.softCream,
@@ -77,18 +86,28 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
-    )..repeat();
+    );
+    if (widget.initialCycleDelay > Duration.zero) {
+      _startTimer = Timer(widget.initialCycleDelay, () {
+        if (!mounted) return;
+        _controller.repeat();
+      });
+    } else {
+      _controller.repeat();
+    }
   }
 
   @override
   void dispose() {
+    _startTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark =
+        widget.forceDark || Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedBuilder(
       animation: _controller,

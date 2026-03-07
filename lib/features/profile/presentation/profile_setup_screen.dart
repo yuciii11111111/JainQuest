@@ -82,7 +82,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Welcome to JainQuest, ${user.displayName ?? "Learner"}!'),
+                  'Profile setup complete, ${user.displayName ?? "Learner"}!'),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 3),
@@ -162,7 +162,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         // Title
                         Text(
                           widget.isFirstTime
-                              ? 'Welcome to JainQuest!'
+                              ? 'Set Up Your Profile'
                               : 'Update Profile',
                           style: Theme.of(context)
                               .textTheme

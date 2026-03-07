@@ -8,7 +8,6 @@ import '../navigation/app_navigator.dart';
 import '../providers/app_providers.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import '../../features/path/presentation/unit_path_screen.dart';
 import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
 import 'floating_guide_overlay.dart';
 import 'typewriter_text.dart';
@@ -52,15 +51,6 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     }
 
     return [
-      _TourStep(
-        key: GuideKeys.continueLearningButton,
-        title: 'Start Learning',
-        message: 'Open your learning path to begin the tour.',
-        onTap: () {
-          setHomeTab(0);
-          pushRoute(const UnitPathScreen());
-        },
-      ),
       _TourStep(
         key: GuideKeys.whatIsJainismLesson,
         title: 'What Is Jainism',

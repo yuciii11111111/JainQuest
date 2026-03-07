@@ -5,7 +5,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/liquid_glass.dart';
@@ -14,12 +13,12 @@ import '../../../core/providers/theme_provider.dart';
 import '../../../core/models/user_models.dart';
 import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
-import '../../path/presentation/unit_path_screen.dart';
 import '../../profile/presentation/profile_screen.dart' show ProfileScreen;
 import '../../guru/presentation/guru_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../resources/presentation/resources_screen.dart';
 import '../../forum/presentation/forum_screen.dart';
+import '../../path/presentation/unit_path_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final bool showTutorialOnLoad;
@@ -34,11 +33,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final GlobalKey _continueLearningKey = GuideKeys.continueLearningButton;
   final GlobalKey _currentLessonKey = GuideKeys.currentLessonCard;
   final GlobalKey _streakCardKey = GlobalKey(debugLabel: 'streak_card');
-  final GlobalKey _currentLessonHighlightKey =
-      GlobalKey(debugLabel: 'current_lesson_highlight');
 
   @override
   void initState() {
@@ -85,9 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             themeMode: themeMode,
             onToggleTheme: toggleTheme,
             streakCardKey: _streakCardKey,
-            continueLearningKey: _continueLearningKey,
             currentLessonKey: _currentLessonKey,
-            currentLessonHighlightKey: _currentLessonHighlightKey,
             onShowGuide: _showTutorial,
             onLessonTap: (lesson) {
               ref.read(lessonRunnerProvider.notifier).startLesson(lesson);
@@ -258,9 +252,7 @@ class _HomeTab extends StatelessWidget {
   final ThemeMode themeMode;
   final Future<void> Function() onToggleTheme;
   final Key? streakCardKey;
-  final GlobalKey continueLearningKey;
   final GlobalKey currentLessonKey;
-  final Key? currentLessonHighlightKey;
   final VoidCallback onShowGuide;
   final ValueChanged<Lesson> onLessonTap;
 
@@ -271,9 +263,7 @@ class _HomeTab extends StatelessWidget {
     required this.themeMode,
     required this.onToggleTheme,
     this.streakCardKey,
-    required this.continueLearningKey,
     required this.currentLessonKey,
-    this.currentLessonHighlightKey,
     required this.onShowGuide,
     required this.onLessonTap,
   });
@@ -527,68 +517,65 @@ class _HomeTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            GradientButton(
-              key: continueLearningKey,
-              label: 'Continue Learning',
-              icon: Icons.play_arrow_rounded,
-              crystal: true,
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const UnitPathScreen()),
-                );
-              },
-              width: double.infinity,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            FloatingCard(
-              key: currentLessonKey,
-              onTap: () {
-                onLessonTap(currentLesson);
-              },
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Row(
-                key: currentLessonHighlightKey,
-                children: [
-                  const LiquidGlassIconBubble(
-                    icon: Icons.spa_rounded,
-                    size: 48,
-                    shape: LiquidGlassShape.rounded,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(AppRadius.small),
+            Row(
+              children: [
+                Expanded(
+                  child: FloatingCard(
+                    key: currentLessonKey,
+                    height: 50,
+                    onTap: () {
+                      onLessonTap(currentLesson);
+                    },
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
                     ),
-                    tintColor: AppColors.primary,
-                    tintOpacity: 0.45,
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        const Icon(Icons.play_arrow_rounded, size: 18),
+                        const SizedBox(width: AppSpacing.xs),
                         Text(
                           'Current Lesson',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                        Text(
-                          currentLesson.title,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          (currentLesson.learningObjectives as List).isNotEmpty
-                              ? (currentLesson.learningObjectives as List).first
-                              : 'Continue your learning journey',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: FloatingCard(
+                    height: 50,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const UnitPathScreen()),
+                      );
+                    },
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.timeline_rounded, size: 18),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          'View Progress',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.xl),
           ],
