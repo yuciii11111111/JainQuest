@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../core/widgets/liquid_glass.dart';
 import '../../../../core/widgets/typewriter_sequence.dart';
 
 class ShortTextScreenWidget extends StatefulWidget {
@@ -154,13 +155,14 @@ class _TextCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final scheme = Theme.of(context).colorScheme;
+    return LiquidGlassContainer(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      borderColor: scheme.outline.withOpacityValue(0.75),
+      borderWidth: 1.2,
+      tintColor: scheme.surface,
+      tintOpacity: 0.3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -169,12 +171,15 @@ class _TextCardWidget extends StatelessWidget {
             items: [
               TypewriterSequenceItem(
                 text: card.title,
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: scheme.onSurface,
+                    ),
                 speed: const Duration(milliseconds: 16),
               ),
               TypewriterSequenceItem(
                 text: card.body,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: scheme.onSurface.withOpacityValue(0.95),
                       height: 1.6,
                     ),
                 speed: const Duration(milliseconds: 12),

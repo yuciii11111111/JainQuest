@@ -68,10 +68,10 @@ class AppColors {
   static const Color lightBackground = Colors.transparent;
   static const Color lightCard = softCream;
   static const Color lightElevated = Color(0xFFF7E2EA);
-  static const Color lightTextPrimary = inkBlack;
-  static const Color lightTextSecondary = Color(0xFF4C2F1B);
-  static const Color lightTextMuted = Color(0xFF7A5D48);
-  static const Color lightBorder = Color(0x66ED8F45);
+  static const Color lightTextPrimary = Color(0xFF1C140F);
+  static const Color lightTextSecondary = Color(0xFF312114);
+  static const Color lightTextMuted = Color(0xFF5A3F2B);
+  static const Color lightBorder = Color(0x99ED8F45);
 }
 
 // ============================================================================
@@ -497,6 +497,14 @@ class AppTheme {
           color: AppColors.lightTextPrimary,
         ),
         iconTheme: IconThemeData(color: AppColors.lightTextPrimary),
+      ),
+      iconTheme: const IconThemeData(
+        color: AppColors.lightTextPrimary,
+        opacity: 0.98,
+      ),
+      primaryIconTheme: const IconThemeData(
+        color: AppColors.lightTextPrimary,
+        opacity: 0.98,
       ),
 
       // Cards

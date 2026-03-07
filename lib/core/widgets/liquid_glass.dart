@@ -109,7 +109,7 @@ class LiquidGlassIconBubble extends StatelessWidget {
   final IconData icon;
   final double size;
   final double iconSize;
-  final Color iconColor;
+  final Color? iconColor;
   final Color? tintColor;
   final double tintOpacity;
   final BorderRadius? borderRadius;
@@ -120,7 +120,7 @@ class LiquidGlassIconBubble extends StatelessWidget {
     required this.icon,
     this.size = 48,
     this.iconSize = 22,
-    this.iconColor = Colors.white,
+    this.iconColor,
     this.tintColor,
     this.tintOpacity = 0.0,
     this.borderRadius,
@@ -129,6 +129,7 @@ class LiquidGlassIconBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return LiquidGlassContainer(
       width: size,
       height: size,
@@ -138,7 +139,11 @@ class LiquidGlassIconBubble extends StatelessWidget {
       tintOpacity: tintOpacity,
       padding: EdgeInsets.zero,
       child: Center(
-        child: Icon(icon, size: iconSize, color: iconColor),
+        child: Icon(
+          icon,
+          size: iconSize,
+          color: iconColor ?? (isLight ? AppColors.lightTextPrimary : Colors.white),
+        ),
       ),
     );
   }

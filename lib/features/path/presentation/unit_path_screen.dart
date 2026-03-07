@@ -209,7 +209,7 @@ class _PathStep extends StatelessWidget {
     final IconData icon = _PathIcons.forIndex(index, isLocked: isLocked);
 
     final Widget node = ProgressRing(
-      progress: isCompleted ? 1.0 : (isCurrent ? 0.7 : 0.0),
+      progress: isCompleted ? 1.0 : 0.0,
       size: ringSize,
       strokeWidth: 8,
       color: ringColor,

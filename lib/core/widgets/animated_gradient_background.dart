@@ -100,6 +100,12 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
         final blendT = paletteProgress - paletteProgress.floor();
         final colors = _lerpPalette(cycle[fromIndex], cycle[toIndex], blendT);
 
+        final double t = _controller.value * 2 * math.pi;
+        final double x1 = 0.5 + 0.3 * math.cos(t);
+        final double y1 = 0.5 + 0.2 * math.sin(t * 0.7);
+        final double x2 = 0.5 + 0.2 * math.sin(t * 1.2);
+        final double y2 = 0.5 + 0.3 * math.cos(t * 0.8);
+
         if (!isDark) {
           return DecoratedBox(
             decoration: BoxDecoration(
@@ -110,15 +116,35 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
                 stops: const [0.0, 0.35, 0.7, 1.0],
               ),
             ),
-            child: child,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment((x1 - 0.5) * 1.4, (y1 - 0.5) * 1.4),
+                  radius: 1.25,
+                  colors: [
+                    AppColors.warmOrange.withValues(alpha: 0.22),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.78],
+                ),
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment((x2 - 0.5) * 1.7, (y2 - 0.5) * 1.7),
+                    radius: 1.45,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.26),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.82],
+                  ),
+                ),
+                child: child,
+              ),
+            ),
           );
         }
-
-        final double t = _controller.value * 2 * math.pi;
-        final double x1 = 0.5 + 0.3 * math.cos(t);
-        final double y1 = 0.5 + 0.2 * math.sin(t * 0.7);
-        final double x2 = 0.5 + 0.2 * math.sin(t * 1.2);
-        final double y2 = 0.5 + 0.3 * math.cos(t * 0.8);
 
         return DecoratedBox(
           decoration: BoxDecoration(

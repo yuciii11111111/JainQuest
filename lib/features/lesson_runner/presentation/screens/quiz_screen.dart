@@ -5,6 +5,7 @@ import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_button.dart';
+import '../../../../core/widgets/liquid_glass.dart';
 
 class QuizScreenWidget extends StatefulWidget {
   final QuizScreen screen;
@@ -349,40 +350,36 @@ class _OptionTile extends StatelessWidget {
     const incorrectColor = Color(0xFFC62828);
     final scheme = Theme.of(context).colorScheme;
     Color borderColor;
-    Color textColor;
+    final Color textColor = scheme.onSurface;
     Color bgColor = scheme.surface;
 
     switch (state) {
       case ChoiceState.normal:
         borderColor = scheme.outline;
-        textColor = scheme.onSurface;
         break;
       case ChoiceState.selected:
         borderColor = AppColors.primary;
-        textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
         borderColor = correctColor;
-        textColor = correctColor;
         bgColor = correctColor.withOpacityValue(0.12);
         break;
       case ChoiceState.incorrect:
         borderColor = incorrectColor;
-        textColor = incorrectColor;
         bgColor = incorrectColor.withOpacityValue(0.12);
         break;
     }
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: LiquidGlassContainer(
         padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md, vertical: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: borderColor, width: 2),
-        ),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderColor: borderColor,
+        borderWidth: 2,
+        tintColor: bgColor,
+        tintOpacity: 0.36,
         child: Row(
           children: [
             Container(
@@ -439,46 +436,42 @@ class _TrueFalseButton extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     Color backgroundColor;
     Color borderColor;
-    Color textColor;
+    final Color textColor = scheme.onSurface;
     IconData? icon;
 
     switch (state) {
       case ChoiceState.normal:
         backgroundColor = scheme.surface;
         borderColor = scheme.outline;
-        textColor = scheme.onSurface;
         break;
       case ChoiceState.selected:
         backgroundColor = scheme.surface;
         borderColor = AppColors.primary;
-        textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
         backgroundColor = correctColor.withOpacityValue(0.12);
         borderColor = correctColor;
-        textColor = correctColor;
         icon = Icons.check_circle_rounded;
         break;
       case ChoiceState.incorrect:
         backgroundColor = incorrectColor.withOpacityValue(0.12);
         borderColor = incorrectColor;
-        textColor = incorrectColor;
         icon = Icons.cancel_rounded;
         break;
     }
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: LiquidGlassContainer(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          border: Border.all(color: borderColor, width: 2),
-        ),
+        borderRadius: BorderRadius.circular(AppRadius.button),
+        borderColor: borderColor,
+        borderWidth: 2,
+        tintColor: backgroundColor,
+        tintOpacity: 0.36,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
