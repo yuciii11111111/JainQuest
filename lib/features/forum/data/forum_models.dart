@@ -101,3 +101,40 @@ class ForumCategory {
     ForumCategory(id: 'challenges', label: 'Challenges'),
   ];
 }
+
+class ForumCommunity {
+  final String id;
+  final String name;
+  final String description;
+  final String adminId;
+  final String adminName;
+  final String adminHandle;
+  final DateTime? createdAt;
+
+  const ForumCommunity({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.adminId,
+    required this.adminName,
+    required this.adminHandle,
+    required this.createdAt,
+  });
+
+  factory ForumCommunity.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data() ?? {};
+    return ForumCommunity(
+      id: doc.id,
+      name: (data['name'] as String?) ?? 'Community',
+      description: (data['description'] as String?) ?? '',
+      adminId: (data['adminId'] as String?) ?? '',
+      adminName: (data['adminName'] as String?) ?? 'Learner',
+      adminHandle: (data['adminHandle'] as String?) ?? '@learner',
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  ForumCategory toCategory() {
+    return ForumCategory(id: id, label: name);
+  }
+}

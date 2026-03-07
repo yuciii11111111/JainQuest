@@ -15,6 +15,8 @@ class ForumService {
 
   CollectionReference<Map<String, dynamic>> get _posts =>
       _firestore.collection('forum_posts');
+  CollectionReference<Map<String, dynamic>> get _communities =>
+      _firestore.collection('forum_communities');
 
   Future<User> _ensureUser() async {
     final current = _auth.currentUser;
@@ -34,12 +36,19 @@ class ForumService {
   }
 
   Stream<List<ForumPost>> watchPosts({String? category}) {
-    Query<Map<String, dynamic>> query = _posts.orderBy('createdAt', descending: true);
+    Query<Map<String, dynamic>> query =
+        _posts.orderBy('createdAt', descending: true);
     if (category != null) {
       query = query.where('category', isEqualTo: category);
     }
     return query.snapshots().map(
           (snapshot) => snapshot.docs.map(ForumPost.fromDoc).toList(),
+        );
+  }
+
+  Stream<List<ForumCommunity>> watchCommunities() {
+    return _communities.orderBy('createdAt', descending: false).snapshots().map(
+          (snapshot) => snapshot.docs.map(ForumCommunity.fromDoc).toList(),
         );
   }
 
@@ -80,6 +89,32 @@ class ForumService {
     });
   }
 
+  Future<String> createCommunity({
+    required String name,
+    String description = '',
+  }) async {
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) {
+      throw ArgumentError('Community name is required.');
+    }
+
+    final user = await _ensureUser();
+    final profile = StorageService.getUserProfile();
+    final displayName = (profile.displayName ?? 'Learner').trim();
+    final handle = _buildHandle(displayName, user.uid);
+
+    final doc = _communities.doc();
+    await doc.set({
+      'name': trimmedName,
+      'description': description.trim(),
+      'adminId': user.uid,
+      'adminName': displayName,
+      'adminHandle': handle,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    return doc.id;
+  }
+
   Future<void> toggleLike(ForumPost post) async {
     final user = await _ensureUser();
     final postRef = _posts.doc(post.id);
@@ -90,7 +125,8 @@ class ForumService {
         return;
       }
       final data = snap.data() ?? {};
-      final likedBy = List<String>.from(data['likedBy'] as List<dynamic>? ?? const []);
+      final likedBy =
+          List<String>.from(data['likedBy'] as List<dynamic>? ?? const []);
       final isLiked = likedBy.contains(user.uid);
       if (isLiked) {
         likedBy.remove(user.uid);
@@ -158,8 +194,7 @@ class ForumService {
       throw StateError('Only the owner can delete this reply.');
     }
 
-    final repliesSnap =
-        await _posts.doc(postId).collection('replies').get();
+    final repliesSnap = await _posts.doc(postId).collection('replies').get();
     if (repliesSnap.docs.isEmpty) {
       return;
     }

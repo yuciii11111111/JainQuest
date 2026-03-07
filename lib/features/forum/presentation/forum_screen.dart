@@ -16,6 +16,7 @@ class _ForumScreenState extends State<ForumScreen> {
 
   String? _activeCategoryId;
   String? _currentUserId;
+  List<ForumCategory> _availableCategories = ForumCategory.presets;
 
   @override
   void initState() {
@@ -43,6 +44,10 @@ class _ForumScreenState extends State<ForumScreen> {
   }
 
   Future<void> _openPostComposer() async {
+    if (_availableCategories.isEmpty) {
+      _showSnack('No community is available right now.');
+      return;
+    }
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -50,7 +55,27 @@ class _ForumScreenState extends State<ForumScreen> {
       builder: (context) {
         return _PostComposerSheet(
           service: _service,
+          categories: _availableCategories,
           initialCategory: _activeCategoryId,
+          onError: _showSnack,
+        );
+      },
+    );
+  }
+
+  Future<void> _openCommunityComposer() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _CommunityComposerSheet(
+          service: _service,
+          onCreated: (communityId) {
+            if (!mounted) return;
+            setState(() => _activeCategoryId = communityId);
+            _showSnack('Community created. You are the admin.');
+          },
           onError: _showSnack,
         );
       },
@@ -106,71 +131,92 @@ class _ForumScreenState extends State<ForumScreen> {
         title: const Text('Community Forum'),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                0,
-              ),
-              child: _CategoryStrip(
-                categories: ForumCategory.presets,
-                activeCategoryId: _activeCategoryId,
-                onSelect: (categoryId) {
-                  setState(() => _activeCategoryId = categoryId);
-                },
-                onShowAll: () => setState(() => _activeCategoryId = null),
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<List<ForumPost>>(
-                stream: _service.watchPosts(category: _activeCategoryId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final posts = snapshot.data ?? const [];
-                  if (posts.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No posts yet. Start the conversation!',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    );
-                  }
-                  return ListView.separated(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    itemCount: posts.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
-                      return _PostCard(
-                        post: post,
-                        currentUserId: _currentUserId,
-                        onLike: () => _service.toggleLike(post),
-                        onReply: () => _openReplyComposer(post: post),
-                        onDelete: () => _deletePost(post),
-                        timeLabel: _formatTime(post.createdAt),
-                        repliesBuilder: _RepliesSection(
-                          post: post,
-                          currentUserId: _currentUserId,
-                          service: _service,
-                          onReply: (reply) =>
-                              _openReplyComposer(post: post, parent: reply),
-                          onDelete: _deleteReply,
-                        ),
+        child: StreamBuilder<List<ForumCommunity>>(
+          stream: _service.watchCommunities(),
+          builder: (context, communitiesSnapshot) {
+            final communities = communitiesSnapshot.data ?? const [];
+            final categories = [
+              ...ForumCategory.presets,
+              ...communities.map((community) => community.toCategory()),
+            ];
+            _availableCategories = categories;
+
+            if (_activeCategoryId != null &&
+                !categories.any((c) => c.id == _activeCategoryId)) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                setState(() => _activeCategoryId = null);
+              });
+            }
+
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                    AppSpacing.lg,
+                    0,
+                  ),
+                  child: _CategoryStrip(
+                    categories: categories,
+                    activeCategoryId: _activeCategoryId,
+                    onSelect: (categoryId) {
+                      setState(() => _activeCategoryId = categoryId);
+                    },
+                    onShowAll: () => setState(() => _activeCategoryId = null),
+                    onAddCommunity: _openCommunityComposer,
+                  ),
+                ),
+                Expanded(
+                  child: StreamBuilder<List<ForumPost>>(
+                    stream: _service.watchPosts(category: _activeCategoryId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final posts = snapshot.data ?? const [];
+                      if (posts.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No posts yet. Start the conversation!',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        );
+                      }
+                      return ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg),
+                        itemCount: posts.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final post = posts[index];
+                          return _PostCard(
+                            post: post,
+                            currentUserId: _currentUserId,
+                            onLike: () => _service.toggleLike(post),
+                            onReply: () => _openReplyComposer(post: post),
+                            onDelete: () => _deletePost(post),
+                            timeLabel: _formatTime(post.createdAt),
+                            repliesBuilder: _RepliesSection(
+                              post: post,
+                              currentUserId: _currentUserId,
+                              service: _service,
+                              onReply: (reply) =>
+                                  _openReplyComposer(post: post, parent: reply),
+                              onDelete: _deleteReply,
+                            ),
+                          );
+                        },
                       );
                     },
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-          ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -197,12 +243,14 @@ class _CategoryStrip extends StatelessWidget {
   final String? activeCategoryId;
   final ValueChanged<String> onSelect;
   final VoidCallback onShowAll;
+  final VoidCallback onAddCommunity;
 
   const _CategoryStrip({
     required this.categories,
     required this.activeCategoryId,
     required this.onSelect,
     required this.onShowAll,
+    required this.onAddCommunity,
   });
 
   @override
@@ -234,7 +282,15 @@ class _CategoryStrip extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        Icon(Icons.filter_list_rounded, color: scheme.onSurfaceVariant),
+        TextButton.icon(
+          onPressed: onAddCommunity,
+          icon: const Icon(Icons.group_add_rounded, size: 18),
+          label: const Text('Add'),
+          style: TextButton.styleFrom(
+            foregroundColor: scheme.onSurfaceVariant,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          ),
+        ),
       ],
     );
   }
@@ -360,7 +416,8 @@ class _PostCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: scheme.surfaceContainerHighest.withOpacityValue(0.7),
+                        color: scheme.surfaceContainerHighest
+                            .withOpacityValue(0.7),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                         border: Border.all(color: scheme.outline),
                       ),
@@ -685,7 +742,8 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                 decoration: InputDecoration(
                   hintText: 'Write your reply...',
                   filled: true,
-                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
+                  fillColor:
+                      scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,
@@ -732,13 +790,154 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
   }
 }
 
+class _CommunityComposerSheet extends StatefulWidget {
+  final ForumService service;
+  final ValueChanged<String> onCreated;
+  final ValueChanged<String> onError;
+
+  const _CommunityComposerSheet({
+    required this.service,
+    required this.onCreated,
+    required this.onError,
+  });
+
+  @override
+  State<_CommunityComposerSheet> createState() =>
+      _CommunityComposerSheetState();
+}
+
+class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      widget.onError('Community name is required.');
+      return;
+    }
+
+    try {
+      final communityId = await widget.service.createCommunity(
+        name: name,
+        description: _descriptionController.text,
+      );
+      widget.onCreated(communityId);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      widget.onError('Could not create community. Try again.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final viewInsets = MediaQuery.of(context).viewInsets;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: viewInsets.bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppRadius.large),
+          ),
+          border: Border(top: BorderSide(color: scheme.outline)),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Create Community',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'You will be the admin of this group.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextField(
+                controller: _nameController,
+                maxLength: 40,
+                autofocus: true,
+                style: Theme.of(context).textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: 'Community name',
+                  filled: true,
+                  fillColor:
+                      scheme.surfaceContainerHighest.withOpacityValue(0.6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: _descriptionController,
+                maxLines: 3,
+                minLines: 2,
+                maxLength: 120,
+                style: Theme.of(context).textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: 'What is this group about? (optional)',
+                  filled: true,
+                  fillColor:
+                      scheme.surfaceContainerHighest.withOpacityValue(0.6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  const Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: _submit,
+                    icon: const Icon(Icons.group_add_rounded, size: 18),
+                    label: const Text('Create'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _PostComposerSheet extends StatefulWidget {
   final ForumService service;
+  final List<ForumCategory> categories;
   final String? initialCategory;
   final ValueChanged<String> onError;
 
   const _PostComposerSheet({
     required this.service,
+    required this.categories,
     required this.initialCategory,
     required this.onError,
   });
@@ -757,8 +956,11 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
     super.initState();
     _contentController = TextEditingController();
     _tagsController = TextEditingController();
-    _selectedCategory =
-        widget.initialCategory ?? ForumCategory.presets.first.id;
+    final hasInitial = widget.initialCategory != null &&
+        widget.categories.any((c) => c.id == widget.initialCategory);
+    _selectedCategory = hasInitial
+        ? widget.initialCategory
+        : (widget.categories.isNotEmpty ? widget.categories.first.id : null);
   }
 
   @override
@@ -828,7 +1030,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: ForumCategory.presets.map((category) {
+                  children: widget.categories.map((category) {
                     final isSelected = category.id == _selectedCategory;
                     return Padding(
                       padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -840,8 +1042,8 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                             setState(() => _selectedCategory = category.id);
                           }
                         },
-                        backgroundColor:
-                            scheme.surfaceContainerHighest.withOpacityValue(0.5),
+                        backgroundColor: scheme.surfaceContainerHighest
+                            .withOpacityValue(0.5),
                         selectedColor: AppColors.primary,
                         labelStyle: TextStyle(
                           color: isSelected
@@ -875,7 +1077,8 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   hintText:
                       'Share a thought, ask a question, or start a challenge...',
                   filled: true,
-                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
+                  fillColor:
+                      scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,
@@ -891,7 +1094,8 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   prefixIcon: Icon(Icons.tag_rounded,
                       color: scheme.onSurfaceVariant, size: 20),
                   filled: true,
-                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
+                  fillColor:
+                      scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,
