@@ -1239,14 +1239,28 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // ── Launch: fade out landing overlay to reveal Flutter underneath
-    function launchApp() {
+    function launchApp(skipAnimation = false) {
       const overlay = document.getElementById('landing-overlay');
+      if (!overlay) return;
+
+      if (skipAnimation) {
+        overlay.remove();
+        document.body.style.overflow = '';
+        return;
+      }
+
       overlay.classList.add('launching');
       // After fade-out transition, remove overlay from DOM entirely
       overlay.addEventListener('transitionend', () => {
         overlay.remove();
         document.body.style.overflow = '';
       }, { once: true });
+    }
+
+    // If coming from the standalone information page, enter app directly.
+    const launchFromInfoPage = new URLSearchParams(window.location.search).get('launch');
+    if (launchFromInfoPage === '1') {
+      launchApp(true);
     }
   </script>
 </body>

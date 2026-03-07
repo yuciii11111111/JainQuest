@@ -34,7 +34,9 @@ class ForumPost {
       authorId: (data['authorId'] as String?) ?? '',
       authorName: (data['authorName'] as String?) ?? 'Learner',
       authorHandle: (data['authorHandle'] as String?) ?? '@learner',
-      category: (data['category'] as String?) ?? 'general',
+      category: (data['category'] as String?) ??
+          (data['communityId'] as String?) ??
+          'general',
       content: (data['content'] as String?) ?? '',
       tags: List<String>.from(data['tags'] as List<dynamic>? ?? const []),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),

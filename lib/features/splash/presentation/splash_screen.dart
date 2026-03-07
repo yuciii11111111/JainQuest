@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2600),
+      duration: const Duration(milliseconds: 3600),
     );
     _writeAnimation = CurvedAnimation(
       parent: _animationController,

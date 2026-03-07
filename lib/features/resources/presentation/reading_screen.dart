@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_slider.dart';
@@ -13,8 +14,10 @@ class ReadingScreen extends StatefulWidget {
 }
 
 class _ReadingScreenState extends State<ReadingScreen> {
+  static const String _bookId = 'fundjain';
   final PageController _pageController = PageController();
   List<String> _pages = [];
+  List<int> _bookmarks = [];
   int _currentPage = 0;
   bool _isLoading = true;
   double _fontSize = 16;
@@ -23,8 +26,27 @@ class _ReadingScreenState extends State<ReadingScreen> {
   @override
   void initState() {
     super.initState();
+    _loadBookmarks();
     _loadBook();
   }
+
+  Future<void> _loadBookmarks() async {
+    final bookmarks = StorageService.getReadingBookmarks(_bookId);
+    if (mounted) {
+      setState(() => _bookmarks = bookmarks);
+    }
+  }
+
+  Future<void> _toggleCurrentPageBookmark() async {
+    final page = _currentPage;
+    await StorageService.toggleReadingBookmark(
+      bookId: _bookId,
+      pageIndex: page,
+    );
+    await _loadBookmarks();
+  }
+
+  bool get _isCurrentPageBookmarked => _bookmarks.contains(_currentPage);
 
   Future<void> _loadBook() async {
     final rawText = await rootBundle.loadString('assets/content/fundjain.txt');
@@ -95,15 +117,21 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       children: [
                         Text(
                           'FundJain Reader',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
                                 color: _darkMode ? AppColors.softCream : null,
                               ),
                         ),
                         Text(
                           'Read a knowledgeable book teaching the fundamentals of Jainism in great depth',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _darkMode ? AppColors.textSecondary : scheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: _darkMode
+                                        ? AppColors.textSecondary
+                                        : scheme.onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -115,6 +143,24 @@ class _ReadingScreenState extends State<ReadingScreen> {
                             color: _darkMode ? AppColors.softCream : null,
                           ),
                     ),
+                  const SizedBox(width: AppSpacing.xs),
+                  IconButton(
+                    tooltip: _isCurrentPageBookmarked
+                        ? 'Remove bookmark'
+                        : 'Bookmark page',
+                    icon: Icon(
+                      _isCurrentPageBookmarked
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_border_rounded,
+                    ),
+                    color: _isCurrentPageBookmarked
+                        ? AppColors.primary
+                        : (_darkMode
+                            ? AppColors.softCream
+                            : scheme.onSurfaceVariant),
+                    onPressed:
+                        _pages.isEmpty ? null : _toggleCurrentPageBookmark,
+                  ),
                 ],
               ),
             ),
@@ -162,16 +208,48 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   const SizedBox(width: AppSpacing.md),
                   FloatingActionButton.small(
                     heroTag: 'themeToggle',
-                    backgroundColor: _darkMode ? AppColors.softCream : AppColors.inkBlack,
+                    backgroundColor:
+                        _darkMode ? AppColors.softCream : AppColors.inkBlack,
                     onPressed: () => setState(() => _darkMode = !_darkMode),
                     child: Icon(
-                      _darkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                      color: _darkMode ? AppColors.inkBlack : AppColors.softCream,
+                      _darkMode
+                          ? Icons.light_mode_rounded
+                          : Icons.dark_mode_rounded,
+                      color:
+                          _darkMode ? AppColors.inkBlack : AppColors.softCream,
                     ),
                   ),
                 ],
               ),
             ),
+            if (_bookmarks.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.xs,
+                    children: _bookmarks.map((bookmark) {
+                      return ActionChip(
+                        label: Text('Pg ${bookmark + 1}'),
+                        onPressed: () {
+                          _pageController.animateToPage(
+                            bookmark,
+                            duration: const Duration(milliseconds: 320),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -184,11 +262,15 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       itemBuilder: (context, index) {
                         return Padding(
                           key: ValueKey(index),
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: _darkMode ? AppColors.inkBlack : scheme.surface,
-                              borderRadius: BorderRadius.circular(AppRadius.card),
+                              color: _darkMode
+                                  ? AppColors.inkBlack
+                                  : scheme.surface,
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.card),
                               border: Border.all(color: scheme.outline),
                             ),
                             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -196,11 +278,16 @@ class _ReadingScreenState extends State<ReadingScreen> {
                               child: SingleChildScrollView(
                                 child: TypewriterText(
                                   text: _pages[index],
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    height: 1.7,
-                                    fontSize: _fontSize,
-                                      color: _darkMode ? AppColors.textSecondary : null,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        height: 1.7,
+                                        fontSize: _fontSize,
+                                        color: _darkMode
+                                            ? AppColors.textSecondary
+                                            : null,
+                                      ),
                                 ),
                               ),
                             ),
@@ -233,7 +320,9 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: PrimaryButton(
-                        label: _currentPage == _pages.length - 1 ? 'Finish' : 'Next',
+                        label: _currentPage == _pages.length - 1
+                            ? 'Finish'
+                            : 'Next',
                         icon: Icons.chevron_right_rounded,
                         onPressed: _currentPage < _pages.length - 1
                             ? () {

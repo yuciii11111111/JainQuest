@@ -20,6 +20,7 @@ class ProfileSetupScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   static const List<String> _emojiOptions = [
     '🧘',
@@ -41,6 +42,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(userProfileProvider);
+      _nameController.text = user.displayName ?? '';
       _ageController.text = user.age?.toString() ?? '';
       _selectedEmoji = user.avatarEmoji;
       setState(() {});
@@ -49,11 +51,24 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _ageController.dispose();
     super.dispose();
   }
 
   Future<void> _saveProfile() async {
+    final displayName = _nameController.text.trim();
+    if (displayName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your name'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     final ageValue = int.tryParse(_ageController.text.trim());
     if (ageValue == null || ageValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -71,6 +86,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     try {
       final user = ref.read(userProfileProvider);
       final updatedUser = user.copyWith(
+        displayName: displayName,
         age: ageValue,
         avatarEmoji: _selectedEmoji ?? user.avatarEmoji,
       );
@@ -82,7 +98,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Profile setup complete, ${user.displayName ?? "Learner"}!'),
+                  'Profile setup complete, ${updatedUser.displayName ?? "Learner"}!'),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 3),
@@ -238,6 +254,38 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           }).toList(),
                         ),
                         const SizedBox(height: AppSpacing.xl),
+
+                        TextField(
+                          controller: _nameController,
+                          textCapitalization: TextCapitalization.words,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'What should we call you?',
+                            hintText: 'Enter your name',
+                            prefixIcon: const Icon(Icons.person_rounded),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: BorderSide(color: scheme.outline),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: BorderSide(color: scheme.outline),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 2),
+                            ),
+                            filled: true,
+                            fillColor: scheme.surface,
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+
+                        const SizedBox(height: AppSpacing.md),
 
                         // Age Input
                         TextField(

@@ -17,6 +17,7 @@ class StorageService {
   static NotificationPrefs _notificationPrefs = const NotificationPrefs();
   static List<AttemptLog> _attemptLogs = [];
   static ThemeMode _themeMode = ThemeMode.dark;
+  static Map<String, List<int>> _readingBookmarks = {};
 
   static Future<void> init({User? user}) async {
     final currentUser = user ?? _auth.currentUser;
@@ -47,6 +48,10 @@ class StorageService {
 
   static DocumentReference<Map<String, dynamic>> _settingsDoc() {
     return _userDoc().collection('settings').doc('theme');
+  }
+
+  static DocumentReference<Map<String, dynamic>> _readingDoc() {
+    return _userDoc().collection('settings').doc('reading');
   }
 
   static CollectionReference<Map<String, dynamic>> _attemptsCollection() {
@@ -83,8 +88,7 @@ class StorageService {
   static Future<void> _loadCachedData() async {
     final userSnap = await _userDoc().get();
     if (userSnap.exists && userSnap.data() != null) {
-      _userProfile =
-          UserProfile.fromMap(userSnap.data()!, fallbackId: _userId);
+      _userProfile = UserProfile.fromMap(userSnap.data()!, fallbackId: _userId);
     }
 
     final progressSnap = await _progressDoc().get();
@@ -101,6 +105,26 @@ class StorageService {
     if (themeSnap.exists && themeSnap.data() != null) {
       final isDark = themeSnap.data()!['isDarkMode'] as bool? ?? true;
       _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    }
+
+    final readingSnap = await _readingDoc().get();
+    if (readingSnap.exists && readingSnap.data() != null) {
+      final rawBookmarks =
+          readingSnap.data()!['bookmarks'] as Map<String, dynamic>? ?? {};
+      _readingBookmarks = rawBookmarks.map(
+        (bookId, pages) {
+          final values = List<dynamic>.from(pages as List<dynamic>? ?? const [])
+              .whereType<num>()
+              .map((value) => value.toInt())
+              .where((value) => value >= 0)
+              .toSet()
+              .toList()
+            ..sort();
+          return MapEntry(bookId, values);
+        },
+      );
+    } else {
+      _readingBookmarks = {};
     }
 
     final attemptsSnap = await _attemptsCollection().get();
@@ -247,7 +271,8 @@ class StorageService {
 
     // Update lesson progress
     final existingProgress = progress.lessonProgress[lessonId];
-    final isFirstCompletion = existingProgress == null || !existingProgress.isCompleted;
+    final isFirstCompletion =
+        existingProgress == null || !existingProgress.isCompleted;
 
     final updatedLessonProgress = LessonProgress(
       lessonId: lessonId,
@@ -261,10 +286,13 @@ class StorageService {
       lastCompletedAt: now,
       lastReplayBonusAt: isFirstCompletion
           ? null
-          : (existingProgress.canGetReplayBonus == true ? now : existingProgress.lastReplayBonusAt),
+          : (existingProgress.canGetReplayBonus == true
+              ? now
+              : existingProgress.lastReplayBonusAt),
     );
 
-    final newLessonProgressMap = Map<String, LessonProgress>.from(progress.lessonProgress);
+    final newLessonProgressMap =
+        Map<String, LessonProgress>.from(progress.lessonProgress);
     newLessonProgressMap[lessonId] = updatedLessonProgress;
 
     // Update completed lessons
@@ -274,7 +302,8 @@ class StorageService {
 
     // Unlock next lesson
     List<String> newUnlockedLessons = progress.unlockedLessons;
-    if (nextLessonId != null && !progress.unlockedLessons.contains(nextLessonId)) {
+    if (nextLessonId != null &&
+        !progress.unlockedLessons.contains(nextLessonId)) {
       newUnlockedLessons = [...progress.unlockedLessons, nextLessonId];
     }
 
@@ -317,16 +346,15 @@ class StorageService {
   }
 
   static List<AttemptLog> getAttemptsForQuestion(String questionId) {
-    return _attemptLogs
-        .where((a) => a.questionId == questionId)
-        .toList()
+    return _attemptLogs.where((a) => a.questionId == questionId).toList()
       ..sort((a, b) => b.attemptedAt.compareTo(a.attemptedAt));
   }
 
   static List<AttemptLog> getQuestionsForReview() {
     final now = DateTime.now();
     return _attemptLogs
-        .where((a) => a.nextReviewDate != null && a.nextReviewDate!.isBefore(now))
+        .where(
+            (a) => a.nextReviewDate != null && a.nextReviewDate!.isBefore(now))
         .toList();
   }
 
@@ -365,6 +393,40 @@ class StorageService {
   }
 
   // =========================================================================
+  // Reading Bookmarks
+  // =========================================================================
+
+  static List<int> getReadingBookmarks(String bookId) {
+    final pages = _readingBookmarks[bookId] ?? const <int>[];
+    final copy = List<int>.from(pages)..sort();
+    return copy;
+  }
+
+  static Future<bool> toggleReadingBookmark({
+    required String bookId,
+    required int pageIndex,
+  }) async {
+    final pages = List<int>.from(_readingBookmarks[bookId] ?? const <int>[]);
+    final exists = pages.contains(pageIndex);
+    if (exists) {
+      pages.remove(pageIndex);
+    } else {
+      pages.add(pageIndex);
+    }
+    pages.sort();
+    _readingBookmarks[bookId] = pages;
+
+    if (_isInitialized && _auth.currentUser != null) {
+      await _readingDoc().set(
+        {'bookmarks': _readingBookmarks},
+        SetOptions(merge: true),
+      );
+    }
+
+    return !exists;
+  }
+
+  // =========================================================================
   // Reset
   // =========================================================================
 
@@ -378,6 +440,7 @@ class StorageService {
     batch.set(_progressDoc(), defaultProgress.toMap());
     batch.set(_notificationDoc(), defaultPrefs.toMap());
     batch.set(_settingsDoc(), {'isDarkMode': _themeMode == ThemeMode.dark});
+    batch.set(_readingDoc(), {'bookmarks': <String, List<int>>{}});
 
     final attemptsSnap = await _attemptsCollection().get();
     for (final doc in attemptsSnap.docs) {
@@ -390,5 +453,6 @@ class StorageService {
     _progressState = defaultProgress;
     _notificationPrefs = defaultPrefs;
     _attemptLogs = [];
+    _readingBookmarks = {};
   }
 }

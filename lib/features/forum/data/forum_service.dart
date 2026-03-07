@@ -36,14 +36,15 @@ class ForumService {
   }
 
   Stream<List<ForumPost>> watchPosts({String? category}) {
-    Query<Map<String, dynamic>> query =
-        _posts.orderBy('createdAt', descending: true);
-    if (category != null) {
-      query = query.where('category', isEqualTo: category);
-    }
-    return query.snapshots().map(
-          (snapshot) => snapshot.docs.map(ForumPost.fromDoc).toList(),
-        );
+    return _posts.orderBy('createdAt', descending: true).snapshots().map(
+      (snapshot) {
+        final posts = snapshot.docs.map(ForumPost.fromDoc).toList();
+        if (category == null) {
+          return posts;
+        }
+        return posts.where((post) => post.category == category).toList();
+      },
+    );
   }
 
   Stream<List<ForumCommunity>> watchCommunities() {
@@ -80,6 +81,7 @@ class ForumService {
       'authorName': displayName,
       'authorHandle': handle,
       'category': category,
+      'communityId': category,
       'content': content,
       'tags': tags,
       'createdAt': FieldValue.serverTimestamp(),
