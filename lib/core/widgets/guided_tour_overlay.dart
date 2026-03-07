@@ -317,7 +317,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
                     key: ValueKey('guide-title-$_currentIndex'),
                     text: step.title,
                     enabled: true,
-                    speed: const Duration(milliseconds: 26),
+                    speed: const Duration(milliseconds: 14),
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -328,7 +328,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
                     key: ValueKey('guide-message-$_currentIndex'),
                     text: step.message,
                     enabled: true,
-                    speed: const Duration(milliseconds: 16),
+                    speed: const Duration(milliseconds: 10),
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall

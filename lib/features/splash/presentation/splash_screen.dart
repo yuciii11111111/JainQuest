@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../auth/presentation/create_account_screen.dart';
 import '../../../core/services/storage_service.dart';
@@ -114,13 +113,6 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      'App is starting…',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
                     ),
                   ],
                 );
