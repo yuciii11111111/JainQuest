@@ -350,7 +350,7 @@ class _BadgesTab extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: badge.isEarned
                               ? AppColors.secondary.withOpacityValue(0.16)
-                              : scheme.surfaceVariant,
+                              : scheme.surfaceContainerHighest,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: badge.isEarned
@@ -423,7 +423,7 @@ class _BadgesTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: badge.isEarned
                         ? AppColors.secondary.withOpacityValue(0.16)
-                        : scheme.surfaceVariant,
+                        : scheme.surfaceContainerHighest,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color:
@@ -548,7 +548,7 @@ class _StatsTab extends StatelessWidget {
                       size: 120,
                       strokeWidth: 10,
                       color: AppColors.primary,
-                      backgroundColor: scheme.surfaceVariant,
+                      backgroundColor: scheme.surfaceContainerHighest,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -652,7 +652,7 @@ class _StatsTab extends StatelessWidget {
                       lineTouchData: LineTouchData(
                         handleBuiltInTouches: true,
                         touchTooltipData: LineTouchTooltipData(
-                          tooltipBorderRadius: BorderRadius.circular(12),
+                          tooltipRoundedRadius: 12,
                           tooltipPadding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
                           getTooltipItems: (touchedSpots) {

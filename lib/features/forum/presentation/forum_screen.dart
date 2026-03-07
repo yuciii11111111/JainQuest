@@ -262,7 +262,7 @@ class _CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive
               ? AppColors.primary
-              : scheme.surfaceVariant.withOpacityValue(0.7),
+              : scheme.surfaceContainerHighest.withOpacityValue(0.7),
           borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(
             color: isActive ? AppColors.primary : scheme.outline,
@@ -360,7 +360,7 @@ class _PostCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: scheme.surfaceVariant.withOpacityValue(0.7),
+                        color: scheme.surfaceContainerHighest.withOpacityValue(0.7),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                         border: Border.all(color: scheme.outline),
                       ),
@@ -514,7 +514,7 @@ class _ReplyNode extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
-          color: scheme.surfaceVariant.withOpacityValue(0.6),
+          color: scheme.surfaceContainerHighest.withOpacityValue(0.6),
           borderRadius: BorderRadius.circular(AppRadius.small),
           border: Border.all(color: scheme.outline),
         ),
@@ -685,7 +685,7 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                 decoration: InputDecoration(
                   hintText: 'Write your reply...',
                   filled: true,
-                  fillColor: scheme.surfaceVariant.withOpacityValue(0.6),
+                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,
@@ -841,7 +841,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                           }
                         },
                         backgroundColor:
-                            scheme.surfaceVariant.withOpacityValue(0.5),
+                            scheme.surfaceContainerHighest.withOpacityValue(0.5),
                         selectedColor: AppColors.primary,
                         labelStyle: TextStyle(
                           color: isSelected
@@ -875,7 +875,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   hintText:
                       'Share a thought, ask a question, or start a challenge...',
                   filled: true,
-                  fillColor: scheme.surfaceVariant.withOpacityValue(0.6),
+                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,
@@ -891,7 +891,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   prefixIcon: Icon(Icons.tag_rounded,
                       color: scheme.onSurfaceVariant, size: 20),
                   filled: true,
-                  fillColor: scheme.surfaceVariant.withOpacityValue(0.6),
+                  fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     borderSide: BorderSide.none,

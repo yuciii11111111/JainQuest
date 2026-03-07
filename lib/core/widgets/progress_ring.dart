@@ -24,7 +24,7 @@ class ProgressRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final clampedProgress = progress.clamp(0.0, 1.0);
     final colorToUse = color ?? AppColors.primary;
-    final bgColor = backgroundColor ?? Theme.of(context).colorScheme.surfaceVariant;
+    final bgColor = backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return CustomPaint(
       size: Size(size, size),

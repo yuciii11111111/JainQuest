@@ -1,0 +1,12 @@
+{
+  "dart.flutterSdkPath": "/Users/diptishah/Documents/GitHub/project/flutter",
+  "dart.analysisExcludedFolders": [
+    "/Users/diptishah/Documents/GitHub/project/flutter"
+  ],
+  "search.exclude": {
+    "**/flutter/**": true
+  },
+  "files.watcherExclude": {
+    "**/flutter/**": true
+  }
+}

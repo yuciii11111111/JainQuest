@@ -157,7 +157,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     final overlayRect = targetRect.inflate(14);
     final screenSize = MediaQuery.of(context).size;
     final tooltipWidth = min(260.0, screenSize.width - 32);
-    final tooltipHeight = 96.0;
+    const tooltipHeight = 96.0;
     final placeBelow = overlayRect.center.dy < screenSize.height * 0.55;
     final tooltipLeft = (overlayRect.center.dx - tooltipWidth / 2)
         .clamp(16.0, screenSize.width - tooltipWidth - 16.0);

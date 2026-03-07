@@ -212,7 +212,7 @@ class _ChatBubble extends StatelessWidget {
     final isUser = message.isUser;
     final bubbleColor = isUser
         ? AppColors.primary.withOpacityValue(0.2)
-        : scheme.surfaceVariant.withOpacityValue(0.7);
+        : scheme.surfaceContainerHighest.withOpacityValue(0.7);
     final borderColor = message.isError ? AppColors.danger : scheme.outline;
     final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final margin = isUser

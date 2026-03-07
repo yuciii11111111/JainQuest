@@ -20,7 +20,7 @@ class ShimmerLoader extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: scheme.surfaceVariant,
+        color: scheme.surfaceContainerHighest,
         borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
       ),
     );

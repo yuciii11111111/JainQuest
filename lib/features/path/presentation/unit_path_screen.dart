@@ -186,12 +186,12 @@ class _PathStep extends StatelessWidget {
       size: ringSize,
       strokeWidth: 8,
       color: ringColor,
-      backgroundColor: scheme.surfaceVariant.withOpacityValue(0.6),
+      backgroundColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
       child: Container(
         width: nodeSize,
         height: nodeSize,
         decoration: BoxDecoration(
-          color: isLocked ? scheme.surfaceVariant : ringColor,
+          color: isLocked ? scheme.surfaceContainerHighest : ringColor,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -359,7 +359,7 @@ class _BossCheckpoint extends StatelessWidget {
             decoration: BoxDecoration(
               color: isUnlocked
                   ? AppColors.warning
-                  : Theme.of(context).colorScheme.surfaceVariant,
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               shape: BoxShape.circle,
               border: Border.all(
                 color: isUnlocked ? AppColors.warning : Theme.of(context).colorScheme.outline,

@@ -11,27 +11,27 @@ class AppColors {
   // Backgrounds
   // Transparent base to let animated gradient show through
   static const Color backgroundBase = Colors.transparent;
-  // Semi-transparent dark green for cards
-  static const Color backgroundCard = Color(0x991A2820);
-  // Slightly lighter for elevated surfaces
-  static const Color backgroundElevated = Color(0xCC2C4334);
+  // Semi-transparent warm charcoal for cards
+  static const Color backgroundCard = Color(0x99251A12);
+  // Slightly lighter warm surface
+  static const Color backgroundElevated = Color(0xCC3A2618);
 
   // Text
   static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFC7BEEA);
-  static const Color textMuted = Color(0xFF8C82B6);
+  static const Color textSecondary = Color(0xFFF2D9C2);
+  static const Color textMuted = Color(0xFFC8A98D);
 
   // Gradients
   static const List<Color> primaryGradient = [
-    Color(0xFF6F5BFA), // Electric Lavender
-    Color(0xFF5B74FF), // Periwinkle
-    Color(0xFF4354D6), // Deep Indigo
+    Color(0xFFFF9E2C), // Saffron
+    Color(0xFFFF7A1A), // Bright Orange
+    Color(0xFFE85A00), // Deep Orange
   ];
 
   static const List<Color> accentGradient = [
-    Color(0xFFC084FC), // Soft Violet
-    Color(0xFFD977FF), // Orchid
-    Color(0xFFF472D0), // Neon Pink
+    Color(0xFFFFE4B5), // Warm Cream
+    Color(0xFFFFD08A), // Light Amber
+    Color(0xFFFFB86B), // Peach Orange
   ];
 
   static const List<Color> successGradient = [
@@ -41,19 +41,19 @@ class AppColors {
   ];
 
   static const List<Color> warmGradient = [
-    Color(0xFFFBBF24), // Amber
-    Color(0xFFF59E0B), // Orange
-    Color(0xFFD97706), // Deep Orange
+    Color(0xFFFFF3D6), // Cream
+    Color(0xFFFFE4B5), // Light Cream
+    Color(0xFFFFC98F), // Warm Peach
   ];
 
   // Solid Accents
-  static const Color primary = Color(0xFF6F5BFA);
-  static const Color secondary = Color(0xFFC084FC);
-  static const Color highlight = Color(0xFF7DD3FC);
+  static const Color primary = Color(0xFFFF6B00);
+  static const Color secondary = Color(0xFFFF9E2C);
+  static const Color highlight = Color(0xFFFFC66D);
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color danger = Color(0xFFEF4444);
-  static const Color achievementGold = Color(0xFFFFD700);
+  static const Color achievementGold = Color(0xFFFFB84D);
 
   // Glassmorphism
   static const Color glassOverlay = Color(0x1AFFFFFF);
@@ -61,13 +61,13 @@ class AppColors {
   static const double glassBlur = 24.0;
 
   // Light Mode (Optional)
-  static const Color lightBackground = Color(0xFFF6F4EF);
-  static const Color lightCard = Color(0xFFFCFBF8);
-  static const Color lightElevated = Color(0xFFF0EEE7);
-  static const Color lightTextPrimary = Color(0xFF1E1B16);
-  static const Color lightTextSecondary = Color(0xFF5E564B);
-  static const Color lightTextMuted = Color(0xFF8A8174);
-  static const Color lightBorder = Color(0xFFE3DED2);
+  static const Color lightBackground = Colors.transparent;
+  static const Color lightCard = Color(0xF2FFF8EE);
+  static const Color lightElevated = Color(0xE6FFEBC8);
+  static const Color lightTextPrimary = Color(0xFF0F172A);
+  static const Color lightTextSecondary = Color(0xFF334155);
+  static const Color lightTextMuted = Color(0xFF64748B);
+  static const Color lightBorder = Color(0x66F2B980);
 }
 
 // ============================================================================
@@ -300,7 +300,7 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.backgroundCard,
-        surfaceVariant: AppColors.backgroundElevated,
+        surfaceContainerHighest: AppColors.backgroundElevated,
         outline: AppColors.glassBorder,
         onSurfaceVariant: AppColors.textSecondary,
         error: AppColors.danger,
@@ -308,7 +308,6 @@ class AppTheme {
         onSecondary: AppColors.textPrimary,
         onSurface: AppColors.textPrimary,
         onError: AppColors.textPrimary,
-        onBackground: AppColors.textPrimary,
       ),
 
       // Typography
@@ -319,17 +318,17 @@ class AppTheme {
       ),
 
       // App Bar
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
       ),
 
       // Cards
@@ -360,6 +359,45 @@ class AppTheme {
           ),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.textPrimary,
+          side: const BorderSide(color: AppColors.glassBorder),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.button),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.backgroundCard,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textMuted,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textPrimary,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : AppColors.backgroundElevated,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary.withOpacityValue(0.35)
+              : AppColors.backgroundElevated,
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: AppColors.backgroundElevated,
+        contentTextStyle: TextStyle(color: AppColors.textPrimary),
+      ),
 
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -375,27 +413,27 @@ class AppTheme {
       ),
 
       // Input Decoration
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         filled: true,
         fillColor: Colors.transparent,
-        border: const UnderlineInputBorder(
+        border: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.glassBorder),
         ),
-        enabledBorder: const UnderlineInputBorder(
+        enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.glassBorder),
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
-        errorBorder: const UnderlineInputBorder(
+        errorBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.danger),
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: 0,
           vertical: AppSpacing.md,
         ),
-        labelStyle: const TextStyle(color: AppColors.textSecondary),
-        hintStyle: const TextStyle(color: AppColors.textMuted),
+        labelStyle: TextStyle(color: AppColors.textSecondary),
+        hintStyle: TextStyle(color: AppColors.textMuted),
         prefixIconColor: AppColors.textSecondary,
         suffixIconColor: AppColors.textSecondary,
       ),
@@ -409,12 +447,11 @@ class AppTheme {
       fontFamily: AppTypography.fontFamily,
       fontFamilyFallback: AppTypography.fontFamilyFallback,
       scaffoldBackgroundColor: AppColors.lightBackground,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.lightCard,
-        surfaceVariant: AppColors.lightElevated,
+        surfaceContainerHighest: AppColors.lightElevated,
         outline: AppColors.lightBorder,
         error: AppColors.danger,
         onPrimary: AppColors.textPrimary,
@@ -422,7 +459,6 @@ class AppTheme {
         onSurface: AppColors.lightTextPrimary,
         onSurfaceVariant: AppColors.lightTextSecondary,
         onError: AppColors.textPrimary,
-        onBackground: AppColors.lightTextPrimary,
       ),
 
       // Typography
@@ -433,17 +469,17 @@ class AppTheme {
       ),
 
       // App Bar
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.lightTextPrimary,
         ),
-        iconTheme: const IconThemeData(color: AppColors.lightTextPrimary),
+        iconTheme: IconThemeData(color: AppColors.lightTextPrimary),
       ),
 
       // Cards
@@ -474,6 +510,45 @@ class AppTheme {
           ),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.lightTextPrimary,
+          side: const BorderSide(color: AppColors.lightBorder),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.button),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.lightCard,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.lightTextMuted,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textPrimary,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : AppColors.lightElevated,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary.withOpacityValue(0.35)
+              : AppColors.lightElevated,
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: AppColors.lightElevated,
+        contentTextStyle: TextStyle(color: AppColors.lightTextPrimary),
+      ),
 
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -486,6 +561,30 @@ class AppTheme {
         color: AppColors.lightBorder,
         thickness: 1,
         space: AppSpacing.md,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.transparent,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.lightBorder),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.lightBorder),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: AppColors.danger),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 0,
+          vertical: AppSpacing.md,
+        ),
+        labelStyle: TextStyle(color: AppColors.lightTextSecondary),
+        hintStyle: TextStyle(color: AppColors.lightTextMuted),
+        prefixIconColor: AppColors.lightTextSecondary,
+        suffixIconColor: AppColors.lightTextSecondary,
       ),
     );
   }

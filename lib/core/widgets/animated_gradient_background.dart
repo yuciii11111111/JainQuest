@@ -41,10 +41,10 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFDF6EC),
-              Color(0xFFF1F6FF),
-              Color(0xFFE8F7EF),
-              Color(0xFFFFF3D6),
+              Color(0xFFFFF8E8),
+              Color(0xFFFFF1D8),
+              Color(0xFFFFE4BF),
+              Color(0xFFFFD6A5),
             ],
             stops: [0.0, 0.35, 0.7, 1.0],
           ),
@@ -73,10 +73,10 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
               ),
               radius: 1.4,
               colors: const [
-                Color(0xFF2E8B57), // Vivid Sea Green
-                Color(0xFF004D40), // Rich Teal
-                Color(0xFF0F2629), // Deep Blue-Green
-                Color(0xFF050505), // Almost Black
+                Color(0xFF7A3B12), // Burnt Orange
+                Color(0xFF4A260F), // Warm Brown
+                Color(0xFF24170F), // Deep Brown
+                Color(0xFF090807), // Near Black
               ],
               stops: const [0.0, 0.4, 0.7, 1.0],
             ),
@@ -90,7 +90,7 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
                 ),
                 radius: 1.2,
                 colors: [
-                  const Color(0xFF64FFDA).withOpacity(0.15), // Teal Accent Glow
+                  const Color(0xFFFFB86B).withValues(alpha: 0.2), // Orange Glow
                   Colors.transparent,
                 ],
                 stops: const [0.0, 0.6],

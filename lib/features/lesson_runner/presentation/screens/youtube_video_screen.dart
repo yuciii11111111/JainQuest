@@ -248,7 +248,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                             allowScrubbing: true,
                             colors: VideoProgressColors(
                               playedColor: AppColors.primary,
-                              bufferedColor: Theme.of(context).colorScheme.surfaceVariant,
+                              bufferedColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               backgroundColor: Theme.of(context).colorScheme.surface,
                             ),
                           ),
@@ -287,7 +287,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Text(

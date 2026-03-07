@@ -423,7 +423,7 @@ class _SwitchTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
+            activeColor: AppColors.primary,
           ),
         ],
       ),
@@ -521,7 +521,7 @@ class _InfoTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: scheme.surfaceVariant,
+              color: scheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: scheme.onSurfaceVariant, size: 20),

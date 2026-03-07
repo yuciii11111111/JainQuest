@@ -166,7 +166,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
               Container(
                 width: 72,
                 height: 72,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),

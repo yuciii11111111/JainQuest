@@ -1249,7 +1249,7 @@ class Unit1Content {
               youtubeVideo: const YoutubeVideoScreen(
                 title: 'Story clip',
                 note: 'Short clip to connect the idea to daily life.',
-                searchKeywords: const [],
+                searchKeywords: [],
                 videoAsset: 'assets/videos/youtubevideo.mp4',
                 clipStartSeconds: 0,
                 clipEndSeconds: 10,

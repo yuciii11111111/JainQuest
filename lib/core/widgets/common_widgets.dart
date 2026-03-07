@@ -154,7 +154,7 @@ class AnimatedProgressBar extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceVariant,
+        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: LayoutBuilder(
@@ -619,7 +619,7 @@ class BadgeWidget extends StatelessWidget {
             decoration: BoxDecoration(
               color: isEarned
                   ? AppColors.secondary.withOpacityValue(0.12)
-                  : Theme.of(context).colorScheme.surfaceVariant,
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               shape: BoxShape.circle,
               border: Border.all(
                 color: isEarned

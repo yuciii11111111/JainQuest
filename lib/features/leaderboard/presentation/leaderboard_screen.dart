@@ -133,7 +133,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             radius: 24,
                             backgroundColor: isCurrentUser
                                 ? AppColors.primary
-                                : scheme.surfaceVariant,
+                                : scheme.surfaceContainerHighest,
                             child: Text(
                               entry.name[0].toUpperCase(),
                               style: const TextStyle(
@@ -430,7 +430,7 @@ class _YourRankCard extends StatelessWidget {
           Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

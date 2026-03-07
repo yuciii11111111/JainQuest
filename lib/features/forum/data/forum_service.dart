@@ -89,7 +89,7 @@ class ForumService {
       if (!snap.exists) {
         return;
       }
-      final data = snap.data() as Map<String, dynamic>? ?? {};
+      final data = snap.data() ?? {};
       final likedBy = List<String>.from(data['likedBy'] as List<dynamic>? ?? const []);
       final isLiked = likedBy.contains(user.uid);
       if (isLiked) {

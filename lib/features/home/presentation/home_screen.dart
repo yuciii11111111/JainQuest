@@ -36,7 +36,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final GlobalKey _continueLearningKey = GuideKeys.continueLearningButton;
   final GlobalKey _currentLessonKey = GuideKeys.currentLessonCard;
-  final GlobalKey _statsKey = GlobalKey();
+  final GlobalKey _streakCardKey = GlobalKey();
+  final GlobalKey _currentLessonHighlightKey = GlobalKey();
   final GlobalKey _askNavKey = GlobalKey();
 
   @override
@@ -56,7 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final targets = [
       TargetFocus(
         identify: "stats",
-        keyTarget: _statsKey,
+        keyTarget: _streakCardKey,
         alignSkip: Alignment.bottomRight,
         contents: [
           TargetContent(
@@ -74,7 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       TargetFocus(
         identify: "current_lesson",
-        keyTarget: _currentLessonKey,
+        keyTarget: _currentLessonHighlightKey,
         alignSkip: Alignment.bottomRight,
         contents: [
           TargetContent(
@@ -157,9 +158,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             unit: unit,
             themeMode: themeMode,
             onToggleTheme: toggleTheme,
-            statsKey: _statsKey,
+            streakCardKey: _streakCardKey,
             continueLearningKey: _continueLearningKey,
             currentLessonKey: _currentLessonKey,
+            currentLessonHighlightKey: _currentLessonHighlightKey,
             onShowGuide: _showTutorial,
             onLessonTap: (lesson) {
               ref.read(lessonRunnerProvider.notifier).startLesson(lesson);
@@ -315,9 +317,10 @@ class _HomeTab extends StatelessWidget {
   final Unit unit;
   final ThemeMode themeMode;
   final VoidCallback onToggleTheme;
-  final Key? statsKey;
+  final Key? streakCardKey;
   final GlobalKey continueLearningKey;
   final GlobalKey currentLessonKey;
+  final Key? currentLessonHighlightKey;
   final VoidCallback onShowGuide;
   final ValueChanged<Lesson> onLessonTap;
 
@@ -327,9 +330,10 @@ class _HomeTab extends StatelessWidget {
     required this.unit,
     required this.themeMode,
     required this.onToggleTheme,
-    this.statsKey,
+    this.streakCardKey,
     required this.continueLearningKey,
     required this.currentLessonKey,
+    this.currentLessonHighlightKey,
     required this.onShowGuide,
     required this.onLessonTap,
   });
@@ -475,10 +479,10 @@ class _HomeTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Row(
-              key: statsKey,
               children: [
                 Expanded(
                   child: FloatingCard(
+                    key: streakCardKey,
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
@@ -588,6 +592,7 @@ class _HomeTab extends StatelessWidget {
               },
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Row(
+                key: currentLessonHighlightKey,
                 children: [
                   Container(
                     width: 48,
@@ -732,12 +737,12 @@ class _JourneyNode extends StatelessWidget {
         size: ringSize,
         strokeWidth: 8,
         color: ringColor,
-        backgroundColor: scheme.surfaceVariant.withOpacityValue(0.6),
+        backgroundColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
         child: Container(
           width: nodeSize,
           height: nodeSize,
           decoration: BoxDecoration(
-            color: isLocked ? scheme.surfaceVariant : ringColor,
+            color: isLocked ? scheme.surfaceContainerHighest : ringColor,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
