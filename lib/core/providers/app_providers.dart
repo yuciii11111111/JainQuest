@@ -148,7 +148,6 @@ final badgesProvider = Provider<List<BadgeDefinition>>((ref) {
 enum LessonScreenType {
   questionIntro,
   shortText,
-  youtubeVideo,
   explanation,
   quiz,
   lessonComplete,
@@ -230,7 +229,6 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
   static const _screenOrder = [
     LessonScreenType.questionIntro,
     LessonScreenType.shortText,
-    LessonScreenType.youtubeVideo,
     LessonScreenType.explanation,
     LessonScreenType.quiz,
     LessonScreenType.lessonComplete,
@@ -483,3 +481,9 @@ final practiceProvider =
     StateNotifierProvider<PracticeNotifier, PracticeState?>((ref) {
   return PracticeNotifier(ref);
 });
+
+// ============================================================================
+// Home Navigation
+// ============================================================================
+
+final homeTabIndexProvider = StateProvider<int>((ref) => 0);

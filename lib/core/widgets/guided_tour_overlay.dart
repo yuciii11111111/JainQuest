@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,10 +8,10 @@ import '../navigation/app_navigator.dart';
 import '../providers/app_providers.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import 'gradient_button.dart';
 import '../../features/path/presentation/unit_path_screen.dart';
 import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
 import 'floating_guide_overlay.dart';
+import 'typewriter_text.dart';
 
 class GuidedTourOverlay extends ConsumerStatefulWidget {
   const GuidedTourOverlay({super.key});
@@ -46,19 +47,24 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       navigator.push(MaterialPageRoute(builder: (_) => page));
     }
 
+    void setHomeTab(int index) {
+      container.read(homeTabIndexProvider.notifier).state = index;
+    }
+
     return [
       _TourStep(
         key: GuideKeys.continueLearningButton,
-        title: 'Start your first course',
-        message: 'Tap Continue Learning to open your path.',
+        title: 'Start Learning',
+        message: 'Open your learning path to begin the tour.',
         onTap: () {
+          setHomeTab(0);
           pushRoute(const UnitPathScreen());
         },
       ),
       _TourStep(
-        key: GuideKeys.firstPathStep,
-        title: 'Your first lesson',
-        message: 'Tap the first lesson to begin.',
+        key: GuideKeys.whatIsJainismLesson,
+        title: 'What Is Jainism',
+        message: 'Start with this first lesson.',
         onTap: () {
           final unit = container.read(unit1Provider);
           if (unit.lessons.isEmpty) {
@@ -71,10 +77,44 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
         },
       ),
       _TourStep(
-        key: GuideKeys.currentLessonCard,
-        title: 'Pick up where you left off',
-        message: 'Tap the Current Lesson card anytime.',
-        onTap: () {},
+        key: GuideKeys.lessonCompleteContinueButton,
+        title: 'Finish The First Lesson',
+        message:
+            'Complete all lesson screens and quiz. When this Continue button appears, move on.',
+        requiresFirstLessonCompleted: true,
+        onTap: () {
+          final navigator = appNavigatorKey.currentState;
+          container.read(lessonRunnerProvider.notifier).endLesson();
+          navigator?.maybePop();
+          Future<void>.delayed(const Duration(milliseconds: 120), () {
+            navigator?.maybePop();
+          });
+          setHomeTab(1);
+        },
+      ),
+      _TourStep(
+        key: GuideKeys.resourcesNavItem,
+        title: 'Reading',
+        message: 'Resources is your reading hub.',
+        onTap: () => setHomeTab(1),
+      ),
+      _TourStep(
+        key: GuideKeys.askGuruNavItem,
+        title: 'Ask Guru',
+        message: 'Use Ask Guru whenever you need help.',
+        onTap: () => setHomeTab(2),
+      ),
+      _TourStep(
+        key: GuideKeys.communityNavItem,
+        title: 'Community',
+        message: 'Join conversations with other learners here.',
+        onTap: () => setHomeTab(3),
+      ),
+      _TourStep(
+        key: GuideKeys.profileNavItem,
+        title: 'Profile',
+        message: 'Track your progress, badges, and settings.',
+        onTap: () => setHomeTab(4),
       ),
     ];
   }
@@ -87,6 +127,14 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       final rect = _calculateTargetRect();
       if (rect != _targetRect) {
         setState(() => _targetRect = rect);
+        return;
+      }
+      if (rect == null && _targetRect == null) {
+        Future<void>.delayed(const Duration(milliseconds: 250), () {
+          if (mounted) {
+            setState(() {});
+          }
+        });
       }
     });
   }
@@ -109,6 +157,18 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
   }
 
   Future<void> _advanceStep(_TourStep step) async {
+    if (step.requiresFirstLessonCompleted) {
+      final progress = ref.read(progressProvider);
+      if (!progress.isLessonCompleted('U01_L01')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Finish "What is Jainism" first, then continue.'),
+          ),
+        );
+        return;
+      }
+    }
+
     step.onTap();
     await Future<void>.delayed(const Duration(milliseconds: 350));
     if (!mounted) {
@@ -128,13 +188,24 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     }
     setState(() {
       _currentIndex = (_currentIndex + 1) % steps.length;
-      _targetRect = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProfileProvider);
+    if (user.showGuidedTour && !_tourActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          _tourActive = true;
+          _currentIndex = 0;
+          _targetRect = null;
+        });
+      });
+      return const SizedBox.shrink();
+    }
+
     if (!user.showGuidedTour) {
       return const SizedBox.shrink();
     }
@@ -148,7 +219,6 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     final step = steps[_currentIndex];
     final targetRect = _targetRect;
     final scheme = Theme.of(context).colorScheme;
-    final isLastStep = _currentIndex >= steps.length - 1;
 
     if (targetRect == null) {
       return const SizedBox.shrink();
@@ -206,44 +276,66 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: null,
+              onTap: () => _advanceStep(step),
               borderRadius: BorderRadius.circular(22),
             ),
           ),
         ),
         AnimatedPositioned(
           duration: const Duration(milliseconds: 500),
-          curve: Curves.easeOut,
+          curve: Curves.easeOutCubic,
           left: tooltipLeft,
           top: tooltipTop,
           width: tooltipWidth,
           height: tooltipHeight,
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: scheme.surface.withOpacityValue(0.95),
-              borderRadius: BorderRadius.circular(AppRadius.card),
-              border: Border.all(color: scheme.outline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  step.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(color: scheme.onSurface),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  step.message,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-              ],
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 420),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) {
+              final slide = Tween<Offset>(
+                begin: const Offset(0, 0.08),
+                end: Offset.zero,
+              ).animate(animation);
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(position: slide, child: child),
+              );
+            },
+            child: Container(
+              key: ValueKey(_currentIndex),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: scheme.surface.withOpacityValue(0.95),
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(color: scheme.outline),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TypewriterText(
+                    key: ValueKey('guide-title-$_currentIndex'),
+                    text: step.title,
+                    enabled: true,
+                    speed: const Duration(milliseconds: 26),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: scheme.onSurface),
+                  ),
+                  const SizedBox(height: 6),
+                  TypewriterText(
+                    key: ValueKey('guide-message-$_currentIndex'),
+                    text: step.message,
+                    enabled: true,
+                    speed: const Duration(milliseconds: 16),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -276,22 +368,6 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             ),
           ),
         ),
-        Positioned(
-          left: 16,
-          right: 16,
-          bottom: 24,
-          child: SafeArea(
-            top: false,
-            child: GradientButton(
-              label: isLastStep ? 'Finish' : 'Next',
-              icon: isLastStep
-                  ? Icons.check_rounded
-                  : Icons.arrow_forward_rounded,
-              onPressed: () => _advanceStep(step),
-              width: double.infinity,
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -302,12 +378,14 @@ class _TourStep {
   final String title;
   final String message;
   final VoidCallback onTap;
+  final bool requiresFirstLessonCompleted;
 
   const _TourStep({
     required this.key,
     required this.title,
     required this.message,
     required this.onTap,
+    this.requiresFirstLessonCompleted = false,
   });
 }
 

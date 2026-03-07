@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
+import '../../../core/widgets/glass_slider.dart';
 import '../../../core/widgets/typewriter_text.dart';
 
 class ReadingScreen extends StatefulWidget {
@@ -95,13 +96,13 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         Text(
                           'FundJain Reader',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: _darkMode ? Colors.white : null,
+                                color: _darkMode ? AppColors.softCream : null,
                               ),
                         ),
                         Text(
                           'Read a knowledgeable book teaching the fundamentals of Jainism in great depth',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _darkMode ? Colors.white70 : scheme.onSurfaceVariant,
+                                color: _darkMode ? AppColors.textSecondary : scheme.onSurfaceVariant,
                               ),
                         ),
                       ],
@@ -111,12 +112,31 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     Text(
                       '${_currentPage + 1}/${_pages.length}',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: _darkMode ? Colors.white : null,
+                            color: _darkMode ? AppColors.softCream : null,
                           ),
                     ),
                 ],
               ),
             ),
+            if (_pages.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.xs,
+                ),
+                child: GlassSlider(
+                  min: 0,
+                  max: (_pages.length - 1).toDouble(),
+                  value: _currentPage.toDouble(),
+                  divisions: _pages.length > 1 ? _pages.length - 1 : null,
+                  label: 'Page ${_currentPage + 1}',
+                  onChanged: (v) {
+                    final targetPage = v.round().clamp(0, _pages.length - 1);
+                    _pageController.jumpToPage(targetPage);
+                    setState(() => _currentPage = targetPage);
+                  },
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Row(
@@ -126,10 +146,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       children: [
                         const Icon(Icons.text_fields_rounded, size: 18),
                         Expanded(
-                          child: Slider(
+                          child: GlassSlider(
                             min: 14,
                             max: 22,
                             value: _fontSize,
+                            divisions: 8,
+                            label: 'Font ${_fontSize.toStringAsFixed(0)}',
                             onChanged: (v) => setState(() => _fontSize = v),
                           ),
                         ),
@@ -140,11 +162,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   const SizedBox(width: AppSpacing.md),
                   FloatingActionButton.small(
                     heroTag: 'themeToggle',
-                    backgroundColor: _darkMode ? Colors.white : Colors.black,
+                    backgroundColor: _darkMode ? AppColors.softCream : AppColors.inkBlack,
                     onPressed: () => setState(() => _darkMode = !_darkMode),
                     child: Icon(
                       _darkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                      color: _darkMode ? Colors.black : Colors.white,
+                      color: _darkMode ? AppColors.inkBlack : AppColors.softCream,
                     ),
                   ),
                 ],
@@ -165,19 +187,21 @@ class _ReadingScreenState extends State<ReadingScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: _darkMode ? const Color(0xFF0F0F16) : scheme.surface,
+                              color: _darkMode ? AppColors.inkBlack : scheme.surface,
                               borderRadius: BorderRadius.circular(AppRadius.card),
                               border: Border.all(color: scheme.outline),
                             ),
                             padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: SingleChildScrollView(
-                              child: TypewriterText(
-                                text: _pages[index],
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      height: 1.7,
-                                      fontSize: _fontSize,
-                                      color: _darkMode ? Colors.white70 : null,
-                                    ),
+                            child: GlassScrollbar(
+                              child: SingleChildScrollView(
+                                child: TypewriterText(
+                                  text: _pages[index],
+                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    height: 1.7,
+                                    fontSize: _fontSize,
+                                      color: _darkMode ? AppColors.textSecondary : null,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -197,7 +221,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         icon: Icons.chevron_left_rounded,
                         onPressed: _currentPage > 0
                             ? () {
-                                _pageController.jumpToPage(_currentPage - 1);
+                                _pageController.animateToPage(
+                                  _currentPage - 1,
+                                  duration: const Duration(milliseconds: 420),
+                                  curve: Curves.easeInOutCubic,
+                                );
                               }
                             : null,
                       ),
@@ -209,7 +237,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         icon: Icons.chevron_right_rounded,
                         onPressed: _currentPage < _pages.length - 1
                             ? () {
-                                _pageController.jumpToPage(_currentPage + 1);
+                                _pageController.animateToPage(
+                                  _currentPage + 1,
+                                  duration: const Duration(milliseconds: 420),
+                                  curve: Curves.easeInOutCubic,
+                                );
                               }
                             : () => Navigator.of(context).pop(),
                       ),

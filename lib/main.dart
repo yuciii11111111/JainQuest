@@ -11,6 +11,7 @@ import 'core/services/storage_service.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/widgets/animated_gradient_background.dart';
 import 'core/widgets/video_background.dart';
+import 'core/widgets/guided_tour_overlay.dart';
 import 'core/navigation/app_navigator.dart';
 import 'features/splash/presentation/splash_screen.dart';
 
@@ -80,6 +81,7 @@ class JainQuestApp extends ConsumerWidget {
             child: Stack(
               children: [
                 child ?? const SizedBox.shrink(),
+                const GuidedTourOverlay(),
               ],
             ),
           ),

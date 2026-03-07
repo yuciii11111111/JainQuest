@@ -7,16 +7,23 @@ import '../services/storage_service.dart';
 // ============================================================================
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.light);
+  ThemeModeNotifier() : super(StorageService.getThemeMode());
 
   Future<void> toggleTheme() async {
-    state = ThemeMode.light;
-    await StorageService.saveThemeMode(ThemeMode.light);
+    final nextMode = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    await setThemeMode(nextMode);
   }
 
-  Future<void> setThemeMode(ThemeMode _) async {
-    state = ThemeMode.light;
-    await StorageService.saveThemeMode(ThemeMode.light);
+  Future<void> setThemeMode(ThemeMode mode) async {
+    if (state == mode) {
+      return;
+    }
+    state = mode;
+    try {
+      await StorageService.saveThemeMode(mode);
+    } catch (_) {
+      // Keep in-memory theme switch responsive even if persistence fails.
+    }
   }
 }
 

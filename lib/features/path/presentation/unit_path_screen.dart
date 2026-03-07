@@ -10,16 +10,39 @@ import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
 import '../../lesson_runner/presentation/lesson_runner_screen.dart';
 
-class UnitPathScreen extends ConsumerWidget {
+class UnitPathScreen extends ConsumerStatefulWidget {
   const UnitPathScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UnitPathScreen> createState() => _UnitPathScreenState();
+}
+
+class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
+  bool _didAutoScroll = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final unit = ref.watch(unit1Provider);
     final progress = ref.watch(progressProvider);
     final user = ref.watch(userProfileProvider);
 
     final unitProgress = progress.completedLessons.length / unit.lessons.length;
+
+    if (user.showGuidedTour && !_didAutoScroll) {
+      _didAutoScroll = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final targetContext = GuideKeys.whatIsJainismLesson.currentContext;
+        if (targetContext != null && mounted) {
+          Scrollable.ensureVisible(
+            targetContext,
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeOutCubic,
+            alignment: 0.35,
+          );
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -113,6 +136,8 @@ class UnitPathScreen extends ConsumerWidget {
                   for (var i = 0; i < unit.lessons.length; i++) ...[
                     _PathStep(
                       key: i == 0 ? GuideKeys.firstPathStep : null,
+                      lessonTitleKey:
+                          i == 0 ? GuideKeys.whatIsJainismLesson : null,
                       lesson: unit.lessons[i],
                       index: i,
                       alignLeft: i.isEven,
@@ -148,6 +173,7 @@ class UnitPathScreen extends ConsumerWidget {
 }
 
 class _PathStep extends StatelessWidget {
+  final Key? lessonTitleKey;
   final Lesson lesson;
   final int index;
   final bool isCompleted;
@@ -157,6 +183,7 @@ class _PathStep extends StatelessWidget {
 
   const _PathStep({
     super.key,
+    this.lessonTitleKey,
     required this.lesson,
     required this.index,
     required this.isCompleted,
@@ -229,6 +256,7 @@ class _PathStep extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             SizedBox(
+              key: lessonTitleKey,
               width: 180,
               child: Text(
                 lesson.title,

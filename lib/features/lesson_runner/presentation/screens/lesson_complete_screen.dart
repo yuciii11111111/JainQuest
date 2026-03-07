@@ -5,6 +5,7 @@ import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/floating_card.dart';
+import '../../../../core/guide/guide_keys.dart';
 
 class LessonCompleteScreenWidget extends StatefulWidget {
   final LessonCompleteScreen screen;
@@ -195,6 +196,7 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
 
               // Continue Button
               GradientButton(
+                key: GuideKeys.lessonCompleteContinueButton,
                 label: 'Continue',
                 icon: Icons.arrow_forward_rounded,
                 onPressed: widget.onContinue,

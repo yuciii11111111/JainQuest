@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+import 'liquid_glass.dart';
 
 // ============================================================================
 // Stats Pill Widget
@@ -26,16 +27,15 @@ class StatsPill extends StatelessWidget {
     final pillColor = color ?? scheme.onSurface;
     final bgColor = backgroundColor ?? scheme.surface;
 
-    return Container(
+    return LiquidGlassContainer(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(color: scheme.outline),
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      borderColor: scheme.outline.withOpacityValue(0.6),
+      tintColor: bgColor,
+      tintOpacity: 0.35,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -154,7 +154,8 @@ class AnimatedProgressBar extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: backgroundColor ??
+            Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: LayoutBuilder(
@@ -318,6 +319,8 @@ class ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const correctColor = Color(0xFF2E7D32);
+    const incorrectColor = Color(0xFFC62828);
     Color backgroundColor;
     Color borderColor;
     Color textColor;
@@ -335,15 +338,15 @@ class ChoiceButton extends StatelessWidget {
         textColor = Theme.of(context).colorScheme.onSurface;
         break;
       case ChoiceState.correct:
-        backgroundColor = Theme.of(context).colorScheme.surface;
-        borderColor = AppColors.success;
-        textColor = AppColors.success;
+        backgroundColor = correctColor.withOpacityValue(0.14);
+        borderColor = correctColor;
+        textColor = correctColor;
         trailingIcon = Icons.check_circle_rounded;
         break;
       case ChoiceState.incorrect:
-        backgroundColor = Theme.of(context).colorScheme.surface;
-        borderColor = AppColors.danger;
-        textColor = AppColors.danger;
+        backgroundColor = incorrectColor.withOpacityValue(0.14);
+        borderColor = incorrectColor;
+        textColor = incorrectColor;
         trailingIcon = Icons.cancel_rounded;
         break;
     }
@@ -355,13 +358,13 @@ class ChoiceButton extends StatelessWidget {
               onTap?.call();
             }
           : null,
-      child: Container(
+      child: LiquidGlassContainer(
         padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          border: Border.all(color: borderColor, width: 2),
-        ),
+        borderRadius: BorderRadius.circular(AppRadius.button),
+        borderColor: borderColor,
+        borderWidth: 2,
+        tintColor: backgroundColor,
+        tintOpacity: 0.45,
         child: Row(
           children: [
             Expanded(
@@ -401,16 +404,15 @@ class FeedbackBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    const correctColor = Color(0xFF2E7D32);
+    const incorrectColor = Color(0xFFC62828);
+    return LiquidGlassContainer(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-          color: isCorrect ? AppColors.success : AppColors.danger,
-          width: 2,
-        ),
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      borderColor: isCorrect ? correctColor : incorrectColor,
+      borderWidth: 2,
+      tintColor: isCorrect ? correctColor : incorrectColor,
+      tintOpacity: 0.16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -419,7 +421,7 @@ class FeedbackBanner extends StatelessWidget {
             children: [
               Icon(
                 isCorrect ? Icons.check_circle_rounded : Icons.info_rounded,
-                color: isCorrect ? AppColors.success : AppColors.danger,
+                color: isCorrect ? correctColor : incorrectColor,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -428,7 +430,7 @@ class FeedbackBanner extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: isCorrect ? AppColors.success : AppColors.danger,
+                  color: isCorrect ? correctColor : incorrectColor,
                 ),
               ),
             ],
@@ -438,7 +440,7 @@ class FeedbackBanner extends StatelessWidget {
             message,
             style: TextStyle(
               fontSize: 14,
-              color: isCorrect ? AppColors.success : AppColors.danger,
+              color: isCorrect ? correctColor : incorrectColor,
               height: 1.45,
             ),
           ),
@@ -449,8 +451,7 @@ class FeedbackBanner extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isCorrect ? AppColors.success : AppColors.danger,
+                  backgroundColor: isCorrect ? correctColor : incorrectColor,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Continue'),
@@ -483,13 +484,13 @@ class ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final scheme = Theme.of(context).colorScheme;
+    return LiquidGlassContainer(
       padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      borderColor: scheme.outline.withOpacityValue(0.6),
+      tintColor: scheme.surface,
+      tintOpacity: 0.3,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

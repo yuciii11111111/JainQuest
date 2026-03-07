@@ -170,7 +170,8 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.emoji_emotions_rounded, color: Colors.white, size: 38),
+                child: const Icon(Icons.emoji_emotions_rounded,
+                    color: Colors.white, size: 38),
               ),
               const SizedBox(height: AppSpacing.lg),
               Padding(
@@ -180,14 +181,18 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                   child: Text(
                     question.prompt,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(height: 1.3),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(height: 1.3),
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   child: Column(
                     children: [
                       if (question.format == QuestionFormat.trueFalse)
@@ -207,7 +212,8 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: showFeedback
                     ? GradientButton(
-                        label: widget.currentQuestionIndex >= widget.screen.questions.length - 1
+                        label: widget.currentQuestionIndex >=
+                                widget.screen.questions.length - 1
                             ? 'Complete Quiz'
                             : 'Next Question',
                         icon: Icons.arrow_forward_rounded,
@@ -217,7 +223,8 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                     : GradientButton(
                         label: 'Check Answer',
                         icon: Icons.check_rounded,
-                        onPressed: selectedChoiceId != null ? _checkAnswer : null,
+                        onPressed:
+                            selectedChoiceId != null ? _checkAnswer : null,
                         width: double.infinity,
                       ),
               ),
@@ -250,7 +257,9 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
 
   ChoiceState _getTrueFalseState(String value, QuizQuestion question) {
     if (!showFeedback) {
-      return selectedChoiceId == value ? ChoiceState.selected : ChoiceState.normal;
+      return selectedChoiceId == value
+          ? ChoiceState.selected
+          : ChoiceState.normal;
     }
 
     if (value == question.answerKey) {
@@ -336,6 +345,8 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const correctColor = Color(0xFF2E7D32);
+    const incorrectColor = Color(0xFFC62828);
     final scheme = Theme.of(context).colorScheme;
     Color borderColor;
     Color textColor;
@@ -351,19 +362,22 @@ class _OptionTile extends StatelessWidget {
         textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
-        borderColor = AppColors.success;
-        textColor = AppColors.success;
+        borderColor = correctColor;
+        textColor = correctColor;
+        bgColor = correctColor.withOpacityValue(0.12);
         break;
       case ChoiceState.incorrect:
-        borderColor = AppColors.danger;
-        textColor = AppColors.danger;
+        borderColor = incorrectColor;
+        textColor = incorrectColor;
+        bgColor = incorrectColor.withOpacityValue(0.12);
         break;
     }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md, vertical: AppSpacing.md),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(AppRadius.card),
@@ -420,6 +434,8 @@ class _TrueFalseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const correctColor = Color(0xFF2E7D32);
+    const incorrectColor = Color(0xFFC62828);
     final scheme = Theme.of(context).colorScheme;
     Color backgroundColor;
     Color borderColor;
@@ -438,15 +454,15 @@ class _TrueFalseButton extends StatelessWidget {
         textColor = scheme.onSurface;
         break;
       case ChoiceState.correct:
-        backgroundColor = scheme.surface;
-        borderColor = AppColors.success;
-        textColor = AppColors.success;
+        backgroundColor = correctColor.withOpacityValue(0.12);
+        borderColor = correctColor;
+        textColor = correctColor;
         icon = Icons.check_circle_rounded;
         break;
       case ChoiceState.incorrect:
-        backgroundColor = scheme.surface;
-        borderColor = AppColors.danger;
-        textColor = AppColors.danger;
+        backgroundColor = incorrectColor.withOpacityValue(0.12);
+        borderColor = incorrectColor;
+        textColor = incorrectColor;
         icon = Icons.cancel_rounded;
         break;
     }

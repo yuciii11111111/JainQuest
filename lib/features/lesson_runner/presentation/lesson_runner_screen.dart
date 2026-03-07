@@ -5,7 +5,6 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
 import 'screens/question_intro_screen.dart';
 import 'screens/short_text_screen.dart';
-import 'screens/youtube_video_screen.dart';
 import 'screens/explanation_screen.dart';
 import 'screens/quiz_screen.dart';
 import 'screens/lesson_complete_screen.dart';
@@ -67,17 +66,14 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         overallProgress = 0.0;
         break;
       case LessonScreenType.shortText:
-        overallProgress = 0.16;
-        break;
-      case LessonScreenType.youtubeVideo:
-        overallProgress = 0.33;
+        overallProgress = 0.25;
         break;
       case LessonScreenType.explanation:
         overallProgress = 0.5;
         break;
       case LessonScreenType.quiz:
         final quizProgress = lessonState.quizProgress;
-        overallProgress = 0.66 + (quizProgress * 0.17);
+        overallProgress = 0.75 + (quizProgress * 0.24);
         break;
       case LessonScreenType.lessonComplete:
         overallProgress = 1.0;
@@ -166,14 +162,6 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         return ShortTextScreenWidget(
           key: const ValueKey('short_text'),
           screen: state.lesson.screens.shortText,
-          onContinue: () {
-            ref.read(lessonRunnerProvider.notifier).nextScreen();
-          },
-        );
-      case LessonScreenType.youtubeVideo:
-        return YoutubeVideoScreenWidget(
-          key: const ValueKey('youtube_video'),
-          screen: state.lesson.screens.youtubeVideo,
           onContinue: () {
             ref.read(lessonRunnerProvider.notifier).nextScreen();
           },

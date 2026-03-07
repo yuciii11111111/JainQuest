@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jainquest/features/lesson_runner/presentation/lesson_runner_screen.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/services/storage_service.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/widgets/floating_card.dart';
+import '../../../core/widgets/liquid_glass.dart';
 import '../../../core/gamification/gamification_constants.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/models/user_models.dart';
@@ -33,12 +34,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _currentIndex = 0;
   final GlobalKey _continueLearningKey = GuideKeys.continueLearningButton;
   final GlobalKey _currentLessonKey = GuideKeys.currentLessonCard;
-  final GlobalKey _streakCardKey = GlobalKey();
-  final GlobalKey _currentLessonHighlightKey = GlobalKey();
-  final GlobalKey _askNavKey = GlobalKey();
+  final GlobalKey _streakCardKey = GlobalKey(debugLabel: 'streak_card');
+  final GlobalKey _currentLessonHighlightKey =
+      GlobalKey(debugLabel: 'current_lesson_highlight');
 
   @override
   void initState() {
@@ -51,106 +51,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showTutorial() {
-    // Basic check to not show every time would go here (StorageService)
-    // For this task, we show it to verify the refactor.
-
-    final targets = [
-      TargetFocus(
-        identify: "stats",
-        keyTarget: _streakCardKey,
-        alignSkip: Alignment.bottomRight,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return _GuideBubble(
-                title: "Track Your Progress",
-                description:
-                    "Keep an eye on your streaks, hearts, and XP here. Consistency is key!",
-                onNext: controller.next,
-              );
-            },
-          ),
-        ],
-      ),
-      TargetFocus(
-        identify: "current_lesson",
-        keyTarget: _currentLessonHighlightKey,
-        alignSkip: Alignment.bottomRight,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) {
-              return _GuideBubble(
-                title: "Next Up",
-                description:
-                    "This is your next lesson. Tap to continue your journey!",
-                onNext: controller.next,
-              );
-            },
-          ),
-        ],
-      ),
-      TargetFocus(
-        identify: "ask_guru",
-        keyTarget: _askNavKey,
-        alignSkip: Alignment.topRight,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) {
-              return _GuideBubble(
-                title: "Ask Guru",
-                description:
-                    "Stuck? Have a question about Jainism? Tap here to ask our AI guide.",
-                onNext: controller.next,
-                isLast: true,
-              );
-            },
-          ),
-        ],
-      ),
-    ];
-
-    TutorialCoachMark(
-      targets: targets,
-      colorShadow: Colors.black,
-      textSkip: "SKIP",
-      paddingFocus: 10,
-      opacityShadow: 0.8,
-      onFinish: () {
-        print("Tutorial finished");
-      },
-      onClickTarget: (target) {
-        print('onClickTarget: $target');
-      },
-      onClickTargetWithTapPosition: (target, tapDetails) {
-        print("target: $target");
-        print(
-            "clicked at position local: ${tapDetails.localPosition} - global: ${tapDetails.globalPosition}");
-      },
-      onClickOverlay: (target) {
-        print('onClickOverlay: $target');
-      },
-      onSkip: () {
-        print("skip");
-        return true;
-      },
-    ).show(context: context);
+    ref.read(homeTabIndexProvider.notifier).state = 0;
+    final user = ref.read(userProfileProvider);
+    if (!user.showGuidedTour) {
+      StorageService.saveUserProfile(user.copyWith(showGuidedTour: true)).then((
+        _,
+      ) {
+        ref.read(userProfileProvider.notifier).refresh();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(homeTabIndexProvider);
     final user = ref.watch(userProfileProvider);
     final progress = ref.watch(progressProvider);
     final unit = ref.watch(unit1Provider);
     final themeMode = ref.watch(themeModeProvider);
-    final toggleTheme = ref.read(themeModeProvider.notifier).toggleTheme;
+    Future<void> toggleTheme() async {
+      await ref.read(themeModeProvider.notifier).toggleTheme();
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: IndexedStack(
-        index: _currentIndex,
+        index: currentIndex,
         children: [
           _HomeTab(
             user: user,
@@ -177,9 +103,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       bottomNavigationBar: _GlassBottomNav(
-        currentIndex: _currentIndex,
-        askKey: _askNavKey,
-        onTap: (index) => setState(() => _currentIndex = index),
+        currentIndex: currentIndex,
+        resourcesKey: GuideKeys.resourcesNavItem,
+        askKey: GuideKeys.askGuruNavItem,
+        communityKey: GuideKeys.communityNavItem,
+        profileKey: GuideKeys.profileNavItem,
+        onTap: (index) => ref.read(homeTabIndexProvider.notifier).state = index,
       ),
     );
   }
@@ -187,62 +116,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 class _GlassBottomNav extends StatelessWidget {
   final int currentIndex;
+  final Key? resourcesKey;
   final Key? askKey;
+  final Key? communityKey;
+  final Key? profileKey;
   final ValueChanged<int> onTap;
 
   const _GlassBottomNav({
     required this.currentIndex,
+    this.resourcesKey,
     this.askKey,
+    this.communityKey,
+    this.profileKey,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border(
-          top: BorderSide(color: scheme.outline, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavItem(
-              icon: Icons.home_rounded,
-              label: 'Home',
-              isSelected: currentIndex == 0,
-              onTap: () => onTap(0),
-            ),
-            _NavItem(
-              icon: Icons.auto_awesome_rounded,
-              label: 'Resources',
-              isSelected: currentIndex == 1,
-              onTap: () => onTap(1),
-            ),
-            _NavItem(
-              key: askKey,
-              imageAsset: 'assets/images/duo_guide.png',
-              label: 'Ask',
-              isSelected: currentIndex == 2,
-              onTap: () => onTap(2),
-            ),
-            _NavItem(
-              icon: Icons.forum_rounded,
-              label: 'Community',
-              isSelected: currentIndex == 3,
-              onTap: () => onTap(3),
-            ),
-            _NavItem(
-              icon: Icons.person_rounded,
-              label: 'Profile',
-              isSelected: currentIndex == 4,
-              onTap: () => onTap(4),
-            ),
-          ],
+      child: LiquidGlassContainer(
+        borderRadius: BorderRadius.circular(0),
+        borderColor: Theme.of(context).colorScheme.outline.withOpacityValue(0.45),
+        tintColor: Theme.of(context).colorScheme.surface,
+        tintOpacity: 0.28,
+        padding: EdgeInsets.zero,
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.home_rounded,
+                label: 'Home',
+                isSelected: currentIndex == 0,
+                onTap: () => onTap(0),
+              ),
+              _NavItem(
+                key: resourcesKey,
+                icon: Icons.auto_awesome_rounded,
+                label: 'Resources',
+                isSelected: currentIndex == 1,
+                onTap: () => onTap(1),
+              ),
+              _NavItem(
+                key: askKey,
+                imageAsset: 'assets/images/duo_guide.png',
+                label: 'Ask',
+                isSelected: currentIndex == 2,
+                onTap: () => onTap(2),
+              ),
+              _NavItem(
+                key: communityKey,
+                icon: Icons.forum_rounded,
+                label: 'Community',
+                isSelected: currentIndex == 3,
+                onTap: () => onTap(3),
+              ),
+              _NavItem(
+                key: profileKey,
+                icon: Icons.person_rounded,
+                label: 'Profile',
+                isSelected: currentIndex == 4,
+                onTap: () => onTap(4),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -271,15 +209,17 @@ class _NavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: LiquidGlassContainer(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.xs,
         ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-        ),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        tintColor: isSelected ? AppColors.primary : scheme.surface,
+        tintOpacity: isSelected ? 0.5 : 0.12,
+        borderColor: isSelected
+            ? Colors.white.withOpacityValue(0.45)
+            : scheme.outline.withOpacityValue(0.45),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -293,7 +233,7 @@ class _NavItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 24,
-                color: isSelected ? Colors.white : scheme.onSurfaceVariant,
+                color: isSelected ? Colors.white : scheme.onSurface,
               ),
             const SizedBox(height: 4),
             Text(
@@ -301,7 +241,7 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? Colors.white : scheme.onSurfaceVariant,
+                color: isSelected ? Colors.white : scheme.onSurface,
               ),
             ),
           ],
@@ -316,7 +256,7 @@ class _HomeTab extends StatelessWidget {
   final ProgressState progress;
   final Unit unit;
   final ThemeMode themeMode;
-  final VoidCallback onToggleTheme;
+  final Future<void> Function() onToggleTheme;
   final Key? streakCardKey;
   final GlobalKey continueLearningKey;
   final GlobalKey currentLessonKey;
@@ -381,34 +321,31 @@ class _HomeTab extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.help_outline_rounded),
-                  onPressed: onShowGuide,
-                  color: scheme.onSurfaceVariant,
+                _GlassActionIcon(
+                  icon: Icons.help_outline_rounded,
+                  onTap: onShowGuide,
                   tooltip: 'Show Guide',
                 ),
-                IconButton(
-                  icon: const Icon(Icons.notifications_rounded),
-                  onPressed: () {},
-                  color: scheme.onSurfaceVariant,
+                const SizedBox(width: AppSpacing.xs),
+                _GlassActionIcon(
+                  icon: Icons.notifications_rounded,
+                  onTap: () {},
                 ),
-                IconButton(
-                  icon: Icon(
-                    themeMode == ThemeMode.dark
-                        ? Icons.wb_sunny_rounded
-                        : Icons.dark_mode_rounded,
-                  ),
-                  onPressed: onToggleTheme,
-                  color: scheme.onSurfaceVariant,
+                const SizedBox(width: AppSpacing.xs),
+                _GlassActionIcon(
+                  icon: themeMode == ThemeMode.dark
+                      ? Icons.wb_sunny_rounded
+                      : Icons.dark_mode_rounded,
+                  onTap: () => onToggleTheme(),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.settings_rounded),
-                  onPressed: () {
+                const SizedBox(width: AppSpacing.xs),
+                _GlassActionIcon(
+                  icon: Icons.settings_rounded,
+                  onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const SettingsScreen()),
                     );
                   },
-                  color: scheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -486,8 +423,12 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        const Icon(Icons.local_fire_department_rounded,
-                            color: AppColors.warning, size: 28),
+                        const LiquidGlassIconBubble(
+                          icon: Icons.local_fire_department_rounded,
+                          iconSize: 28,
+                          tintColor: AppColors.warning,
+                          tintOpacity: 0.34,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.currentStreak}',
                             style: Theme.of(context).textTheme.titleLarge),
@@ -503,8 +444,12 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        const Icon(Icons.favorite_rounded,
-                            color: AppColors.danger, size: 28),
+                        const LiquidGlassIconBubble(
+                          icon: Icons.favorite_rounded,
+                          iconSize: 28,
+                          tintColor: AppColors.danger,
+                          tintOpacity: 0.34,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.hearts}',
                             style: Theme.of(context).textTheme.titleLarge),
@@ -520,8 +465,12 @@ class _HomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       children: [
-                        const Icon(Icons.star_rounded,
-                            color: AppColors.achievementGold, size: 28),
+                        const LiquidGlassIconBubble(
+                          icon: Icons.star_rounded,
+                          iconSize: 28,
+                          tintColor: AppColors.achievementGold,
+                          tintOpacity: 0.34,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         Text('${user.totalXp}',
                             style: Theme.of(context).textTheme.titleLarge),
@@ -557,12 +506,19 @@ class _HomeTab extends StatelessWidget {
                       3,
                       (index) => Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 3),
-                        child: Icon(
-                          Icons.circle,
-                          size: 12,
-                          color: index < progress.completedLessons.length
+                        child: LiquidGlassContainer(
+                          width: 12,
+                          height: 12,
+                          shape: LiquidGlassShape.circle,
+                          tintColor: index < progress.completedLessons.length
                               ? AppColors.primary
-                              : scheme.onSurfaceVariant.withOpacityValue(0.5),
+                              : scheme.surface,
+                          tintOpacity: index < progress.completedLessons.length
+                              ? 0.5
+                              : 0.2,
+                          borderColor:
+                              scheme.outline.withOpacityValue(0.45),
+                          child: const SizedBox.shrink(),
                         ),
                       ),
                     ),
@@ -575,6 +531,7 @@ class _HomeTab extends StatelessWidget {
               key: continueLearningKey,
               label: 'Continue Learning',
               icon: Icons.play_arrow_rounded,
+              crystal: true,
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const UnitPathScreen()),
@@ -594,14 +551,15 @@ class _HomeTab extends StatelessWidget {
               child: Row(
                 key: currentLessonHighlightKey,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(AppRadius.small),
+                  const LiquidGlassIconBubble(
+                    icon: Icons.spa_rounded,
+                    size: 48,
+                    shape: LiquidGlassShape.rounded,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadius.small),
                     ),
-                    child: const Icon(Icons.spa_rounded, color: Colors.white),
+                    tintColor: AppColors.primary,
+                    tintOpacity: 0.45,
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
@@ -738,25 +696,13 @@ class _JourneyNode extends StatelessWidget {
         strokeWidth: 8,
         color: ringColor,
         backgroundColor: scheme.surfaceContainerHighest.withOpacityValue(0.6),
-        child: Container(
-          width: nodeSize,
-          height: nodeSize,
-          decoration: BoxDecoration(
-            color: isLocked ? scheme.surfaceContainerHighest : ringColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: ringColor.withOpacityValue(isLocked ? 0.18 : 0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Icon(
-            icon,
-            color: isLocked ? scheme.onSurfaceVariant : Colors.white,
-            size: 28,
-          ),
+        child: LiquidGlassIconBubble(
+          icon: icon,
+          size: nodeSize,
+          iconSize: 28,
+          tintColor: isLocked ? scheme.surfaceContainerHighest : ringColor,
+          tintOpacity: isLocked ? 0.2 : 0.46,
+          iconColor: isLocked ? scheme.onSurfaceVariant : Colors.white,
         ),
       ),
     );
@@ -887,75 +833,43 @@ class _JourneyIcons {
   }
 }
 
-class _GuideBubble extends StatelessWidget {
-  final String title;
-  final String description;
-  final VoidCallback onNext;
-  final bool isLast;
+class _GlassActionIcon extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final String? tooltip;
 
-  const _GuideBubble({
-    required this.title,
-    required this.description,
-    required this.onNext,
-    this.isLast = false,
+  const _GlassActionIcon({
+    required this.icon,
+    required this.onTap,
+    this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Solid dark background
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset('assets/images/duo_guide.png', height: 40, width: 40),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
-          ),
-          const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: const StadiumBorder(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              ),
-              child: Text(isLast ? "Finish" : "Next"),
-            ),
-          ),
-        ],
-      ),
+    final iconWidget = LiquidGlassIconBubble(
+      icon: icon,
+      size: 36,
+      iconSize: 18,
+      iconColor: Theme.of(context).colorScheme.onSurface,
+      tintColor: Theme.of(context).colorScheme.surface,
+      tintOpacity: 0.2,
+    );
+
+    if (tooltip != null) {
+      return Tooltip(
+        message: tooltip!,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: iconWidget,
+        ),
+      );
+    }
+
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: iconWidget,
     );
   }
 }

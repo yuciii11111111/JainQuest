@@ -353,6 +353,11 @@ class StorageService {
 
   static Future<void> saveThemeMode(ThemeMode mode) async {
     _themeMode = mode;
+
+    if (!_isInitialized || _auth.currentUser == null) {
+      return;
+    }
+
     await _settingsDoc().set(
       {'isDarkMode': mode == ThemeMode.dark},
       SetOptions(merge: true),

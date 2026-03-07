@@ -7,67 +7,71 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+  static const Color inkBlack = Color(0xFF000000);
+  static const Color softCream = Color(0xFFFBF0F4);
+  static const Color warmOrange = Color(0xFFED8F45);
+
   // Backgrounds
-  // Backgrounds
+  // Transparent base to let animated gradient show through
   // Transparent base to let animated gradient show through
   static const Color backgroundBase = Colors.transparent;
   // Semi-transparent warm charcoal for cards
-  static const Color backgroundCard = Color(0x99251A12);
+  static const Color backgroundCard = Color(0xD9000000);
   // Slightly lighter warm surface
-  static const Color backgroundElevated = Color(0xCC3A2618);
+  static const Color backgroundElevated = Color(0xCC24150A);
 
   // Text
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFF2D9C2);
-  static const Color textMuted = Color(0xFFC8A98D);
+  static const Color textPrimary = softCream;
+  static const Color textSecondary = Color(0xFFFFD9BC);
+  static const Color textMuted = Color(0xFFD5B8A2);
 
   // Gradients
   static const List<Color> primaryGradient = [
-    Color(0xFFFF9E2C), // Saffron
-    Color(0xFFFF7A1A), // Bright Orange
-    Color(0xFFE85A00), // Deep Orange
+    Color(0xFFFFA362),
+    warmOrange,
+    Color(0xFFD8782D),
   ];
 
   static const List<Color> accentGradient = [
-    Color(0xFFFFE4B5), // Warm Cream
-    Color(0xFFFFD08A), // Light Amber
-    Color(0xFFFFB86B), // Peach Orange
+    softCream,
+    Color(0xFFF7D5C0),
+    Color(0xFFF3BE95),
   ];
 
   static const List<Color> successGradient = [
-    Color(0xFF34D399), // Emerald
-    Color(0xFF10B981), // Green
-    Color(0xFF059669), // Deep Green
+    Color(0xFFF5B07A),
+    warmOrange,
+    Color(0xFFC06A2E),
   ];
 
   static const List<Color> warmGradient = [
-    Color(0xFFFFF3D6), // Cream
-    Color(0xFFFFE4B5), // Light Cream
-    Color(0xFFFFC98F), // Warm Peach
+    softCream,
+    Color(0xFFF8DFE8),
+    Color(0xFFF1C9A8),
   ];
 
   // Solid Accents
-  static const Color primary = Color(0xFFFF6B00);
-  static const Color secondary = Color(0xFFFF9E2C);
-  static const Color highlight = Color(0xFFFFC66D);
-  static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color danger = Color(0xFFEF4444);
-  static const Color achievementGold = Color(0xFFFFB84D);
+  static const Color primary = warmOrange;
+  static const Color secondary = Color(0xFFFFA362);
+  static const Color highlight = softCream;
+  static const Color success = Color(0xFFD8782D);
+  static const Color warning = Color(0xFFF0A76A);
+  static const Color danger = Color(0xFFE06749);
+  static const Color achievementGold = Color(0xFFF3AE72);
 
   // Glassmorphism
-  static const Color glassOverlay = Color(0x1AFFFFFF);
-  static const Color glassBorder = Color(0x4DFFFFFF);
+  static const Color glassOverlay = Color(0x26FBF0F4);
+  static const Color glassBorder = Color(0x66FBF0F4);
   static const double glassBlur = 24.0;
 
   // Light Mode (Optional)
   static const Color lightBackground = Colors.transparent;
-  static const Color lightCard = Color(0xF2FFF8EE);
-  static const Color lightElevated = Color(0xE6FFEBC8);
-  static const Color lightTextPrimary = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF334155);
-  static const Color lightTextMuted = Color(0xFF64748B);
-  static const Color lightBorder = Color(0x66F2B980);
+  static const Color lightCard = softCream;
+  static const Color lightElevated = Color(0xFFF7E2EA);
+  static const Color lightTextPrimary = inkBlack;
+  static const Color lightTextSecondary = Color(0xFF4C2F1B);
+  static const Color lightTextMuted = Color(0xFF7A5D48);
+  static const Color lightBorder = Color(0x66ED8F45);
 }
 
 // ============================================================================
@@ -185,6 +189,17 @@ extension ColorOpacityX on Color {
 class AppTheme {
   AppTheme._();
 
+  static const PageTransitionsTheme _smoothPageTransitions =
+      PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: ZoomPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+      TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+    },
+  );
+
   static TextTheme _buildTextTheme({
     required Color primary,
     required Color secondary,
@@ -296,6 +311,7 @@ class AppTheme {
       fontFamily: AppTypography.fontFamily,
       fontFamilyFallback: AppTypography.fontFamilyFallback,
       scaffoldBackgroundColor: AppColors.backgroundBase,
+      pageTransitionsTheme: _smoothPageTransitions,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
@@ -447,6 +463,7 @@ class AppTheme {
       fontFamily: AppTypography.fontFamily,
       fontFamilyFallback: AppTypography.fontFamilyFallback,
       scaffoldBackgroundColor: AppColors.lightBackground,
+      pageTransitionsTheme: _smoothPageTransitions,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +46,8 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   void initState() {
     super.initState();
     _intent = widget.initialIntent;
-    _step = _intent == AuthIntent.undecided ? _AuthStep.intent : _AuthStep.method;
+    _step =
+        _intent == AuthIntent.undecided ? _AuthStep.intent : _AuthStep.method;
   }
 
   @override
@@ -88,7 +91,9 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         case _AuthStep.intent:
           break;
         case _AuthStep.method:
-          _step = _intent == AuthIntent.undecided ? _AuthStep.intent : _AuthStep.method;
+          _step = _intent == AuthIntent.undecided
+              ? _AuthStep.intent
+              : _AuthStep.method;
           if (_intent != AuthIntent.undecided) {
             _intent = AuthIntent.undecided;
             _step = _AuthStep.intent;
@@ -143,7 +148,8 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
     }
 
     if (_isSignUp &&
-        _confirmPasswordController.text.trim() != _passwordController.text.trim()) {
+        _confirmPasswordController.text.trim() !=
+            _passwordController.text.trim()) {
       _showError('Passwords do not match.');
       return;
     }
@@ -151,7 +157,8 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
     setState(() => _isLoading = true);
     try {
       if (_isSignUp) {
-        final result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final result =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
@@ -256,6 +263,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: FontWeight.w800,
+                    fontSize: 56,
                   ),
             ),
             const Spacer(),
@@ -586,22 +594,24 @@ class _CleanInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
+            color: scheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
+      cursorColor: scheme.onSurface,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: scheme.onSurfaceVariant,
             ),
         suffixIcon: suffix,
         filled: true,
-        fillColor: Colors.white.withOpacityValue(0.92),
+        fillColor: scheme.surfaceContainerHighest.withOpacityValue(0.92),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(999),
           borderSide: BorderSide.none,
