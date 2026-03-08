@@ -43,6 +43,8 @@ class UserProfile extends Equatable {
 
   final bool showGuidedTour;
 
+  final String preferredLanguageCode;
+
   const UserProfile({
     required this.id,
     this.displayName,
@@ -58,6 +60,7 @@ class UserProfile extends Equatable {
     this.email,
     this.avatarEmoji,
     this.showGuidedTour = false,
+    this.preferredLanguageCode = 'en',
   });
 
   UserProfile copyWith({
@@ -75,6 +78,7 @@ class UserProfile extends Equatable {
     String? email,
     String? avatarEmoji,
     bool? showGuidedTour,
+    String? preferredLanguageCode,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -91,6 +95,8 @@ class UserProfile extends Equatable {
       email: email ?? this.email,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
       showGuidedTour: showGuidedTour ?? this.showGuidedTour,
+      preferredLanguageCode:
+          preferredLanguageCode ?? this.preferredLanguageCode,
     );
   }
 
@@ -133,6 +139,7 @@ class UserProfile extends Equatable {
       'email': email,
       'avatarEmoji': avatarEmoji,
       'showGuidedTour': showGuidedTour,
+      'preferredLanguageCode': preferredLanguageCode,
     };
   }
 
@@ -152,6 +159,7 @@ class UserProfile extends Equatable {
       email: data['email'] as String?,
       avatarEmoji: data['avatarEmoji'] as String?,
       showGuidedTour: data['showGuidedTour'] as bool? ?? false,
+      preferredLanguageCode: data['preferredLanguageCode'] as String? ?? 'en',
     );
   }
 
@@ -171,6 +179,7 @@ class UserProfile extends Equatable {
         email,
         avatarEmoji,
         showGuidedTour,
+        preferredLanguageCode,
       ];
 }
 
@@ -190,7 +199,7 @@ class ProgressState extends Equatable {
   const ProgressState({
     this.lessonProgress = const {},
     this.completedLessons = const [],
-    this.unlockedLessons = const ['U01_L01'],
+    this.unlockedLessons = const ['U01_L05'],
     this.earnedBadges = const [],
   });
 
@@ -246,7 +255,7 @@ class ProgressState extends Equatable {
       unlockedLessons: (data['unlockedLessons'] as List?)
               ?.map((e) => e.toString())
               .toList() ??
-          const ['U01_L01'],
+          const ['U01_L05'],
       earnedBadges:
           (data['earnedBadges'] as List?)?.map((e) => e.toString()).toList() ??
               const [],

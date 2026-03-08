@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/liquid_glass.dart';
-import '../../../../core/widgets/typewriter_sequence.dart';
+import '../../../../core/widgets/tr_text.dart';
 
 class ShortTextScreenWidget extends StatefulWidget {
   final ShortTextScreen screen;
@@ -83,7 +84,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                '${cards.length} min read',
+                context.t('min_read', args: {'count': cards.length.toString()}),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -122,7 +123,7 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
                 if (_currentPage > 0)
                   Expanded(
                     child: SecondaryButton(
-                      label: 'Back',
+                      label: context.t('back'),
                       icon: Icons.arrow_back_rounded,
                       onPressed: () {
                         _pageController.jumpToPage(_currentPage - 1);
@@ -134,7 +135,9 @@ class _ShortTextScreenWidgetState extends State<ShortTextScreenWidget> {
                 // Next button
                 Expanded(
                   child: PrimaryButton(
-                    label: _currentPage < cards.length - 1 ? 'Next' : 'Continue',
+                    label: _currentPage < cards.length - 1
+                        ? context.t('next')
+                        : context.t('continue'),
                     icon: Icons.arrow_forward_rounded,
                     onPressed: _nextCard,
                   ),
@@ -166,45 +169,33 @@ class _TextCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TypewriterSequence(
-            gap: AppSpacing.lg,
-            items: [
-              TypewriterSequenceItem(
-                text: card.title,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TrText(
+                card.title,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: scheme.onSurface,
                     ),
-                speed: const Duration(milliseconds: 16),
               ),
-              TypewriterSequenceItem(
-                text: card.body,
+              const SizedBox(height: AppSpacing.md),
+              Container(
+                width: 48,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              TrText(
+                card.body,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurface.withOpacityValue(0.95),
                       height: 1.6,
                     ),
-                speed: const Duration(milliseconds: 12),
               ),
             ],
-            itemBuilder: (context, child, index, item) {
-              if (index == 0) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    child,
-                    const SizedBox(height: AppSpacing.md),
-                    Container(
-                      width: 48,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ],
-                );
-              }
-              return child;
-            },
           ),
         ],
       ),

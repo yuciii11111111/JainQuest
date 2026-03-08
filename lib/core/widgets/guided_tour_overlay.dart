@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../guide/guide_keys.dart';
+import '../localization/app_strings.dart';
 import '../navigation/app_navigator.dart';
 import '../providers/app_providers.dart';
 import '../services/storage_service.dart';
@@ -38,6 +39,9 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
 
   List<_TourStep> _stepsFor(BuildContext context) {
     final container = ProviderScope.containerOf(context, listen: false);
+    final unit = container.read(unit1Provider);
+    final firstLessonTitle =
+        unit.lessons.isNotEmpty ? unit.lessons.first.title : 'First Lesson';
     void pushRoute(Widget page) {
       final navigator = appNavigatorKey.currentState;
       if (navigator == null) {
@@ -52,11 +56,10 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
 
     return [
       _TourStep(
-        key: GuideKeys.whatIsJainismLesson,
-        title: 'What Is Jainism',
-        message: 'Start with this first lesson.',
+        key: GuideKeys.currentLessonCard,
+        title: firstLessonTitle,
+        message: context.t('guided_start_message'),
         onTap: () {
-          final unit = container.read(unit1Provider);
           if (unit.lessons.isEmpty) {
             return;
           }
@@ -68,9 +71,8 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       ),
       _TourStep(
         key: GuideKeys.lessonCompleteContinueButton,
-        title: 'Finish The First Lesson',
-        message:
-            'Complete all lesson screens and quiz. When this Continue button appears, move on.',
+        title: context.t('guided_finish_title'),
+        message: context.t('guided_finish_message'),
         requiresFirstLessonCompleted: true,
         onTap: () {
           final navigator = appNavigatorKey.currentState;
@@ -84,26 +86,26 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       ),
       _TourStep(
         key: GuideKeys.resourcesNavItem,
-        title: 'Reading',
-        message: 'Resources is your reading hub.',
+        title: context.t('guided_reading_title'),
+        message: context.t('guided_reading_message'),
         onTap: () => setHomeTab(1),
       ),
       _TourStep(
         key: GuideKeys.askGuruNavItem,
-        title: 'Ask Guru',
-        message: 'Use Ask Guru whenever you need help.',
+        title: context.t('ask_guru'),
+        message: context.t('guided_ask_guru_message'),
         onTap: () => setHomeTab(2),
       ),
       _TourStep(
         key: GuideKeys.communityNavItem,
-        title: 'Community',
-        message: 'Join conversations with other learners here.',
+        title: context.t('guided_community_title'),
+        message: context.t('guided_community_message'),
         onTap: () => setHomeTab(3),
       ),
       _TourStep(
         key: GuideKeys.profileNavItem,
-        title: 'Profile',
-        message: 'Track your progress, badges, and settings.',
+        title: context.t('guided_profile_title'),
+        message: context.t('guided_profile_message'),
         onTap: () => setHomeTab(4),
       ),
     ];
@@ -149,10 +151,11 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
   Future<void> _advanceStep(_TourStep step) async {
     if (step.requiresFirstLessonCompleted) {
       final progress = ref.read(progressProvider);
-      if (!progress.isLessonCompleted('U01_L01')) {
+      final firstLessonId = ref.read(unit1Provider).lessons.first.lessonId;
+      if (!progress.isLessonCompleted(firstLessonId)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Finish "What is Jainism" first, then continue.'),
+          SnackBar(
+            content: Text(context.t('guided_finish_first')),
           ),
         );
         return;
@@ -307,7 +310,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
                     key: ValueKey('guide-title-$_currentIndex'),
                     text: step.title,
                     enabled: true,
-                    speed: const Duration(milliseconds: 14),
+                    speed: const Duration(milliseconds: 8),
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -318,7 +321,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
                     key: ValueKey('guide-message-$_currentIndex'),
                     text: step.message,
                     enabled: true,
-                    speed: const Duration(milliseconds: 10),
+                    speed: const Duration(milliseconds: 6),
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -351,7 +354,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
               setState(() => _tourActive = false);
             },
             child: Text(
-              'Skip',
+              context.t('skip'),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),

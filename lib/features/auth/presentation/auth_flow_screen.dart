@@ -556,35 +556,27 @@ class _CleanPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final disabled = onPressed == null || isLoading;
     return SizedBox(
       height: 58,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.primary.withOpacityValue(0.45),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
+      child: LiquidGlassContainer(
+        onTap: disabled ? null : onPressed,
+        borderRadius: BorderRadius.circular(999),
+        tintColor: scheme.primary,
+        tintOpacity: disabled ? 0.1 : 0.24,
+        borderColor: scheme.primary.withOpacityValue(disabled ? 0.35 : 0.72),
+        child: Center(
+          child: Text(
+            isLoading ? 'Please wait...' : label,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: disabled
+                      ? scheme.onSurface.withOpacityValue(0.45)
+                      : Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
         ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.2,
-                  color: Colors.white,
-                ),
-              )
-            : Text(
-                label,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
       ),
     );
   }
@@ -601,22 +593,26 @@ class _CleanTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final disabled = onPressed == null;
+    final scheme = Theme.of(context).colorScheme;
     return SizedBox(
       height: 46,
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
+      child: LiquidGlassContainer(
+        onTap: disabled ? null : onPressed,
+        borderRadius: BorderRadius.circular(999),
+        tintColor: scheme.primary,
+        tintOpacity: 0.08,
+        borderColor: scheme.primary.withOpacityValue(0.32),
+        child: Center(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: disabled
+                      ? scheme.onSurface.withOpacityValue(0.45)
+                      : AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
         ),
       ),
     );

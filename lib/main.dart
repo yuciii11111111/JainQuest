@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jainquest/firebase_options.dart';
 
@@ -14,6 +15,7 @@ import 'core/widgets/video_background.dart';
 import 'core/widgets/guided_tour_overlay.dart';
 import 'core/navigation/app_navigator.dart';
 import 'features/splash/presentation/splash_screen.dart';
+import 'core/localization/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +55,7 @@ class JainQuestApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final appLanguage = ref.watch(appLanguageProvider);
 
     // Update system UI overlay style based on theme
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -72,6 +75,13 @@ class JainQuestApp extends ConsumerWidget {
       title: 'JainQuest',
       debugShowCheckedModeBanner: false,
       navigatorKey: appNavigatorKey,
+      locale: appLanguage.locale,
+      supportedLocales: const [Locale('en'), Locale('hi'), Locale('gu')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,

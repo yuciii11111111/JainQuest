@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'liquid_glass.dart';
+import 'tr_text.dart';
 
 // ============================================================================
 // Stats Pill Widget
@@ -368,7 +370,7 @@ class ChoiceButton extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text(
+              child: TrText(
                 label,
                 style: TextStyle(
                   fontSize: 16,
@@ -426,7 +428,7 @@ class FeedbackBanner extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                isCorrect ? 'Correct' : 'Not quite',
+                isCorrect ? context.t('correct') : context.t('not_quite'),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -436,7 +438,7 @@ class FeedbackBanner extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          TrText(
             message,
             style: TextStyle(
               fontSize: 14,
@@ -454,7 +456,7 @@ class FeedbackBanner extends StatelessWidget {
                   backgroundColor: isCorrect ? correctColor : incorrectColor,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Continue'),
+                child: Text(context.t('continue')),
               ),
             ),
           ],

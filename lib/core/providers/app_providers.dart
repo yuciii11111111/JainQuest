@@ -37,6 +37,12 @@ class UserProfileNotifier extends StateNotifier<UserProfile> {
     await StorageService.saveUserProfile(updatedUser);
     state = updatedUser;
   }
+
+  Future<void> updatePreferredLanguage(String languageCode) async {
+    final updatedUser = state.copyWith(preferredLanguageCode: languageCode);
+    await StorageService.saveUserProfile(updatedUser);
+    state = updatedUser;
+  }
 }
 
 final userProfileProvider =
@@ -199,7 +205,8 @@ class LessonRunnerState {
       totalCorrect: totalCorrect ?? this.totalCorrect,
       totalQuestions: totalQuestions ?? this.totalQuestions,
       warmupAnswered: warmupAnswered ?? this.warmupAnswered,
-      currentQuizQuestionIndex: currentQuizQuestionIndex ?? this.currentQuizQuestionIndex,
+      currentQuizQuestionIndex:
+          currentQuizQuestionIndex ?? this.currentQuizQuestionIndex,
       quizAnswers: quizAnswers ?? this.quizAnswers,
     );
   }

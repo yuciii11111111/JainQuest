@@ -1,5 +1,6 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/gradient_button.dart';
@@ -7,8 +8,51 @@ import '../../../core/widgets/typewriter_sequence.dart';
 import '../../resources/data/resource_data.dart';
 import 'reading_screen.dart';
 
-class ResourcesScreen extends StatelessWidget {
+class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
+
+  @override
+  State<ResourcesScreen> createState() => _ResourcesScreenState();
+}
+
+class _ResourcesScreenState extends State<ResourcesScreen> {
+  static const List<_QuickGuide> _quickGuides = [
+    _QuickGuide(
+      id: 'ahimsa_daily_life',
+      title: 'Ahimsa in Daily Life',
+      description:
+          'A simple checklist for practicing non-violence in speech, thought, and action.',
+      body:
+          'Pause before you speak. Swap harsh words with kindness. Choose plant-based meals today. Notice tiny lives around you.',
+      icon: Icons.spa_rounded,
+    ),
+    _QuickGuide(
+      id: 'jiva_vs_ajiva',
+      title: 'Jiva vs Ajiva',
+      description:
+          'A quick way to spot living vs non-living using the senses ladder.',
+      body:
+          'Living beings sense, breathe, and move in subtle ways. Ajiva is matter and time - supporting life but not alive.',
+      icon: Icons.bubble_chart_rounded,
+    ),
+    _QuickGuide(
+      id: 'karma_and_emotion',
+      title: 'Karma & Emotion',
+      description:
+          'How emotions affect karmic binding and how to slow the chain.',
+      body:
+          'Strong emotions bind karma quickly. Slow down with breath, gratitude, and gentle speech.',
+      icon: Icons.bolt_rounded,
+    ),
+  ];
+
+  Map<String, bool> _guideCompletions = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _guideCompletions = StorageService.getQuickGuideCompletions();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,32 +119,23 @@ class ResourcesScreen extends StatelessWidget {
               Text('Quick Guides',
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
-              _ResourceTile(
-                title: 'Ahimsa in Daily Life',
-                description:
-                    'A simple checklist for practicing non-violence in speech, thought, and action.',
-                icon: Icons.spa_rounded,
-                onTap: () => _openGuide(context, 'Ahimsa in Daily Life',
-                    'Pause before you speak. Swap harsh words with kindness. Choose plant-based meals today. Notice tiny lives around you.'),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _ResourceTile(
-                title: 'Jiva vs Ajiva',
-                description:
-                    'A quick way to spot living vs non-living using the senses ladder.',
-                icon: Icons.bubble_chart_rounded,
-                onTap: () => _openGuide(context, 'Jiva vs Ajiva',
-                    'Living beings sense, breathe, and move in subtle ways. Ajiva is matter and time - supporting life but not alive.'),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _ResourceTile(
-                title: 'Karma & Emotion',
-                description:
-                    'How emotions affect karmic binding and how to slow the chain.',
-                icon: Icons.bolt_rounded,
-                onTap: () => _openGuide(context, 'Karma & Emotion',
-                    'Strong emotions bind karma quickly. Slow down with breath, gratitude, and gentle speech.'),
-              ),
+              ..._quickGuides.asMap().entries.map((entry) {
+                final index = entry.key;
+                final guide = entry.value;
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom:
+                        index == _quickGuides.length - 1 ? 0 : AppSpacing.md,
+                  ),
+                  child: _ResourceTile(
+                    title: guide.title,
+                    description: guide.description,
+                    icon: guide.icon,
+                    isCompleted: _guideCompletions[guide.id] ?? false,
+                    onTap: () => _openGuide(guide),
+                  ),
+                );
+              }),
               const SizedBox(height: AppSpacing.xl),
               const SizedBox(height: AppSpacing.lg),
               Text('Video Library',
@@ -120,9 +155,10 @@ class ResourcesScreen extends StatelessWidget {
     );
   }
 
-  void _openGuide(BuildContext context, String title, String body) {
+  Future<void> _openGuide(_QuickGuide guide) async {
+    final isCompleted = _guideCompletions[guide.id] ?? false;
     final scheme = Theme.of(context).colorScheme;
-    showModalBottomSheet(
+    final markedComplete = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
@@ -138,7 +174,10 @@ class ResourcesScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(title, style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    guide.title,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close_rounded),
@@ -148,13 +187,44 @@ class ResourcesScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                body,
+                guide.body,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
                     ?.copyWith(height: 1.6),
               ),
+              const SizedBox(height: AppSpacing.sm),
+              if (isCompleted)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacityValue(0.15),
+                    borderRadius: BorderRadius.circular(AppRadius.small),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.check_circle_rounded,
+                          size: 16, color: Colors.green),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Completed',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: AppSpacing.md),
+              if (!isCompleted)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  icon: const Icon(Icons.check_circle_outline_rounded),
+                  label: const Text('Mark as Completed'),
+                ),
+              if (!isCompleted) const SizedBox(height: AppSpacing.sm),
               GradientButton(
                 label: 'Open Reader',
                 icon: Icons.auto_stories_rounded,
@@ -170,19 +240,44 @@ class ResourcesScreen extends StatelessWidget {
         );
       },
     );
+
+    if (markedComplete == true && mounted) {
+      await StorageService.markQuickGuideCompleted(guide.id);
+      setState(() {
+        _guideCompletions[guide.id] = true;
+      });
+    }
   }
+}
+
+class _QuickGuide {
+  final String id;
+  final String title;
+  final String description;
+  final String body;
+  final IconData icon;
+
+  const _QuickGuide({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.body,
+    required this.icon,
+  });
 }
 
 class _ResourceTile extends StatelessWidget {
   final String title;
   final String description;
   final IconData icon;
+  final bool isCompleted;
   final VoidCallback? onTap;
 
   const _ResourceTile({
     required this.title,
     required this.description,
     required this.icon,
+    this.isCompleted = false,
     this.onTap,
   });
 
@@ -207,9 +302,33 @@ class _ResourceTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    if (isCompleted)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacityValue(0.15),
+                          borderRadius: BorderRadius.circular(AppRadius.small),
+                        ),
+                        child: Text(
+                          'Completed',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: Colors.green.shade800),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(

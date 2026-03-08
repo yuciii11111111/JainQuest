@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
-import '../../../../core/widgets/typewriter_sequence.dart';
+import '../../../../core/widgets/tr_text.dart';
 
 class QuestionIntroScreenWidget extends StatefulWidget {
   final QuestionIntroScreen screen;
@@ -19,7 +20,8 @@ class QuestionIntroScreenWidget extends StatefulWidget {
   });
 
   @override
-  State<QuestionIntroScreenWidget> createState() => _QuestionIntroScreenWidgetState();
+  State<QuestionIntroScreenWidget> createState() =>
+      _QuestionIntroScreenWidgetState();
 }
 
 class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
@@ -81,40 +83,28 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
           const SizedBox(height: AppSpacing.lg),
 
           // Title badge
-          TypewriterSequence(
-            gap: AppSpacing.lg,
-            items: [
-              TypewriterSequenceItem(
-                text: widget.screen.title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                ),
-                speed: const Duration(milliseconds: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacityValue(0.1),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: TrText(
+              widget.screen.title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
               ),
-              TypewriterSequenceItem(
-                text: widget.screen.prompt,
-                style: Theme.of(context).textTheme.headlineSmall,
-                speed: const Duration(milliseconds: 16),
-              ),
-            ],
-            itemBuilder: (context, child, index, item) {
-              if (index == 0) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacityValue(0.1),
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                  child: child,
-                );
-              }
-              return child;
-            },
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          TrText(
+            widget.screen.prompt,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: AppSpacing.xl),
 
@@ -145,7 +135,7 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
           // Submit button (before answer)
           if (!showFeedback)
             PrimaryButton(
-              label: 'Check',
+              label: context.t('check'),
               onPressed: selectedChoiceId != null ? _submitAnswer : null,
             ),
 

@@ -18,6 +18,7 @@ class StorageService {
   static List<AttemptLog> _attemptLogs = [];
   static ThemeMode _themeMode = ThemeMode.dark;
   static Map<String, List<int>> _readingBookmarks = {};
+  static Map<String, bool> _quickGuideCompletions = {};
 
   static Future<void> init({User? user}) async {
     final currentUser = user ?? _auth.currentUser;
@@ -109,8 +110,9 @@ class StorageService {
 
     final readingSnap = await _readingDoc().get();
     if (readingSnap.exists && readingSnap.data() != null) {
+      final readingData = readingSnap.data()!;
       final rawBookmarks =
-          readingSnap.data()!['bookmarks'] as Map<String, dynamic>? ?? {};
+          readingData['bookmarks'] as Map<String, dynamic>? ?? {};
       _readingBookmarks = rawBookmarks.map(
         (bookId, pages) {
           final values = List<dynamic>.from(pages as List<dynamic>? ?? const [])
@@ -123,8 +125,14 @@ class StorageService {
           return MapEntry(bookId, values);
         },
       );
+      final rawGuideCompletions =
+          readingData['quickGuideCompletions'] as Map<String, dynamic>? ?? {};
+      _quickGuideCompletions = rawGuideCompletions.map(
+        (guideId, completed) => MapEntry(guideId, completed == true),
+      );
     } else {
       _readingBookmarks = {};
+      _quickGuideCompletions = {};
     }
 
     final attemptsSnap = await _attemptsCollection().get();
@@ -426,6 +434,28 @@ class StorageService {
     return !exists;
   }
 
+  static Map<String, bool> getQuickGuideCompletions() {
+    return Map<String, bool>.from(_quickGuideCompletions);
+  }
+
+  static bool isQuickGuideCompleted(String guideId) {
+    return _quickGuideCompletions[guideId] ?? false;
+  }
+
+  static Future<void> markQuickGuideCompleted(
+    String guideId, {
+    bool completed = true,
+  }) async {
+    _quickGuideCompletions[guideId] = completed;
+
+    if (_isInitialized && _auth.currentUser != null) {
+      await _readingDoc().set(
+        {'quickGuideCompletions': _quickGuideCompletions},
+        SetOptions(merge: true),
+      );
+    }
+  }
+
   // =========================================================================
   // Reset
   // =========================================================================
@@ -440,7 +470,10 @@ class StorageService {
     batch.set(_progressDoc(), defaultProgress.toMap());
     batch.set(_notificationDoc(), defaultPrefs.toMap());
     batch.set(_settingsDoc(), {'isDarkMode': _themeMode == ThemeMode.dark});
-    batch.set(_readingDoc(), {'bookmarks': <String, List<int>>{}});
+    batch.set(_readingDoc(), {
+      'bookmarks': <String, List<int>>{},
+      'quickGuideCompletions': <String, bool>{},
+    });
 
     final attemptsSnap = await _attemptsCollection().get();
     for (final doc in attemptsSnap.docs) {
@@ -454,5 +487,6 @@ class StorageService {
     _notificationPrefs = defaultPrefs;
     _attemptLogs = [];
     _readingBookmarks = {};
+    _quickGuideCompletions = {};
   }
 }

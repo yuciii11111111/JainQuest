@@ -1,5 +1,6 @@
 {
   "dart.flutterSdkPath": "/Users/diptishah/Documents/GitHub/project/flutter",
+  "dart.sdkPath": "/Users/diptishah/Documents/GitHub/project/flutter/bin/cache/dart-sdk",
   "dart.analysisExcludedFolders": [
     "/Users/diptishah/Documents/GitHub/project/flutter"
   ],
@@ -8,5 +9,8 @@
   },
   "files.watcherExclude": {
     "**/flutter/**": true
+  },
+  "terminal.integrated.env.osx": {
+    "PATH": "/Users/diptishah/Documents/GitHub/project/flutter/bin:${env:PATH}"
   }
 }

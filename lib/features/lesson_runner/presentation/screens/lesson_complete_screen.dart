@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/floating_card.dart';
 import '../../../../core/guide/guide_keys.dart';
+import '../../../../core/widgets/tr_text.dart';
 
 class LessonCompleteScreenWidget extends StatefulWidget {
   final LessonCompleteScreen screen;
@@ -30,7 +32,8 @@ class LessonCompleteScreenWidget extends StatefulWidget {
       _LessonCompleteScreenWidgetState();
 }
 
-class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget> {
+class _LessonCompleteScreenWidgetState
+    extends State<LessonCompleteScreenWidget> {
   @override
   Widget build(BuildContext context) {
     final displayedXp = widget.xpEarned;
@@ -52,7 +55,7 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
               const SizedBox(height: AppSpacing.xl),
 
               // Title
-              Text(
+              TrText(
                 widget.screen.title,
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       color: AppColors.success,
@@ -79,7 +82,10 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           '+$displayedXp XP',
-                          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.copyWith(
                                 color: AppColors.warning,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -97,17 +103,17 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
                           color: AppColors.success,
                           borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.emoji_events_rounded,
                               size: 20,
                               color: Colors.white,
                             ),
-                            SizedBox(width: AppSpacing.xs),
+                            const SizedBox(width: AppSpacing.xs),
                             Text(
-                              'Perfect Score Bonus!',
+                              context.t('perfect_score_bonus'),
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -149,14 +155,14 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        'Badge Earned!',
+                        context.t('badge_earned'),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: AppColors.secondary,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
-                      Text(
+                      TrText(
                         widget.screen.rewardText,
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
@@ -181,11 +187,15 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          '${widget.streak} Day Streak!',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppColors.warning,
-                                fontWeight: FontWeight.w800,
-                              ),
+                          context.t(
+                            'day_streak',
+                            args: {'count': widget.streak.toString()},
+                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: AppColors.warning,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                         ),
                       ],
                     ),
@@ -197,7 +207,7 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
               // Continue Button
               GradientButton(
                 key: GuideKeys.lessonCompleteContinueButton,
-                label: 'Continue',
+                label: context.t('continue'),
                 icon: Icons.arrow_forward_rounded,
                 onPressed: widget.onContinue,
                 width: double.infinity,
@@ -207,11 +217,14 @@ class _LessonCompleteScreenWidgetState extends State<LessonCompleteScreenWidget>
 
               // Share Button
               GradientButton(
-                label: 'Share Achievement',
+                label: context.t('share_achievement'),
                 icon: Icons.share_rounded,
                 onPressed: () {
                   Share.share(
-                    'I just earned ${widget.xpEarned} XP in JainQuest!',
+                    context.t(
+                      'share_msg',
+                      args: {'xp': widget.xpEarned.toString()},
+                    ),
                   );
                 },
                 width: double.infinity,

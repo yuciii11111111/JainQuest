@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   
   # State Management
   flutter_riverpod: 
@@ -47,6 +49,7 @@ dependencies:
   
   # Utilities
   intl: 
+  translator: ^1.0.3+1
   equatable: 
   uuid: 
   google_generative_ai: 

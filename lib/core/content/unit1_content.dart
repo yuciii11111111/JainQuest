@@ -40,605 +40,677 @@ class _LessonSeed {
 const List<_LessonSeed> _lessonSeeds = [
   _LessonSeed(
     lessonId: 'U01_L06',
-    title: 'Three Jewels (Ratnatraya)',
+    title: 'Essence of Jainism (AAA Core)',
     objectives: [
-      'Name the three jewels',
-      'Explain why they work together',
-      'Apply the trio to a daily choice',
+      'Explain Ahimsa, Anekantvad, and Aparigraha as one integrated framework',
+      'Connect the Jain mission of "Live and Let Live" to modern decisions',
+      'Apply AAA to thought, speech, action, and consumption',
     ],
-    warmupPrompt: 'Which set is called the Three Jewels?',
-    warmupCorrect: 'Right view, right knowledge, right conduct',
-    warmupWrong: 'Wealth, health, fame',
+    warmupPrompt: 'The strongest summary of Jain Way of Life is:',
+    warmupCorrect:
+        'Compassionate non-violence, open-mindedness, and contentment in daily choices',
+    warmupWrong: 'Rituals alone, without lifestyle change',
     coreIdea:
-        'The Three Jewels are right view, right knowledge, and right conduct. They guide how to see, understand, and act.',
+        'The book presents Jainism as a practical operating system for modern life, centered on Triple A: Ahimsa (non-violence), Anekantvad (many-sided understanding), and Aparigraha (non-possessiveness). These are not abstract ideals; they are daily disciplines for reducing harm, ego, and excess while building clarity and inner stability.',
     whyItMatters:
-        'Without all three, growth is uneven. Understanding needs action to become real.',
+        'When the AAA framework is practiced consistently, it improves relationships, lowers inner conflict, and creates a values-based way to navigate technology, social pressure, politics, and consumer culture. It turns spirituality into a repeatable life method.',
     practiceTip:
-        'Before a choice, check if it fits right view, right knowledge, and right conduct.',
+        'Before major choices, run a three-point check: Does this reduce harm? Does this respect other viewpoints? Does this reduce unnecessary attachment?',
     explanationKey:
-        'Right view is basic belief in non-violence and the soul. Right knowledge is accurate understanding. Right conduct is living those insights.',
+        'The text emphasizes that timeless principles remain valid, but application must evolve for the modern world. AAA becomes the bridge between ancient wisdom and contemporary life complexity.',
     explanationPractice:
-        'Use the three jewels as a quick compass for everyday decisions.',
-    quizPrompt: 'Which trio makes up the Three Jewels?',
-    quizCorrect: 'Right view, right knowledge, right conduct',
-    quizWrong: 'Faith, luck, ritual',
+        'Use AAA as a daily reflection template in the morning and evening to convert values from belief into measurable behavior.',
+    quizPrompt: 'The Jain AAA framework refers to:',
+    quizCorrect: 'Ahimsa, Anekantvad, and Aparigraha',
+    quizWrong: 'Asceticism, argument, and authority',
     nextLessonId: 'U01_L07',
   ),
   _LessonSeed(
     lessonId: 'U01_L07',
-    title: 'Five Great Vows (Mahavrata)',
+    title: 'What Is Jainism? A Practical Summary',
     objectives: [
-      'List the five great vows',
-      'Know who takes the Mahavrata',
-      'Describe their purpose',
+      'Describe Jainism as both religion and way of life',
+      'Explain "Live and Let Live" in practical terms',
+      'Relate right conduct to spiritual and social wellbeing',
     ],
-    warmupPrompt: 'How many great vows are there?',
-    warmupCorrect: 'Five',
-    warmupWrong: 'Three',
+    warmupPrompt: '"Live and Let Live" most directly means:',
+    warmupCorrect:
+        'Live mindfully while allowing others dignity, safety, and freedom',
+    warmupWrong: 'Stay passive and avoid all responsibility',
     coreIdea:
-        'Mahavrata are strict vows for monks and nuns: ahimsa, satya, asteya, brahmacharya, aparigraha.',
+        'Jainism is presented as a living discipline where personal awakening and social ethics are inseparable. The mission is coexistence: to live consciously, reduce avoidable harm, and support the wellbeing of all life forms, not just human convenience.',
     whyItMatters:
-        'They reduce harm and attachment at the deepest level.',
+        'This framing helps students understand Jainism beyond identity labels. It provides a clear moral direction for family life, school, work, and civic participation.',
     practiceTip:
-        'Householders use the same values in lighter, realistic ways.',
+        'Translate "Live and Let Live" into one concrete behavior each day, such as patient listening, mindful food choices, or non-reactive speech.',
     explanationKey:
-        'The five great vows are full commitments to non-violence, truth, non-stealing, celibacy, and non-attachment.',
+        'The book repeatedly frames Jain principles as actionable guidance for contemporary dilemmas, not only religious instruction for temple settings.',
     explanationPractice:
-        'Even small choices can move toward these vows.',
-    quizPrompt: 'Which list matches the five great vows?',
+        'When conflict appears, ask: "How can I protect truth, compassion, and dignity at the same time?"',
+    quizPrompt: 'Jainism in this course is best described as:',
     quizCorrect:
-        'Ahimsa, satya, asteya, brahmacharya, aparigraha',
-    quizWrong: 'Prayer, fasting, charity, pilgrimage, ritual',
+        'A way of life rooted in compassion, open-mindedness, and disciplined conduct',
+    quizWrong: 'Only a system of ceremonies',
     nextLessonId: 'U01_L08',
   ),
   _LessonSeed(
     lessonId: 'U01_L08',
-    title: 'Anuvrata (Small Vows)',
+    title: 'The Jain Spectrum and Identity in Today\'s World',
     objectives: [
-      'Define anuvrata',
-      'Know who practices them',
-      'Explain their daily value',
+      'Recognize traditional, modern, AAA-focused, and newcomer pathways',
+      'Respect diversity in belief while preserving core values',
+      'Build inclusive Jain identity without dilution of ethics',
     ],
-    warmupPrompt: 'Anuvrata are mainly for:',
-    warmupCorrect: 'Householders',
-    warmupWrong: 'Only monks',
+    warmupPrompt: 'The Jain spectrum chapter teaches that:',
+    warmupCorrect:
+        'People can engage Jainism in different ways while staying grounded in core values',
+    warmupWrong: 'Only one cultural style is authentic',
     coreIdea:
-        'Anuvrata are smaller vows for laypeople, adapting the same values to daily life.',
+        'The text describes a broad Jain spectrum: deeply traditional practitioners, modern seekers, value-centered AAA practitioners, and newcomers. The unifying core is ethical alignment, especially Ahimsa, Anekantvad, and Aparigraha.',
     whyItMatters:
-        'They make spiritual practice practical in family and work life.',
-    practiceTip: 'Set one clear boundary like mindful speech.',
+        'A spectrum model reduces judgment and encourages participation across generations, geographies, and backgrounds. It helps communities stay both principled and welcoming.',
+    practiceTip:
+        'In group settings, focus first on shared Jain values before debating differences in ritual detail.',
     explanationKey:
-        'Anuvrata balance spiritual aims with real responsibilities.',
+        'Identity is strongest when rooted in principles, not merely in labels or external conformity.',
     explanationPractice:
-        'Consistency matters more than intensity.',
-    quizPrompt: 'Anuvrata are:',
-    quizCorrect: 'Smaller vows for laypeople',
-    quizWrong: 'Secret teachings for scholars',
+        'Practice intellectual humility: hold your tradition with devotion while engaging other Jain expressions with curiosity and respect.',
+    quizPrompt: 'A balanced Jain identity is built on:',
+    quizCorrect:
+        'Shared ethical principles with respectful diversity in expression',
+    quizWrong: 'Uniform behavior enforced without dialogue',
     nextLessonId: 'U01_L09',
   ),
   _LessonSeed(
     lessonId: 'U01_L09',
-    title: 'Ahimsa in Thought, Speech, Action',
+    title: 'Non-Violence (Ahimsa): Thought, Speech, Action',
     objectives: [
-      'Explain ahimsa at three levels',
-      'Recognize intention as part of action',
-      'Practice a simple pause',
+      'Define Ahimsa across inner and outer behavior',
+      'Explain the cycle of violence vs circle of non-violence',
+      'Apply forgiveness and restraint in daily conflict',
     ],
-    warmupPrompt: 'Ahimsa includes:',
-    warmupCorrect: 'Mind, speech, and body',
-    warmupWrong: 'Only actions',
+    warmupPrompt: 'Ahimsa is complete only when it includes:',
+    warmupCorrect: 'Thoughts, words, actions, and lifestyle impact',
+    warmupWrong: 'Only avoiding physical aggression',
     coreIdea:
-        'Non-violence starts in thoughts, shows in speech, and ends in actions.',
+        'Ahimsa is presented as the central force of Jain living. The chapter expands non-violence from direct physical harm to emotional harm, verbal harm, systemic harm, and ecological harm, while highlighting forgiveness and compassion as active strengths.',
     whyItMatters:
-        'Harm often begins in the mind before it appears outside.',
+        'Without this expanded definition, people may avoid obvious violence but still cause damage through speech, consumption, and indifference. Full Ahimsa builds trustworthy character and social healing.',
     practiceTip:
-        'Pause before reacting and soften inner language.',
+        'Pause before response: verify facts, soften tone, and choose language that protects truth without humiliating anyone.',
     explanationKey:
-        'Jain ethics treats intention as part of the act.',
+        'The text links Ahimsa to practical ladders and circles of practice, starting with self-regulation and extending to family, society, animals, and environment.',
     explanationPractice:
-        'Replace harsh judgment with curiosity.',
-    quizPrompt: 'Ahimsa applies to which levels?',
-    quizCorrect: 'Thought, speech, and action',
-    quizWrong: 'Only physical action',
+        'End each day by reviewing one moment where anger could have become violence and redesign how you will respond next time.',
+    quizPrompt: 'The most complete definition of Ahimsa is:',
+    quizCorrect:
+        'Reducing harm in thought, speech, action, and systems of living',
+    quizWrong: 'Avoiding fights while ignoring speech and consumption',
     nextLessonId: 'U01_L10',
   ),
   _LessonSeed(
     lessonId: 'U01_L10',
-    title: 'Satya (Truthfulness)',
+    title: 'Non-Absolutism (Anekantvad) in a Polarized Age',
     objectives: [
-      'Define satya',
-      'Connect truth with non-violence',
-      'Apply kind speech',
+      'Define Anekantvad as disciplined many-sided thinking',
+      'Apply perspective-taking without moral confusion',
+      'Use respectful disagreement in family and public life',
     ],
-    warmupPrompt: 'Satya means:',
-    warmupCorrect: 'Truthfulness with care',
-    warmupWrong: 'Brutal honesty',
-    coreIdea: 'Satya is truthful speech that avoids harm.',
+    warmupPrompt: 'Anekantvad teaches that:',
+    warmupCorrect: 'No single viewpoint captures all aspects of truth',
+    warmupWrong: 'Truth does not exist',
+    coreIdea:
+        'Anekantvad in the book is a method for reducing dogmatism and improving dialogue. It does not deny truth; it trains us to recognize partial truths, context limits, and the need for humility when making claims.',
     whyItMatters:
-        'Truth without kindness can still hurt; Jainism balances both.',
-    practiceTip: 'Speak what is true, useful, and gentle.',
-    explanationKey: 'Satya is aligned with ahimsa.',
+        'In an era of social media conflict and ideological certainty, this practice prevents intellectual violence and supports wiser decisions in family, civic, and professional settings.',
+    practiceTip:
+        'When disagreement arises, first articulate the strongest version of the other person\'s view before presenting your own.',
+    explanationKey:
+        'The chapter links open-mindedness to emotional maturity and social cohesion, especially in intergenerational and interfaith conversations.',
     explanationPractice:
-        'Choose timing and tone that reduce harm.',
-    quizPrompt: 'Satya is best described as:',
-    quizCorrect: 'Truth spoken without harm',
-    quizWrong: 'Saying everything you think',
+        'Use phrases like "from one perspective" and "in this context" to keep claims precise, respectful, and testable.',
+    quizPrompt: 'Anekantvad helps us:',
+    quizCorrect: 'Seek fuller truth through humility and multiple perspectives',
+    quizWrong: 'Defend one position regardless of evidence',
     nextLessonId: 'U01_L11',
   ),
   _LessonSeed(
     lessonId: 'U01_L11',
-    title: 'Asteya (Non-Stealing)',
+    title: 'Non-Possessiveness (Aparigraha) and Contentment',
     objectives: [
-      'Define asteya',
-      'Identify subtle forms of stealing',
-      'Practice respect for resources',
+      'Differentiate need, comfort, and excess',
+      'Connect attachment with stress, fear, and ego',
+      'Design a simplicity practice for modern life',
     ],
-    warmupPrompt: 'Asteya encourages:',
-    warmupCorrect: 'Not taking what is not given',
-    warmupWrong: 'Taking only small things',
-    coreIdea: 'Asteya is non-stealing in actions and intentions.',
-    whyItMatters: 'It builds trust and reduces greed.',
-    practiceTip: 'Respect time, credit, and resources.',
+    warmupPrompt: 'Aparigraha is best practiced by:',
+    warmupCorrect: 'Reducing clinging while using resources responsibly',
+    warmupWrong: 'Rejecting all ownership without context',
+    coreIdea:
+        'The chapter frames Aparigraha as freedom from compulsive accumulation, status anxiety, and identity built on possessions. It encourages conscious boundaries around buying, storing, showcasing, and consuming.',
+    whyItMatters:
+        'Attachment increases fear of loss, comparison, and chronic dissatisfaction. Non-possessiveness restores gratitude, generosity, and emotional balance.',
+    practiceTip:
+        'Create three categories for belongings: essential, useful, and excess; reduce one excess category each month.',
     explanationKey:
-        'Stealing includes subtle forms like plagiarism or wasting others time.',
-    explanationPractice: 'Ask permission and give credit.',
-    quizPrompt: 'Asteya means:',
-    quizCorrect: 'Non-stealing',
-    quizWrong: 'Non-speaking',
+        'The text links minimalism and contentment to both spiritual calm and practical wellbeing in family finance and environmental impact.',
+    explanationPractice:
+        'Before purchasing, ask: "Will this serve my values long-term, or only my impulse right now?"',
+    quizPrompt: 'Aparigraha primarily develops:',
+    quizCorrect: 'Contentment, simplicity, and freedom from clinging',
+    quizWrong: 'Pride in extreme deprivation',
     nextLessonId: 'U01_L12',
   ),
   _LessonSeed(
     lessonId: 'U01_L12',
-    title: 'Brahmacharya (Self-Restraint)',
+    title: 'Unity and Diversity Among Jains',
     objectives: [
-      'Define brahmacharya',
-      'Explain householders practice',
-      'See how restraint protects clarity',
+      'Recognize shared values across traditions',
+      'Avoid sectarian ego while preserving authenticity',
+      'Build cooperation in community life',
     ],
-    warmupPrompt: 'Brahmacharya focuses on:',
-    warmupCorrect: 'Self-control in desires',
-    warmupWrong: 'Ignoring relationships',
+    warmupPrompt: 'Unity in Jainism is strongest when based on:',
+    warmupCorrect: 'Shared ethics and mutual respect across traditions',
+    warmupWrong: 'Ignoring all differences and context',
     coreIdea:
-        'Brahmacharya is channeling energy wisely, not impulsively.',
+        'The book emphasizes that diversity in ritual, language, and community practice can coexist with deep unity in Jain principles. The goal is not forced sameness but value-based solidarity.',
     whyItMatters:
-        'It protects clarity and prevents attachment from driving choices.',
-    practiceTip: 'Notice triggers and choose moderation.',
+        'Communities become resilient when they reduce internal fragmentation and focus on collective transmission of values to younger generations.',
+    practiceTip:
+        'In community discussions, separate principle-level agreement from method-level differences.',
     explanationKey:
-        'For monks it is celibacy; for householders it is fidelity and restraint.',
+        'Anekantvad is presented as the internal glue that allows diversity without hostility.',
     explanationPractice:
-        'Respect boundaries in media and conversation.',
-    quizPrompt: 'For householders, brahmacharya is closest to:',
-    quizCorrect: 'Fidelity and restraint',
-    quizWrong: 'Complete avoidance of all contact',
+        'Use collaborative planning for events that include multiple Jain traditions while retaining each group\'s dignity.',
+    quizPrompt: 'Healthy Jain unity looks like:',
+    quizCorrect: 'Principled cooperation with respectful diversity',
+    quizWrong: 'Uniformity achieved through criticism',
     nextLessonId: 'U01_L13',
   ),
   _LessonSeed(
     lessonId: 'U01_L13',
-    title: 'Aparigraha (Non-Attachment)',
+    title: 'Why Live Jain Values? 24 Practical Reasons',
     objectives: [
-      'Define aparigraha',
-      'Explain attachment vs ownership',
-      'Try a simplicity practice',
+      'Summarize evidence-based benefits of Jain practices',
+      'Connect ethics with happiness, leadership, and mental wellbeing',
+      'Develop confidence in sharing Jain values publicly',
     ],
-    warmupPrompt: 'Aparigraha is:',
-    warmupCorrect: 'Non-attachment',
-    warmupWrong: 'Collecting more',
-    coreIdea: 'Aparigraha means limiting possessions and clinging.',
+    warmupPrompt: 'The "24 reasons" chapter mainly argues that Jain living is:',
+    warmupCorrect:
+        'Spiritually deep and practically validated by modern outcomes',
+    warmupWrong: 'Useful only in ancient social settings',
+    coreIdea:
+        'This chapter compiles practical, scientific, and social reasons to live and share Jain values, including emotional regulation, healthier habits, stronger leadership, environmental responsibility, and compassionate social behavior.',
     whyItMatters:
-        'Less attachment reduces fear and jealousy.',
-    practiceTip: 'Simplify one area and share what you do not use.',
-    explanationKey: 'Possessions are tools, not identity.',
-    explanationPractice: 'Ask: do I own this, or does it own me?',
-    quizPrompt: 'Aparigraha teaches:',
-    quizCorrect: 'Non-attachment and simplicity',
-    quizWrong: 'Luxury and display',
+        'Students and families often ask whether ancient principles remain relevant today. The chapter answers with applied evidence and lived examples.',
+    practiceTip:
+        'Choose three reasons most meaningful to your life and convert each into a weekly habit goal.',
+    explanationKey:
+        'The text presents Jain values as high-functioning life tools for children, professionals, families, and communities.',
+    explanationPractice:
+        'When explaining Jainism to others, combine value language with practical outcomes rather than abstract doctrine alone.',
+    quizPrompt: 'The 24 reasons chapter positions Jain practice as:',
+    quizCorrect:
+        'A life system that supports wellbeing, ethics, and social harmony',
+    quizWrong: 'A private belief with no practical impact',
     nextLessonId: 'U01_L14',
   ),
   _LessonSeed(
     lessonId: 'U01_L14',
-    title: 'Anekantavada (Many-Sided Reality)',
+    title: 'Vegetarian and Vegan Way of Life',
     objectives: [
-      'Define anekantavada',
-      'Reduce dogmatism',
-      'Apply perspective-taking',
+      'Explain compassionate eating through Ahimsa',
+      'Distinguish unmindful vegetarianism from value-based practice',
+      'Create a realistic path toward balanced vegan choices',
     ],
-    warmupPrompt: 'Anekantavada teaches:',
-    warmupCorrect: 'Many-sided reality',
-    warmupWrong: 'Only one view',
+    warmupPrompt: 'A Jain-aligned food path in the book emphasizes:',
+    warmupCorrect: 'Compassionate, mindful, and informed plant-based decisions',
+    warmupWrong: 'Food rules without ethical understanding',
     coreIdea:
-        'Reality has many aspects; no single view captures all.',
-    whyItMatters: 'It reduces dogmatism and conflict.',
-    practiceTip: 'Ask what might be true from another angle.',
-    explanationKey: 'Truth is complex, so humility is required.',
-    explanationPractice: 'Listen to others to complete the picture.',
-    quizPrompt: 'Anekantavada is the doctrine of:',
-    quizCorrect: 'Many-sidedness',
-    quizWrong: 'Single absolute view',
+        'The food chapters frame diet as daily ethics: what we eat directly expresses non-violence, restraint, and responsibility. The text also encourages practical transitions, ingredient awareness, and gratitude toward all contributors in the food chain.',
+    whyItMatters:
+        'Food is the most frequent moral decision we make. Aligning diet with values reduces hidden harm and strengthens integrity between belief and behavior.',
+    practiceTip:
+        'Audit one week of meals, label each as compassionate or compromise-based, then plan one clear improvement for the next week.',
+    explanationKey:
+        'The self-evaluation model in the book supports gradual, honest progress rather than guilt-based perfectionism.',
+    explanationPractice:
+        'Learn food labels carefully, ask respectful questions while eating out, and share your rationale through compassion rather than judgment.',
+    quizPrompt: 'The chapter\'s food ethic centers on:',
+    quizCorrect: 'Compassionate, mindful, and progressively plant-based living',
+    quizWrong: 'Identity signaling through food labels only',
     nextLessonId: 'U01_L15',
   ),
   _LessonSeed(
     lessonId: 'U01_L15',
-    title: 'Syadvada (Conditional Truth)',
+    title: 'A Typical Day: AM-PM JWOL Practice',
     objectives: [
-      'Define syadvada',
-      'Use context in statements',
-      'Avoid extremes',
+      'Build a short daily spiritual routine',
+      'Integrate prayer, meditation, and self-study in limited time',
+      'Use morning intention and evening review for consistency',
     ],
-    warmupPrompt: 'Syadvada is about:',
-    warmupCorrect: 'Conditional statements',
-    warmupWrong: 'No truth at all',
+    warmupPrompt: 'A realistic daily JWOL routine should be:',
+    warmupCorrect: 'Short, consistent, and value-focused',
+    warmupWrong: 'Long but irregular and unsustainable',
     coreIdea:
-        'Syadvada uses "in some ways" to express partial truth.',
-    whyItMatters: 'It helps communicate without extremes.',
-    practiceTip: 'Add context before making strong claims.',
-    explanationKey: 'Statements are valid in certain conditions.',
-    explanationPractice: 'Use "from this perspective" to be precise.',
-    quizPrompt: 'Syadvada emphasizes:',
-    quizCorrect: 'Conditional truth',
-    quizWrong: 'Random opinions',
+        'The book offers a practical morning-evening structure that can be done in minutes: mindful prayer, brief meditation, value recall, and self-review. The emphasis is consistency over intensity.',
+    whyItMatters:
+        'Without daily rhythm, values remain inspirational but unstable. Small routines create compounding inner discipline and emotional steadiness.',
+    practiceTip:
+        'Start with a 5-7 minute AM-PM routine and protect it like a non-negotiable appointment with your highest self.',
+    explanationKey:
+        'Daily structure is presented as the bridge between aspiration and transformation.',
+    explanationPractice:
+        'Use the morning to set intention and the evening to assess where you aligned or drifted from Ahimsa, Anekantvad, and Aparigraha.',
+    quizPrompt: 'The key to daily Jain practice is:',
+    quizCorrect: 'Regularity with sincere attention, even in short sessions',
+    quizWrong: 'Occasional intense effort only',
     nextLessonId: 'U01_L16',
   ),
   _LessonSeed(
     lessonId: 'U01_L16',
-    title: 'Nayavada (Viewpoints)',
+    title: 'Measuring Progress in Jain Way of Life',
     objectives: [
-      'Define nayavada',
-      'Understand partial viewpoints',
-      'Combine perspectives for balance',
+      'Use self-evaluation honestly without self-condemnation',
+      'Track progress across food, behavior, and mindset',
+      'Set milestone-based growth targets',
     ],
-    warmupPrompt: 'Nayavada focuses on:',
-    warmupCorrect: 'Viewpoints',
-    warmupWrong: 'Ignoring evidence',
+    warmupPrompt: 'A good spiritual progress system should:',
+    warmupCorrect: 'Increase awareness and guide steady improvement',
+    warmupWrong: 'Create guilt and comparison',
     coreIdea:
-        'Nayavada is the study of viewpoints to understand reality.',
-    whyItMatters: 'It trains careful thinking and fairness.',
-    practiceTip: 'Separate the part from the whole in arguments.',
-    explanationKey: 'Each naya highlights one aspect, not the whole.',
+        'The progress framework in the book encourages staged growth from unawareness to mindful and enriched practice. It emphasizes truthful self-assessment, gratitude, and visible next steps.',
+    whyItMatters:
+        'What is not measured is rarely improved. Reflection with compassion creates momentum and prevents denial or performative spirituality.',
+    practiceTip:
+        'Pick one category each week, rate your current level honestly, and define one behavior that moves you one level higher.',
+    explanationKey:
+        'Progress is framed as directional, not perfection-based, and rooted in repeatable habits.',
     explanationPractice:
-        'Combine viewpoints for fuller understanding.',
-    quizPrompt: 'Nayavada is best described as:',
-    quizCorrect: 'A method of viewpoints',
-    quizWrong: 'A rule of silence',
+        'Review monthly with accountability: what improved, what slipped, and what support systems you need to continue advancing.',
+    quizPrompt: 'The purpose of JWOL self-evaluation is to:',
+    quizCorrect: 'Build awareness and guide practical growth',
+    quizWrong: 'Judge others and claim superiority',
     nextLessonId: 'U01_L17',
   ),
   _LessonSeed(
     lessonId: 'U01_L17',
-    title: 'Nav Tattva (Nine Realities)',
+    title: 'My Mind and My Body',
     objectives: [
-      'Define nav tattva',
-      'Recognize key categories',
-      'Use them as a learning map',
+      'Connect emotional hygiene to spiritual discipline',
+      'Understand stress, habits, and self-regulation',
+      'Apply mind-body practices for balanced living',
     ],
-    warmupPrompt: 'Nav Tattva means:',
-    warmupCorrect: 'Nine realities',
-    warmupWrong: 'Nine rituals',
+    warmupPrompt: 'Mind-body Jain practice is about:',
+    warmupCorrect: 'Caring for mental and physical wellbeing as part of dharma',
+    warmupWrong: 'Ignoring health in the name of spirituality',
     coreIdea:
-        'Nine realities explain how the soul binds and frees from karma.',
+        'The chapter expands Jain discipline into mental and physical wellbeing, showing that ethical living requires a stable mind and healthy body. Habits, rest, movement, and mindful attention all support better choices.',
     whyItMatters:
-        'They provide a map of spiritual progress.',
-    practiceTip: 'Identify what increases bondage and what stops it.',
+        'A distressed mind increases reactivity, anger, and attachment. Mental and bodily care strengthens capacity for Ahimsa and equanimity.',
+    practiceTip:
+        'Anchor one daily reset: breath awareness, short walk, mindful eating, or digital pause before sleep.',
     explanationKey:
-        'Key categories include jiva, ajiva, asrava, bandha, samvara, nirjara, moksha, punya, papa.',
+        'The text treats wellbeing practices as spiritual infrastructure, not optional lifestyle extras.',
     explanationPractice:
-        'Use them to review actions daily.',
-    quizPrompt: 'Nav Tattva refers to:',
-    quizCorrect: 'Nine fundamental realities',
-    quizWrong: 'Nine temple festivals',
+        'Notice triggers that weaken your restraint and redesign your routine to protect calm and clarity.',
+    quizPrompt: 'Caring for mind and body in Jain practice is:',
+    quizCorrect: 'A core support for ethical and spiritual consistency',
+    quizWrong: 'Unrelated to spiritual progress',
     nextLessonId: 'U01_L18',
   ),
   _LessonSeed(
     lessonId: 'U01_L18',
-    title: 'Eight Types of Karma',
+    title: 'My Things: Ownership, Simplicity, Responsibility',
     objectives: [
-      'Know there are eight main karma types',
-      'Connect karma with experience',
-      'Identify clarity-blocking karma',
+      'Audit possession habits through Aparigraha',
+      'Reduce clutter and symbolic consumption',
+      'Adopt responsible buying and sharing practices',
     ],
-    warmupPrompt: 'How many main karma types are taught?',
-    warmupCorrect: 'Eight',
-    warmupWrong: 'Four',
+    warmupPrompt: 'A Jain approach to possessions asks:',
+    warmupCorrect:
+        'Do these things serve life, or do they control my attention?',
+    warmupWrong: 'How can I display more status quickly?',
     coreIdea:
-        'Jainism describes eight main karma types affecting knowledge, perception, energy, and more.',
-    whyItMatters: 'It shows why souls experience limits.',
-    practiceTip: 'Notice how emotions cloud clarity.',
+        'This chapter reframes possessions as tools, not identity markers. It encourages thoughtful acquisition, maintenance, sharing, and release so material life supports, rather than dominates, inner life.',
+    whyItMatters:
+        'Unchecked possession patterns drain time, money, and attention while increasing ego comparison and anxiety.',
+    practiceTip:
+        'For every new non-essential purchase, release or donate one similar item you already own.',
     explanationKey:
-        'Knowledge-obscuring and perception-obscuring karma are key categories.',
-    explanationPractice: 'Cultivate calm to reduce new binding.',
-    quizPrompt: 'Jainism describes how many main karma types?',
-    quizCorrect: 'Eight',
-    quizWrong: 'Ten',
+        'Practical non-possessiveness includes mindful purchasing, longer product use, and reduced waste.',
+    explanationPractice:
+        'Track impulse buying cues and replace one with a value-based pause routine before checkout.',
+    quizPrompt: 'Responsible ownership in JWOL means:',
+    quizCorrect:
+        'Using possessions with restraint, purpose, and accountability',
+    quizWrong: 'Collecting more to feel secure',
     nextLessonId: 'U01_L19',
   ),
   _LessonSeed(
     lessonId: 'U01_L19',
-    title: 'Leshya (Inner Colorations)',
+    title: 'My Consumptions: Food, Media, and Mind Inputs',
     objectives: [
-      'Define leshya',
-      'Link emotions to inner color',
-      'Shift toward brighter states',
+      'Expand consumption ethics beyond food',
+      'Evaluate media, products, and habits through Ahimsa',
+      'Build mindful boundaries for digital and material intake',
     ],
-    warmupPrompt: 'Leshya refers to:',
-    warmupCorrect: 'Colorations of the soul',
-    warmupWrong: 'Temple architecture',
+    warmupPrompt: 'In JWOL, consumption includes:',
+    warmupCorrect: 'What we eat, watch, buy, repeat, and mentally absorb',
+    warmupWrong: 'Only the food we consume',
     coreIdea:
-        'Leshya are inner colorations shaped by emotions and intentions.',
+        'The self-evaluation chapter highlights that consumption is multidimensional: diet, digital media, entertainment, purchasing, and emotional content. Each input shapes consciousness and conduct.',
     whyItMatters:
-        'They show the quality of your inner state.',
-    practiceTip: 'Shift from harsh to gentle intentions.',
+        'Unfiltered consumption drives agitation, imitation, and attachment. Mindful curation protects focus and character.',
+    practiceTip:
+        'Run a weekly input audit: identify one nourishing input to increase and one harmful input to reduce.',
     explanationKey:
-        'Dark leshya come from anger and greed; bright leshya from compassion.',
+        'The text links awareness-based consumption to both spiritual clarity and practical mental health.',
     explanationPractice:
-        'Choose thoughts that lighten your inner color.',
-    quizPrompt: 'Leshya describes:',
-    quizCorrect: 'Inner colorations from emotions',
-    quizWrong: 'Outer clothing rules',
+        'Before consuming content, ask whether it increases compassion, wisdom, and calm or fuels craving and reactivity.',
+    quizPrompt: 'Mindful consumption in JWOL is:',
+    quizCorrect:
+        'A full-spectrum practice covering food, media, products, and mental habits',
+    quizWrong: 'Only a dietary checklist',
     nextLessonId: 'U01_L20',
   ),
   _LessonSeed(
     lessonId: 'U01_L20',
-    title: 'Samvara (Stoppage)',
+    title: 'My Life and My World: Ecology and Responsibility',
     objectives: [
-      'Define samvara',
-      'Explain how karma inflow stops',
-      'Practice mindful restraint',
+      'Connect Jain ethics with environmental stewardship',
+      'Understand interdependence of personal and planetary choices',
+      'Practice compassion toward animals and ecosystems',
     ],
-    warmupPrompt: 'Samvara means:',
-    warmupCorrect: 'Stopping karma inflow',
-    warmupWrong: 'Increasing karma',
+    warmupPrompt: 'JWOL environmental responsibility begins with:',
+    warmupCorrect:
+        'Daily personal choices in food, transport, waste, and consumption',
+    warmupWrong: 'Waiting for institutions alone to act',
     coreIdea:
-        'Samvara is the stoppage of new karma through discipline.',
+        'The chapter expands Ahimsa to planetary scale, showing that climate, pollution, waste, and animal exploitation are ethical as well as ecological concerns. Personal habits are treated as moral votes.',
     whyItMatters:
-        'Without stopping inflow, shedding is slower.',
+        'Jain non-violence loses force if limited to interpersonal behavior while ignoring environmental harm that affects countless life forms.',
     practiceTip:
-        'Use vows and mindfulness to reduce harmful actions.',
-    explanationKey: 'Right conduct seals the leaks.',
-    explanationPractice: 'Track one habit that invites negativity.',
-    quizPrompt: 'Samvara is:',
-    quizCorrect: 'Stoppage of karma inflow',
-    quizWrong: 'Collection of more karma',
+        'Choose one high-impact practice this month: reduce food waste, lower disposable use, or shift to lower-harm transport habits.',
+    explanationKey:
+        'The book positions environmentalism as a direct extension of Jain compassion and restraint.',
+    explanationPractice:
+        'Evaluate recurring routines by footprint: what can be reduced, repaired, reused, or replaced with lower-harm alternatives?',
+    quizPrompt: 'A Jain ecological ethic is:',
+    quizCorrect:
+        'Ahimsa applied to all life systems, not only human interactions',
+    quizWrong: 'Separate from spiritual practice',
     nextLessonId: 'U01_L21',
   ),
   _LessonSeed(
     lessonId: 'U01_L21',
-    title: 'Nirjara (Shedding Karma)',
+    title: 'Spiritual Progress: Inner Growth and Gunsthan Mindset',
     objectives: [
-      'Define nirjara',
-      'Know it removes existing karma',
-      'Connect it with tapas',
+      'Understand spiritual growth as staged and disciplined',
+      'Connect self-awareness with reduction of passions',
+      'Use gradual progression without discouragement',
     ],
-    warmupPrompt: 'Nirjara is:',
-    warmupCorrect: 'Shedding karma',
-    warmupWrong: 'Binding karma',
-    coreIdea: 'Nirjara is the removal of existing karma.',
-    whyItMatters: 'It clears the soul over time.',
-    practiceTip: 'Practice forgiveness and austerity.',
-    explanationKey: 'Shedding happens naturally and through tapas.',
+    warmupPrompt: 'Spiritual growth in Jainism is presented as:',
+    warmupCorrect: 'A progressive path of purification and awareness',
+    warmupWrong: 'A sudden event with no preparation',
+    coreIdea:
+        'The spiritual progress chapters present growth as gradual refinement of belief, knowledge, and conduct. Movement happens by reducing anger, ego, deceit, and greed while strengthening discipline and equanimity.',
+    whyItMatters:
+        'A staged model prevents frustration and helps practitioners remain committed during setbacks.',
+    practiceTip:
+        'Track one passion pattern weekly (anger, pride, deceit, greed) and document specific reduction strategies.',
+    explanationKey:
+        'The path framework converts spirituality from vague aspiration into structured personal development.',
     explanationPractice:
-        'Choose voluntary discipline to speed up clarity.',
-    quizPrompt: 'Nirjara means:',
-    quizCorrect: 'Shedding existing karma',
-    quizWrong: 'Hiding karma',
+        'Celebrate small victories in restraint and clarity; consistency across months matters more than dramatic episodes.',
+    quizPrompt: 'A realistic Jain view of spiritual progress is:',
+    quizCorrect: 'Gradual purification through disciplined practice',
+    quizWrong: 'Instant perfection without inner work',
     nextLessonId: 'U01_L22',
   ),
   _LessonSeed(
     lessonId: 'U01_L22',
-    title: 'Moksha (Liberation)',
+    title: 'Many Dimensions of Violence (Himsa)',
     objectives: [
-      'Define moksha',
-      'Explain freedom from rebirth',
-      'Link daily actions to liberation',
+      'Identify physical, verbal, emotional, structural, and ecological violence',
+      'Recognize subtle violence in intent and indifference',
+      'Design prevention strategies in daily life',
     ],
-    warmupPrompt: 'Moksha is:',
-    warmupCorrect: 'Liberation',
-    warmupWrong: 'Rebirth',
+    warmupPrompt: 'The chapter on Himsa teaches that violence can be:',
+    warmupCorrect: 'Direct, indirect, subtle, systemic, and normalized',
+    warmupWrong: 'Only physical injury',
     coreIdea:
-        'Moksha is freedom from the cycle of birth and death.',
+        'The text broadens awareness by showing how harm appears in lifestyle, language, commerce, and social systems. It invites practitioners to detect violence not just in obvious acts but in normalized patterns that degrade life.',
     whyItMatters:
-        'It is the ultimate goal of Jain practice.',
+        'Without this lens, people unknowingly cooperate with harmful systems while believing they are non-violent.',
     practiceTip:
-        'Align goals with inner freedom, not just external success.',
+        'Map one daily routine and identify hidden harm points; redesign one step to reduce impact.',
     explanationKey:
-        'Liberation comes when karma is fully shed.',
+        'Non-violence requires active discernment, not passive self-image.',
     explanationPractice:
-        'Small steps of detachment point toward moksha.',
-    quizPrompt: 'Moksha refers to:',
-    quizCorrect: 'Liberation from rebirth',
-    quizWrong: 'A holy pilgrimage site',
+        'Evaluate choices by effect on vulnerable beings, future generations, and ecosystems, not only immediate convenience.',
+    quizPrompt: 'Understanding Himsa deeply helps us:',
+    quizCorrect: 'Detect and reduce both visible and subtle forms of harm',
+    quizWrong: 'Limit ethics to obvious physical aggression',
     nextLessonId: 'U01_L23',
   ),
   _LessonSeed(
     lessonId: 'U01_L23',
-    title: 'Gupti (Three Controls)',
+    title: 'Food Dharma: Health, Purchasing, and Eating Out',
     objectives: [
-      'Define gupti',
-      'Name the three controls',
-      'Practice mindful restraint',
+      'Apply compassion and health principles to food planning',
+      'Make responsible purchasing decisions',
+      'Navigate restaurants and social eating with values intact',
     ],
-    warmupPrompt: 'Gupti are:',
-    warmupCorrect: 'Controls of mind, speech, body',
-    warmupWrong: 'Festival days',
-    coreIdea: 'Gupti are the three controls that protect conduct.',
-    whyItMatters: 'They prevent impulsive harm.',
+    warmupPrompt: 'Responsible Jain food practice includes:',
+    warmupCorrect:
+        'Nutrition, compassion, ingredient awareness, and ethical purchasing',
+    warmupWrong: 'Taste preference without ethical review',
+    coreIdea:
+        'The food section combines non-violence with practical nutrition and purchasing discipline. It covers balanced plant-based choices, ingredient transparency, restaurant strategy, and gratitude-driven food culture.',
+    whyItMatters:
+        'Food behavior influences health, emotion, environment, and moral consistency every single day.',
     practiceTip:
-        'Guard one channel for a day: mind, speech, or body.',
+        'Prepare a values-first food plan before social events so convenience does not override conviction.',
     explanationKey:
-        'Control is not suppression; it is conscious direction.',
-    explanationPractice: 'Slow down before acting.',
-    quizPrompt: 'Gupti refers to control of:',
-    quizCorrect: 'Mind, speech, and body',
-    quizWrong: 'Weather and seasons',
+        'The book encourages informed and compassionate decision-making rather than rigid identity posturing.',
+    explanationPractice:
+        'Ask where food comes from, how it is produced, and who is affected across the full supply chain.',
+    quizPrompt: 'Food dharma in this lesson means:',
+    quizCorrect:
+        'Compassionate, informed, and health-conscious eating and purchasing',
+    quizWrong: 'Unquestioned routine eating',
     nextLessonId: 'U01_L24',
   ),
   _LessonSeed(
     lessonId: 'U01_L24',
-    title: 'Samiti (Careful Conduct)',
+    title: 'Family Life: Parenting, Marriage, and Home Values',
     objectives: [
-      'Define samiti',
-      'Know it reduces accidental harm',
-      'Apply mindfulness in routine',
+      'Build a Jain value framework for family decisions',
+      'Apply compassionate boundaries in marriage expectations',
+      'Raise children with ethics, discipline, and openness',
     ],
-    warmupPrompt: 'Samiti means:',
-    warmupCorrect: 'Careful conduct',
-    warmupWrong: 'Ignoring details',
+    warmupPrompt: 'A Jain family framework is strongest when:',
+    warmupCorrect:
+        'Core values are discussed early, clearly, and practiced consistently',
+    warmupWrong: 'Assumptions replace communication',
     coreIdea:
-        'Samiti are five careful practices to reduce harm.',
+        'The family chapters provide concrete guidance for raising children, setting marriage expectations, and building a values-aligned home culture. Diet, communication, conflict style, and spiritual routines are treated as foundational agreements.',
     whyItMatters:
-        'Attention prevents accidental violence.',
-    practiceTip: 'Walk, speak, and handle objects mindfully.',
+        'Many future conflicts in relationships come from unspoken expectations. Value clarity protects trust and long-term harmony.',
+    practiceTip:
+        'Create a written family value charter covering food, speech norms, celebrations, giving, and digital boundaries.',
     explanationKey:
-        'Examples include careful walking and careful speech.',
+        'The text frames family as the primary training ground where Jain values are transmitted by behavior, not lectures.',
     explanationPractice:
-        'Mindfulness turns routine into compassion.',
-    quizPrompt: 'Samiti refers to:',
-    quizCorrect: 'Careful conduct to avoid harm',
-    quizWrong: 'Fast ritual chanting',
+        'Use regular family check-ins to review alignment and gently correct drift without blame.',
+    quizPrompt: 'In this chapter, strong Jain family culture is built through:',
+    quizCorrect:
+        'Early value alignment, clear commitments, and regular practice',
+    quizWrong: 'Reactive decisions without shared principles',
     nextLessonId: 'U01_L25',
   ),
   _LessonSeed(
     lessonId: 'U01_L25',
-    title: 'Tapas (Austerity)',
+    title: 'Self-Reflection, Meditation, and Mental Health',
     objectives: [
-      'Define tapas',
-      'Differentiate external and internal tapas',
-      'Use discipline wisely',
+      'Use meditation and reflection to regulate emotions',
+      'Understand neuroplasticity and habit rewiring',
+      'Approach mental health with compassion and responsibility',
     ],
-    warmupPrompt: 'Tapas are:',
-    warmupCorrect: 'Austerities and discipline',
-    warmupWrong: 'Luxury comforts',
+    warmupPrompt: 'Mental wellbeing in JWOL is supported by:',
+    warmupCorrect:
+        'Reflection, healthy routines, support systems, and mindful practices',
+    warmupWrong: 'Suppressing emotions and avoiding help',
     coreIdea:
-        'Tapas are disciplines that reduce attachment and ego.',
-    whyItMatters: 'They strengthen will and clarity.',
-    practiceTip: 'Try a simple fast or reduced indulgence.',
-    explanationKey: 'There are external and internal tapas.',
+        'These chapters connect Jain reflection practices with modern insights on mental fitness and neuroplasticity. Repeated habits, thought patterns, and intentional routines can reshape emotional resilience and behavioral outcomes.',
+    whyItMatters:
+        'Untreated stress and comparison loops can erode ethics, relationships, and self-control. Mental wellbeing is not separate from spiritual progress.',
+    practiceTip:
+        'Build a daily 3-step reset: breath practice, journaling one reflection, and one act of gratitude or forgiveness.',
+    explanationKey:
+        'The book emphasizes destigmatizing mental health care and combining spiritual discipline with professional support when needed.',
     explanationPractice:
-        'Use discipline for insight, not pride.',
-    quizPrompt: 'Tapas means:',
-    quizCorrect: 'Austerity and disciplined practice',
-    quizWrong: 'Entertainment and festivals',
+        'Treat emotional distress with honesty and compassion; seeking help is responsibility, not weakness.',
+    quizPrompt: 'A Jain-aligned mental health approach includes:',
+    quizCorrect: 'Mindful habits, compassion, and timely support',
+    quizWrong: 'Ignoring symptoms in silence',
     nextLessonId: 'U01_L26',
   ),
   _LessonSeed(
     lessonId: 'U01_L26',
-    title: 'Paryushan (Renewal)',
+    title: 'Guidance for Youth and Responsible Living',
     objectives: [
-      'Identify Paryushan as a Jain festival',
-      'Connect it with repentance',
-      'Practice forgiveness',
+      'Apply Jain values in school and social pressure contexts',
+      'Practice mindful purchasing and donation ethics',
+      'Align ambitions with integrity and compassion',
     ],
-    warmupPrompt: 'Paryushan is:',
-    warmupCorrect: 'A period of reflection and restraint',
-    warmupWrong: 'A harvest festival',
+    warmupPrompt: 'Jain guidance for students emphasizes:',
+    warmupCorrect:
+        'Character, discipline, and ethical decision-making in real-world situations',
+    warmupWrong: 'Academic success at any moral cost',
     coreIdea:
-        'Paryushan is a Jain festival focused on repentance and renewal.',
-    whyItMatters: 'It refreshes vows and relationships.',
-    practiceTip: 'Do pratikraman and ask forgiveness.',
+        'The guidance section gives practical frameworks for high school and young adults: peer pressure, identity, lifestyle choices, money habits, and purposeful giving. It emphasizes clarity before crisis.',
+    whyItMatters:
+        'Early adult decisions compound quickly. Values-based choices at this stage strongly influence future character and wellbeing.',
+    practiceTip:
+        'Before major decisions, list consequences for self, family, other beings, and long-term integrity.',
     explanationKey:
-        'Forgiveness is central: "Micchami Dukkadam".',
-    explanationPractice: 'Clear old resentments.',
-    quizPrompt: 'Paryushan emphasizes:',
-    quizCorrect: 'Reflection, fasting, and forgiveness',
-    quizWrong: 'Competitive sports',
+        'Responsible purchasing and thoughtful donation are presented as direct expressions of Aparigraha and Ahimsa.',
+    explanationPractice:
+        'Budget for giving and simplicity so generosity is planned behavior, not occasional emotion.',
+    quizPrompt: 'Youth guidance in this lesson focuses on:',
+    quizCorrect:
+        'Ethical clarity, disciplined choices, and responsible consumption',
+    quizWrong: 'Short-term approval and comparison',
     nextLessonId: 'U01_L27',
   ),
   _LessonSeed(
     lessonId: 'U01_L27',
-    title: 'Samayik (Equanimity)',
+    title: 'Workplace Excellence and Ethical Investing',
     objectives: [
-      'Define samayik',
-      'Connect it with calm awareness',
-      'Practice brief meditation',
+      'Apply Jain core values in professional environments',
+      'Practice non-violent communication and principled leadership',
+      'Evaluate investments through ethical impact',
     ],
-    warmupPrompt: 'Samayik is:',
-    warmupCorrect: 'A practice of equanimity',
-    warmupWrong: 'A business meeting',
+    warmupPrompt: 'A Jain approach to career success is:',
+    warmupCorrect:
+        'High performance aligned with compassion, integrity, and restraint',
+    warmupWrong: 'Results regardless of harm',
     coreIdea:
-        'Samayik is meditative equanimity, staying balanced.',
+        'The workplace chapters show how Jain values support leadership quality, trust, collaboration, and long-term credibility. Ethical investing extends this logic by aligning capital with non-harm and social responsibility.',
     whyItMatters:
-        'It trains the mind to stay calm amid change.',
+        'Professional influence and financial choices shape many lives. Values must travel with us into boardrooms, markets, and decision systems.',
     practiceTip:
-        'Sit quietly and observe thoughts without reacting.',
+        'Use an ethics screen for career and investment decisions: harm profile, transparency, fairness, and sustainability.',
     explanationKey:
-        'Equanimity reduces new karma binding.',
+        'The text frames Jain ethics as competitive strengths in complex professional environments, not obstacles to achievement.',
     explanationPractice:
-        'Consistency builds inner stability.',
-    quizPrompt: 'Samayik focuses on:',
-    quizCorrect: 'Equanimity and inner balance',
-    quizWrong: 'Public debates',
+        'Lead with clarity and empathy: protect people while solving problems decisively.',
+    quizPrompt: 'Ethical Jain professionalism combines:',
+    quizCorrect: 'Competence, compassion, and accountability',
+    quizWrong: 'Achievement detached from values',
     nextLessonId: 'U01_L28',
   ),
   _LessonSeed(
     lessonId: 'U01_L28',
-    title: 'Pratikraman (Self-Review)',
+    title: 'Forgiveness: Releasing Harm and Rebuilding Trust',
     objectives: [
-      'Define pratikraman',
-      'See how it reduces ego',
-      'Make a simple review habit',
+      'Understand forgiveness as strength, not weakness',
+      'Differentiate accountability from revenge',
+      'Practice apology, release, and relational repair',
     ],
-    warmupPrompt: 'Pratikraman is:',
-    warmupCorrect: 'Self-review and repentance',
-    warmupWrong: 'Celebrating victories',
+    warmupPrompt: 'Jain forgiveness primarily helps us:',
+    warmupCorrect: 'End cycles of resentment and restore inner freedom',
+    warmupWrong: 'Ignore wrongdoing without discernment',
     coreIdea:
-        'Pratikraman is a practice of reflecting and correcting mistakes.',
+        'The forgiveness chapter presents release as emotional non-violence that protects both inner health and social harmony. It includes asking forgiveness, granting forgiveness, and making behavioral correction.',
     whyItMatters:
-        'It prevents repetition and softens ego.',
-    practiceTip: 'Review the day and resolve to improve.',
+        'Resentment drains attention, hardens ego, and perpetuates conflict across families and communities. Forgiveness interrupts the violence cycle.',
+    practiceTip:
+        'Use a structured method: acknowledge harm, express remorse, make amends, and commit to changed behavior.',
     explanationKey:
-        'It includes confession, apology, and resolve.',
+        'Forgiveness in Jain thought coexists with truth and responsibility; it is not denial.',
     explanationPractice:
-        'Honest review reduces inner baggage.',
-    quizPrompt: 'Pratikraman is best described as:',
-    quizCorrect: 'Self-review with repentance',
-    quizWrong: 'A travel ceremony',
+        'Practice periodic reconciliation rituals to clear old emotional debt before it becomes identity.',
+    quizPrompt: 'In this lesson, forgiveness is:',
+    quizCorrect:
+        'A disciplined practice that releases resentment while honoring truth',
+    quizWrong: 'Passive acceptance of repeated harm',
     nextLessonId: 'U01_L29',
   ),
   _LessonSeed(
     lessonId: 'U01_L29',
-    title: 'Jain Cosmology (Loka)',
+    title: 'Life Events, Festivals, and the Art of Dying',
     objectives: [
-      'Identify Jain cosmology as a worldview',
-      'Know the universe is eternal',
-      'Keep focus on ethics',
+      'Align celebrations with Jain values',
+      'Understand major festivals as ethical renewal',
+      'Approach mortality with awareness and dignity',
     ],
-    warmupPrompt: 'Jain cosmology describes:',
-    warmupCorrect: 'The structure of the universe',
-    warmupWrong: 'Only one planet',
+    warmupPrompt: 'Jain festivals are most meaningful when they:',
+    warmupCorrect:
+        'Renew vows, humility, and compassion, not only social excitement',
+    warmupWrong: 'Focus only on display and consumption',
     coreIdea:
-        'Jain cosmology describes a universe with distinct realms and no creator god.',
+        'The life celebration chapters connect rituals, festivals, and major life transitions to inner transformation. They also discuss death awareness as preparation for peaceful detachment and value-centered living.',
     whyItMatters:
-        'It frames spiritual progress in a vast context.',
-    practiceTip: 'Focus on ethics rather than speculation.',
+        'When festivals lose ethical focus, they become performative. When linked to reflection and vows, they become engines of renewal.',
+    practiceTip:
+        'For each celebration, define one inner commitment, one family value action, and one compassion-based service act.',
     explanationKey:
-        'The loka is finite in shape but eternal in existence.',
+        'The art of dying is framed as the culmination of a life trained in awareness, restraint, gratitude, and non-attachment.',
     explanationPractice:
-        'Use cosmology as inspiration for humility.',
-    quizPrompt: 'Jain cosmology teaches that the universe is:',
-    quizCorrect: 'Eternal and structured in realms',
-    quizWrong: 'Created once and then ended',
+        'Discuss life values and end-of-life intentions openly in families to reduce fear and increase meaningful living now.',
+    quizPrompt: 'A Jain celebration is complete when it includes:',
+    quizCorrect: 'Ritual, reflection, and renewed ethical commitment',
+    quizWrong: 'Ritual without transformation',
     nextLessonId: 'U01_L30',
   ),
   _LessonSeed(
     lessonId: 'U01_L30',
-    title: 'Pancha Parameshti',
+    title: 'Equanimity, Pratikraman, and Lifelong Renewal',
     objectives: [
-      'Name the five supreme beings',
-      'Know their role in the path',
-      'Connect them to the Navkar Mantra',
+      'Practice equanimity under changing life conditions',
+      'Use Pratikraman as systematic self-correction',
+      'Create a long-term renewal plan for Jain living',
     ],
-    warmupPrompt: 'Pancha Parameshti refers to:',
-    warmupCorrect: 'Five supreme beings',
-    warmupWrong: 'Five elements',
+    warmupPrompt: 'Pratikraman is best understood as:',
+    warmupCorrect:
+        'Regular self-review, repentance, correction, and recommitment',
+    warmupWrong: 'A one-time ritual event',
     coreIdea:
-        'The five supreme beings are Arihant, Siddha, Acharya, Upadhyaya, and Sadhu.',
+        'The concluding chapters emphasize that Jain life is a cycle of awareness, lapse detection, repair, and recommitment. Equanimity (Samayik spirit) and Pratikraman keep the practitioner honest, humble, and steadily improving.',
     whyItMatters:
-        'They represent stages and roles on the path.',
-    practiceTip: 'Offer respect to the qualities they embody.',
+        'Without reflection and correction, values decay into identity language. Renewal practices maintain spiritual credibility over decades.',
+    practiceTip:
+        'Schedule weekly self-audit across speech, consumption, relationships, and intentions; identify one correction and one gratitude each cycle.',
     explanationKey:
-        'Navkar Mantra honors these five, not any one personality.',
+        'Lifelong practice depends on rhythm: reflection, forgiveness, discipline, and continuous learning from scriptures and lived experience.',
     explanationPractice:
-        'Use their qualities as personal ideals.',
-    quizPrompt: 'Pancha Parameshti are:',
-    quizCorrect: 'Arihant, Siddha, Acharya, Upadhyaya, Sadhu',
-    quizWrong: 'Earth, water, fire, air, space',
+        'Close each cycle with a clear next commitment so repentance becomes transformation, not repetition.',
+    quizPrompt: 'The purpose of regular Pratikraman is to:',
+    quizCorrect:
+        'Continuously purify conduct through honest review and correction',
+    quizWrong: 'Complete spirituality through ritual attendance alone',
     nextLessonId: 'U01_MASTER_TEST',
   ),
 ];
@@ -651,10 +723,6 @@ class Unit1Content {
     title: 'Foundations of Jainism',
     level: 'Beginner',
     lessons: [
-      _lesson1,
-      _lesson2,
-      _lesson3,
-      _lesson4,
       _lesson5,
       ..._generatedLessons,
       _masterTest,
@@ -687,13 +755,15 @@ class Unit1Content {
             label: 'Gaining power over others',
             isCorrect: false,
             feedbackCorrect: 'Correct.',
-            feedbackWrong: 'Not this. The focus is self-control and reducing harm.',
+            feedbackWrong:
+                'Not this. The focus is self-control and reducing harm.',
           ),
           Choice(
             choiceId: 'b',
             label: 'Non-violence and self-mastery',
             isCorrect: true,
-            feedbackCorrect: 'Correct. Jainism emphasizes non-violence and inner discipline.',
+            feedbackCorrect:
+                'Correct. Jainism emphasizes non-violence and inner discipline.',
             feedbackWrong: 'Incorrect.',
           ),
           Choice(
@@ -701,7 +771,8 @@ class Unit1Content {
             label: 'Winning arguments',
             isCorrect: false,
             feedbackCorrect: 'Correct.',
-            feedbackWrong: 'Not this. Jainism is more about choices and character than debate.',
+            feedbackWrong:
+                'Not this. Jainism is more about choices and character than debate.',
           ),
         ],
       ),
@@ -709,15 +780,18 @@ class Unit1Content {
         cards: [
           TextCard(
             title: 'What is Jainism?',
-            body: 'Jainism is a way of living that trains you to reduce harm, strengthen self-control, and become calmer and clearer in daily life.',
+            body:
+                'Jainism is a way of living that trains you to reduce harm, strengthen self-control, and become calmer and clearer in daily life.',
           ),
           TextCard(
             title: 'Who are Jinas?',
-            body: 'A Jina is someone who has conquered inner enemies like anger, ego, greed, and jealousy. The real victory is inside.',
+            body:
+                'A Jina is someone who has conquered inner enemies like anger, ego, greed, and jealousy. The real victory is inside.',
           ),
           TextCard(
             title: 'Key terms',
-            body: 'Jina: victor over inner enemies. Jinendra: respectful title linked to Jina. Tirthankara: a teacher who re-shows the path to liberation.',
+            body:
+                'Jina: victor over inner enemies. Jinendra: respectful title linked to Jina. Tirthankara: a teacher who re-shows the path to liberation.',
           ),
         ],
       ),
@@ -733,13 +807,17 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Core purpose',
-            body: 'The purpose is to reduce harm and attachment so the soul becomes clearer, like cleaning a foggy mirror.',
+            body:
+                'The purpose is to reduce harm and attachment so the soul becomes clearer, like cleaning a foggy mirror.',
           ),
           ExplanationSection(
             title: 'Ahimsa in real life',
-            body: 'Ahimsa is not only physical non-violence. It includes how we speak, how we react, and how we treat living beings and nature.',
-            scientificConnection: 'Pausing before reacting helps the brain\'s self-control systems engage, reducing impulsive behavior.',
-            realLifeAnalogy: 'A pause button before replying to an angry message.',
+            body:
+                'Ahimsa is not only physical non-violence. It includes how we speak, how we react, and how we treat living beings and nature.',
+            scientificConnection:
+                'Pausing before reacting helps the brain\'s self-control systems engage, reducing impulsive behavior.',
+            realLifeAnalogy:
+                'A pause button before replying to an angry message.',
           ),
         ],
       ),
@@ -761,7 +839,8 @@ class Unit1Content {
                 choiceId: 'b',
                 label: 'Conquers inner enemies',
                 isCorrect: true,
-                feedbackCorrect: 'That\'s right! A Jina conquers anger, ego, greed, and jealousy.',
+                feedbackCorrect:
+                    'That\'s right! A Jina conquers anger, ego, greed, and jealousy.',
                 feedbackWrong: '',
               ),
             ],
@@ -821,15 +900,18 @@ class Unit1Content {
         cards: [
           TextCard(
             title: 'Jiva vs Ajiva',
-            body: 'Jiva is living (has awareness). Ajiva is non-living (no awareness).',
+            body:
+                'Jiva is living (has awareness). Ajiva is non-living (no awareness).',
           ),
           TextCard(
             title: 'Consciousness',
-            body: 'Consciousness means experiencing and responding in some form.',
+            body:
+                'Consciousness means experiencing and responding in some form.',
           ),
           TextCard(
             title: '1-5 senses',
-            body: 'Living beings are grouped by senses, from 1-sense to 5-sense beings.',
+            body:
+                'Living beings are grouped by senses, from 1-sense to 5-sense beings.',
           ),
         ],
       ),
@@ -845,16 +927,19 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Living (Jiva)',
-            body: 'Humans, animals, insects, and plants are living because they have awareness.',
+            body:
+                'Humans, animals, insects, and plants are living because they have awareness.',
           ),
           ExplanationSection(
             title: 'Non-living (Ajiva)',
-            body: 'Objects lack awareness. Jain philosophy also discusses time and space as non-living categories.',
+            body:
+                'Objects lack awareness. Jain philosophy also discusses time and space as non-living categories.',
           ),
           ExplanationSection(
             title: 'Senses ladder',
             body: '1-sense: touch. 2: taste. 3: smell. 4: sight. 5: hearing.',
-            scientificConnection: 'In biology, living things respond to stimuli; non-living objects do not respond on their own.',
+            scientificConnection:
+                'In biology, living things respond to stimuli; non-living objects do not respond on their own.',
             realLifeAnalogy: 'Signal on vs signal off.',
           ),
         ],
@@ -870,7 +955,8 @@ class Unit1Content {
                 choiceId: 'a',
                 label: 'Living',
                 isCorrect: true,
-                feedbackCorrect: 'Right! Jiva means living or having consciousness.',
+                feedbackCorrect:
+                    'Right! Jiva means living or having consciousness.',
                 feedbackWrong: '',
               ),
               Choice(
@@ -933,11 +1019,13 @@ class Unit1Content {
           ),
           TextCard(
             title: 'Infinite qualities',
-            body: 'This means the soul has limitless potential for clarity, peace, and understanding when obstacles are removed.',
+            body:
+                'This means the soul has limitless potential for clarity, peace, and understanding when obstacles are removed.',
           ),
           TextCard(
             title: 'Why it feels limited',
-            body: 'Karma covers the soul like dust on a mirror or blur on a lens.',
+            body:
+                'Karma covers the soul like dust on a mirror or blur on a lens.',
           ),
         ],
       ),
@@ -953,13 +1041,17 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Eternal does not mean unchanging body',
-            body: 'The body changes like a costume; the soul is the experiencer.',
+            body:
+                'The body changes like a costume; the soul is the experiencer.',
           ),
           ExplanationSection(
             title: 'Why binding happens',
-            body: 'Karma binds more when actions are mixed with intense anger, ego, greed, or attachment.',
-            scientificConnection: 'Strong emotions can hijack decision-making; calm improves self-control.',
-            realLifeAnalogy: 'Clean lens vs dirty lens: same world, different clarity.',
+            body:
+                'Karma binds more when actions are mixed with intense anger, ego, greed, or attachment.',
+            scientificConnection:
+                'Strong emotions can hijack decision-making; calm improves self-control.',
+            realLifeAnalogy:
+                'Clean lens vs dirty lens: same world, different clarity.',
           ),
         ],
       ),
@@ -974,7 +1066,8 @@ class Unit1Content {
                 choiceId: 'a',
                 label: 'Eternal',
                 isCorrect: true,
-                feedbackCorrect: 'Right! The soul is eternal in Jain philosophy.',
+                feedbackCorrect:
+                    'Right! The soul is eternal in Jain philosophy.',
                 feedbackWrong: '',
               ),
               Choice(
@@ -982,7 +1075,8 @@ class Unit1Content {
                 label: 'Temporary',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'The soul is eternal, only the body is temporary.',
+                feedbackWrong:
+                    'The soul is eternal, only the body is temporary.',
               ),
             ],
           ),
@@ -1037,11 +1131,13 @@ class Unit1Content {
           ),
           TextCard(
             title: 'How it binds',
-            body: 'Actions plus intense emotion create stronger binding, like glue.',
+            body:
+                'Actions plus intense emotion create stronger binding, like glue.',
           ),
           TextCard(
             title: 'States',
-            body: 'Calm awareness supports a cleaner state; anger and attachment support a stickier state.',
+            body:
+                'Calm awareness supports a cleaner state; anger and attachment support a stickier state.',
           ),
         ],
       ),
@@ -1057,13 +1153,16 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Emotion as glue',
-            body: 'The same action can bind differently depending on the emotion behind it.',
-            scientificConnection: 'Stress increases impulsive reactions; calm reduces harmful choices.',
+            body:
+                'The same action can bind differently depending on the emotion behind it.',
+            scientificConnection:
+                'Stress increases impulsive reactions; calm reduces harmful choices.',
             realLifeAnalogy: 'Dust sticks more to wet hands than dry hands.',
           ),
           ExplanationSection(
             title: 'Pure vs impure states',
-            body: 'Pure state: more awareness and less attachment. Impure state: more anger, ego, and craving.',
+            body:
+                'Pure state: more awareness and less attachment. Impure state: more anger, ego, and craving.',
           ),
         ],
       ),
@@ -1086,7 +1185,8 @@ class Unit1Content {
                 label: 'Random luck',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'Karma is not random. It follows cause and effect.',
+                feedbackWrong:
+                    'Karma is not random. It follows cause and effect.',
               ),
             ],
           ),
@@ -1122,13 +1222,15 @@ class Unit1Content {
             label: 'A warrior-king',
             isCorrect: false,
             feedbackCorrect: 'Correct.',
-            feedbackWrong: 'Not quite. Tirthankaras are teachers, not conquerors.',
+            feedbackWrong:
+                'Not quite. Tirthankaras are teachers, not conquerors.',
           ),
           Choice(
             choiceId: 'b',
             label: 'A path-maker who teaches liberation',
             isCorrect: true,
-            feedbackCorrect: 'Correct. A Tirthankara re-shows the path to liberation.',
+            feedbackCorrect:
+                'Correct. A Tirthankara re-shows the path to liberation.',
             feedbackWrong: 'Incorrect.',
           ),
         ],
@@ -1137,15 +1239,18 @@ class Unit1Content {
         cards: [
           TextCard(
             title: 'Who are they?',
-            body: 'Tirthankaras are teachers who re-open the path to liberation in each time cycle.',
+            body:
+                'Tirthankaras are teachers who re-open the path to liberation in each time cycle.',
           ),
           TextCard(
             title: 'Why the name?',
-            body: 'Tirtha means a crossing. They help souls cross from suffering to freedom.',
+            body:
+                'Tirtha means a crossing. They help souls cross from suffering to freedom.',
           ),
           TextCard(
             title: 'Key examples',
-            body: 'Rishabhanatha (first), Parshvanatha, and Mahavira (24th) are well-known.',
+            body:
+                'Rishabhanatha (first), Parshvanatha, and Mahavira (24th) are well-known.',
           ),
         ],
       ),
@@ -1161,11 +1266,13 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Path-makers',
-            body: 'They rediscover and teach the Jain path when it is forgotten.',
+            body:
+                'They rediscover and teach the Jain path when it is forgotten.',
           ),
           ExplanationSection(
             title: 'Why 24?',
-            body: 'In this time cycle, 24 Tirthankaras are described, each renewing the teachings.',
+            body:
+                'In this time cycle, 24 Tirthankaras are described, each renewing the teachings.',
           ),
         ],
       ),
@@ -1338,7 +1445,8 @@ class Unit1Content {
         cards: [
           TextCard(
             title: 'Mixed Review',
-            body: 'This quiz blends questions from every course in Unit 1.',
+            body:
+                'This quiz reviews core ideas from the full Jain Way of Life curriculum in Unit 1.',
           ),
         ],
       ),
@@ -1354,7 +1462,8 @@ class Unit1Content {
         sections: [
           ExplanationSection(
             title: 'Focus on clarity',
-            body: 'Answer slowly and carefully. This is a summary of your progress.',
+            body:
+                'Answer slowly and carefully. This is a summary of your progress.',
           ),
         ],
       ),
@@ -1363,105 +1472,114 @@ class Unit1Content {
           QuizQuestion(
             questionId: 'U01_MT_q1',
             format: QuestionFormat.multipleChoice,
-            prompt: 'A Jina is someone who:',
+            prompt: 'The Jain AAA framework stands for:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Conquers inner enemies',
+                label: 'Ahimsa, Anekantvad, and Aparigraha',
                 isCorrect: true,
-                feedbackCorrect: 'Correct! Inner victory is the key.',
+                feedbackCorrect:
+                    'Correct! These three values anchor the Jain Way of Life.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'Wins arguments',
+                label: 'Authority, austerity, and argument',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'Not quite. Jainism focuses on inner discipline.',
+                feedbackWrong:
+                    'Not quite. The core is Ahimsa, Anekantvad, and Aparigraha.',
               ),
             ],
           ),
           QuizQuestion(
             questionId: 'U01_MT_q2',
             format: QuestionFormat.multipleChoice,
-            prompt: 'Jiva means:',
+            prompt: 'A complete practice of Ahimsa includes:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Living',
+                label: 'Thought, speech, action, and lifestyle impact',
                 isCorrect: true,
-                feedbackCorrect: 'Right! Jiva is living.',
+                feedbackCorrect:
+                    'Right! Ahimsa must be practiced at all these levels.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'Non-living',
+                label: 'Only avoiding physical fights',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'That\'s Ajiva.',
+                feedbackWrong:
+                    'Too narrow. Ahimsa is broader than physical restraint.',
               ),
             ],
           ),
           QuizQuestion(
             questionId: 'U01_MT_q3',
             format: QuestionFormat.multipleChoice,
-            prompt: 'The soul is described as:',
+            prompt: 'Anekantvad encourages us to:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Eternal',
+                label: 'Recognize partial perspectives and seek fuller truth',
                 isCorrect: true,
-                feedbackCorrect: 'Correct! The soul is eternal.',
+                feedbackCorrect:
+                    'Correct! Anekantvad builds humility and many-sided understanding.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'Temporary',
+                label: 'Reject all viewpoints except our own',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'The soul is eternal; the body changes.',
+                feedbackWrong: 'That approach increases dogmatism, not wisdom.',
               ),
             ],
           ),
           QuizQuestion(
             questionId: 'U01_MT_q4',
             format: QuestionFormat.multipleChoice,
-            prompt: 'Karma is best described as:',
+            prompt: 'Aparigraha primarily develops:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Subtle matter that can attach',
+                label: 'Contentment and freedom from compulsive attachment',
                 isCorrect: true,
-                feedbackCorrect: 'Correct! Karma is pudgal.',
+                feedbackCorrect:
+                    'Correct! Aparigraha reduces clinging and comparison.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'Random luck',
+                label: 'Status through accumulation',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'Not in Jain philosophy.',
+                feedbackWrong:
+                    'Not this. Aparigraha asks for restraint and simplicity.',
               ),
             ],
           ),
           QuizQuestion(
             questionId: 'U01_MT_q5',
             format: QuestionFormat.multipleChoice,
-            prompt: 'A Tirthankara is a:',
+            prompt: 'The purpose of Pratikraman is to:',
             choices: [
               Choice(
                 choiceId: 'a',
-                label: 'Path-maker who teaches liberation',
+                label: 'Review, repent, correct, and recommit',
                 isCorrect: true,
-                feedbackCorrect: 'Correct! They re-show the path.',
+                feedbackCorrect:
+                    'Correct! Pratikraman turns reflection into correction.',
                 feedbackWrong: '',
               ),
               Choice(
                 choiceId: 'b',
-                label: 'Warrior-king',
+                label: 'Finish spiritual growth in one ritual',
                 isCorrect: false,
                 feedbackCorrect: '',
-                feedbackWrong: 'Not this. Their role is spiritual teaching.',
+                feedbackWrong:
+                    'Not quite. It is a continuous renewal practice, not a one-time completion.',
               ),
             ],
           ),
@@ -1518,4 +1636,3 @@ class Unit1Content {
     ),
   ];
 }
-

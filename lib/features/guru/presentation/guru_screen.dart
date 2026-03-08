@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/tr_text.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../providers/guru_provider.dart';
@@ -79,8 +81,8 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                     width: 32,
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Ask Guru',
+                  TrText(
+                    context.t('ask_guru'),
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge
@@ -133,7 +135,7 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                             horizontal: AppSpacing.md,
                             vertical: AppSpacing.sm,
                           ),
-                          child: Text(
+                          child: TrText(
                             question,
                             style: Theme.of(context).textTheme.labelLarge,
                           ),
@@ -179,8 +181,8 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                         maxLines: 4,
                         textInputAction: TextInputAction.send,
                         onSubmitted: (_) => _sendMessage(),
-                        decoration: const InputDecoration(
-                          hintText: 'Type your question...',
+                        decoration: InputDecoration(
+                          hintText: context.t('type_question'),
                           border: InputBorder.none,
                         ),
                       ),
@@ -230,7 +232,7 @@ class _ChatBubble extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.card),
             border: Border.all(color: borderColor),
           ),
-          child: Text(
+          child: TrText(
             message.text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: message.isError ? AppColors.danger : scheme.onSurface,

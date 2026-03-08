@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/liquid_glass.dart';
+import '../../../../core/widgets/tr_text.dart';
 
 class QuizScreenWidget extends StatefulWidget {
   final QuizScreen screen;
@@ -152,7 +154,13 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Question ${widget.currentQuestionIndex + 1} of ${widget.screen.questions.length}',
+                            context.t(
+                              'question_of',
+                              args: {
+                                'current': '${widget.currentQuestionIndex + 1}',
+                                'total': '${widget.screen.questions.length}',
+                              },
+                            ),
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ],
@@ -179,7 +187,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: GlassCard(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Text(
+                  child: TrText(
                     question.prompt,
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
@@ -215,14 +223,14 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                     ? GradientButton(
                         label: widget.currentQuestionIndex >=
                                 widget.screen.questions.length - 1
-                            ? 'Complete Quiz'
-                            : 'Next Question',
+                            ? context.t('complete_quiz')
+                            : context.t('next_question'),
                         icon: Icons.arrow_forward_rounded,
                         onPressed: _continueToNext,
                         width: double.infinity,
                       )
                     : GradientButton(
-                        label: 'Check Answer',
+                        label: context.t('check_answer'),
                         icon: Icons.check_rounded,
                         onPressed:
                             selectedChoiceId != null ? _checkAnswer : null,
@@ -240,14 +248,14 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
     return Column(
       children: [
         _TrueFalseButton(
-          label: 'True',
+          label: context.t('true_label'),
           isSelected: selectedChoiceId == 'true',
           state: _getTrueFalseState('true', question),
           onTap: showFeedback ? null : () => _selectChoice('true'),
         ),
         const SizedBox(height: AppSpacing.md),
         _TrueFalseButton(
-          label: 'False',
+          label: context.t('false_label'),
           isSelected: selectedChoiceId == 'false',
           state: _getTrueFalseState('false', question),
           onTap: showFeedback ? null : () => _selectChoice('false'),
@@ -314,8 +322,15 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
 
     if (question.format == QuestionFormat.trueFalse) {
       feedbackMessage = isCorrectAnswer == true
-          ? 'That\'s right!'
-          : 'The correct answer is ${question.answerKey}.';
+          ? context.t('thats_right')
+          : context.t(
+              'correct_answer_is',
+              args: {
+                'answer': question.answerKey == 'true'
+                    ? context.t('true_label')
+                    : context.t('false_label'),
+              },
+            );
     } else {
       final selectedChoice = question.choices?.firstWhere(
         (c) => c.choiceId == selectedChoiceId,
@@ -402,7 +417,7 @@ class _OptionTile extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: Text(
+              child: TrText(
                 label,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: textColor,
@@ -479,7 +494,7 @@ class _TrueFalseButton extends StatelessWidget {
               Icon(icon, color: textColor, size: 24),
               const SizedBox(width: AppSpacing.sm),
             ],
-            Text(
+            TrText(
               label,
               style: TextStyle(
                 fontSize: 18,

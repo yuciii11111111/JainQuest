@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_language.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/widgets/glass_card.dart';
@@ -35,6 +37,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     '🦚',
   ];
   String? _selectedEmoji;
+  AppLanguage _selectedLanguage = AppLanguage.english;
   bool _isLoading = false;
 
   @override
@@ -45,6 +48,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       _nameController.text = user.displayName ?? '';
       _ageController.text = user.age?.toString() ?? '';
       _selectedEmoji = user.avatarEmoji;
+      _selectedLanguage = AppLanguage.fromCode(user.preferredLanguageCode);
       setState(() {});
     });
   }
@@ -60,8 +64,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     final displayName = _nameController.text.trim();
     if (displayName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your name'),
+        SnackBar(
+          content: Text(context.t('please_enter_name')),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -72,8 +76,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     final ageValue = int.tryParse(_ageController.text.trim());
     if (ageValue == null || ageValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid age'),
+        SnackBar(
+          content: Text(context.t('please_enter_valid_age')),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -89,6 +93,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         displayName: displayName,
         age: ageValue,
         avatarEmoji: _selectedEmoji ?? user.avatarEmoji,
+        preferredLanguageCode: _selectedLanguage.code,
       );
       await StorageService.saveUserProfile(updatedUser);
       ref.read(userProfileProvider.notifier).refresh();
@@ -98,7 +103,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Profile setup complete, ${updatedUser.displayName ?? "Learner"}!'),
+                context.t(
+                  'profile_setup_complete',
+                  args: {'name': updatedUser.displayName ?? 'Learner'},
+                ),
+              ),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 3),
@@ -115,8 +124,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to save profile. Please try again.'),
+          SnackBar(
+            content: Text(context.t('failed_to_save_profile')),
             backgroundColor: AppColors.danger,
             behavior: SnackBarBehavior.floating,
           ),
@@ -178,8 +187,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         // Title
                         Text(
                           widget.isFirstTime
-                              ? 'Set Up Your Profile'
-                              : 'Update Profile',
+                              ? context.t('set_up_profile')
+                              : context.t('update_profile'),
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium
@@ -192,7 +201,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         const SizedBox(height: AppSpacing.sm),
 
                         Text(
-                          'Let\'s personalize your learning journey',
+                          context.t('personalize_learning'),
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: scheme.onSurfaceVariant,
@@ -203,7 +212,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         const SizedBox(height: AppSpacing.xl),
 
                         Text(
-                          'Choose your avatar',
+                          context.t('choose_avatar'),
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -255,13 +264,56 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         ),
                         const SizedBox(height: AppSpacing.xl),
 
+                        const SizedBox(height: AppSpacing.lg),
+
+                        DropdownButtonFormField<AppLanguage>(
+                          value: _selectedLanguage,
+                          decoration: InputDecoration(
+                            labelText: context.t('preferred_language'),
+                            prefixIcon: const Icon(Icons.language_rounded),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: BorderSide(color: scheme.outline),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: BorderSide(color: scheme.outline),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.button),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 2),
+                            ),
+                            filled: true,
+                            fillColor: scheme.surface,
+                          ),
+                          items: AppLanguage.values
+                              .map(
+                                (language) => DropdownMenuItem<AppLanguage>(
+                                  value: language,
+                                  child: Text(language.nativeName),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (language) {
+                            if (language != null) {
+                              setState(() => _selectedLanguage = language);
+                            }
+                          },
+                        ),
+
+                        const SizedBox(height: AppSpacing.md),
+
                         TextField(
                           controller: _nameController,
                           textCapitalization: TextCapitalization.words,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'What should we call you?',
-                            hintText: 'Enter your name',
+                            labelText: context.t('what_call_you'),
+                            hintText: context.t('enter_name'),
                             prefixIcon: const Icon(Icons.person_rounded),
                             border: OutlineInputBorder(
                               borderRadius:
@@ -292,8 +344,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           controller: _ageController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            labelText: 'How old are you?',
-                            hintText: 'Enter your age',
+                            labelText: context.t('how_old'),
+                            hintText: context.t('enter_age'),
                             prefixIcon: const Icon(Icons.cake_rounded),
                             border: OutlineInputBorder(
                               borderRadius:
@@ -321,7 +373,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                         // Save Button
                         GradientButton(
-                          label: widget.isFirstTime ? 'Get Started' : 'Save',
+                          label: widget.isFirstTime
+                              ? context.t('get_started')
+                              : context.t('save'),
                           icon: Icons.check_rounded,
                           onPressed: _isLoading ? null : _saveProfile,
                           isLoading: _isLoading,
@@ -333,7 +387,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
                             child: Text(
-                              'Back',
+                              context.t('back'),
                               style: TextStyle(color: scheme.onSurfaceVariant),
                             ),
                           ),

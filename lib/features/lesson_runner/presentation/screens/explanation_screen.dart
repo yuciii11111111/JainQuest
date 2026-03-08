@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
-import '../../../../core/widgets/typewriter_sequence.dart';
+import '../../../../core/widgets/tr_text.dart';
 
 class ExplanationScreenWidget extends StatelessWidget {
   final ExplanationScreen screen;
@@ -46,12 +47,12 @@ class ExplanationScreenWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Deep Dive',
+                            context.t('deep_dive'),
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Explore the concepts in detail',
+                            context.t('explore_concepts'),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -85,7 +86,7 @@ class ExplanationScreenWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: PrimaryButton(
-              label: 'Continue to Quiz',
+              label: context.t('continue_to_quiz'),
               icon: Icons.arrow_forward_rounded,
               onPressed: onContinue,
             ),
@@ -118,20 +119,19 @@ class _ExplanationSectionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TypewriterSequence(
-                  gap: AppSpacing.md,
-                  items: [
-                    TypewriterSequenceItem(
-                      text: section.title,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TrText(
+                      section.title,
                       style: Theme.of(context).textTheme.headlineSmall,
-                      speed: const Duration(milliseconds: 16),
                     ),
-                    TypewriterSequenceItem(
-                      text: section.body,
+                    const SizedBox(height: AppSpacing.md),
+                    TrText(
+                      section.body,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             height: 1.6,
                           ),
-                      speed: const Duration(milliseconds: 12),
                     ),
                   ],
                 ),
@@ -143,7 +143,7 @@ class _ExplanationSectionCard extends StatelessWidget {
           if (section.scientificConnection != null)
             _InfoBox(
               icon: Icons.science_rounded,
-              title: 'Science Connection',
+              title: context.t('science_connection'),
               content: section.scientificConnection!,
               color: Colors.blue,
             ),
@@ -152,11 +152,10 @@ class _ExplanationSectionCard extends StatelessWidget {
           if (section.realLifeAnalogy != null)
             _InfoBox(
               icon: Icons.emoji_objects_rounded,
-              title: 'Real-Life Analogy',
+              title: context.t('real_life_analogy'),
               content: section.realLifeAnalogy!,
               color: AppColors.secondary,
             ),
-
         ],
       ),
     );
@@ -209,7 +208,7 @@ class _InfoBox extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                TrText(
                   content,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 1.5,
