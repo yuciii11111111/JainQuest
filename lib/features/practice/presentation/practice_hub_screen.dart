@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/widgets/common_widgets.dart';
 import 'practice_session_screen.dart';
 
@@ -86,11 +87,7 @@ class PracticeHubScreen extends ConsumerWidget {
                 rewards: const ['Earn XP', 'Refill hearts'],
                 onTap: () {
                   ref.read(practiceProvider.notifier).startPractice(PracticeMode.review);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const PracticeSessionScreen(),
-                    ),
-                  );
+                  Navigator.of(context).pushUltraSmooth(const PracticeSessionScreen());
                 },
               ),
               const SizedBox(height: AppSpacing.md),
@@ -103,11 +100,7 @@ class PracticeHubScreen extends ConsumerWidget {
                 rewards: const ['Improve accuracy', 'Refill hearts'],
                 onTap: () {
                   ref.read(practiceProvider.notifier).startPractice(PracticeMode.targetWeakSpots);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const PracticeSessionScreen(),
-                    ),
-                  );
+                  Navigator.of(context).pushUltraSmooth(const PracticeSessionScreen());
                 },
               ),
             ],

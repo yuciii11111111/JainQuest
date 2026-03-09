@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../profile/presentation/profile_setup_screen.dart';
@@ -31,8 +32,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const CreateAccountScreen()),
+    Navigator.of(context).pushAndRemoveUntilUltraSmooth(
+      const CreateAccountScreen(),
       (route) => false,
     );
   }
@@ -70,10 +71,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: const Icon(Icons.settings_rounded),
                       color: scheme.onSurfaceVariant,
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => const SettingsScreen()),
-                        );
+                        Navigator.of(context).pushUltraSmooth(const SettingsScreen());
                       },
                       tooltip: 'Settings',
                     ),
@@ -117,12 +115,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               heroTag: 'editProfile',
                               backgroundColor: AppColors.primary,
                               onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProfileSetupScreen(
-                                            isFirstTime: false),
-                                  ),
+                                Navigator.of(context).pushUltraSmooth(
+                                  const ProfileSetupScreen(isFirstTime: false),
                                 );
                               },
                               child: const Icon(Icons.edit_rounded, size: 18),

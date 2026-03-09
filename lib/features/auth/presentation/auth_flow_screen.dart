@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/models/user_models.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
@@ -214,19 +215,15 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   Future<void> _continueAfterWelcome() async {
     if (!mounted) return;
     if (_needsProfileSetup) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const ProfileSetupScreen(isFirstTime: true),
-        ),
+      Navigator.of(context).pushAndRemoveUntilUltraSmooth(
+        const ProfileSetupScreen(isFirstTime: true),
         (route) => false,
       );
       return;
     }
 
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(showTutorialOnLoad: _isSignUp),
-      ),
+    Navigator.of(context).pushAndRemoveUntilUltraSmooth(
+      HomeScreen(showTutorialOnLoad: _isSignUp),
       (route) => false,
     );
   }

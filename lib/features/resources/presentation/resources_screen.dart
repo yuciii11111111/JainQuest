@@ -2,6 +2,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
@@ -105,10 +106,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       label: 'Start Reading',
                       icon: Icons.auto_stories_rounded,
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => const ReadingScreen()),
-                        );
+                        Navigator.of(context).pushUltraSmooth(const ReadingScreen());
                       },
                       width: double.infinity,
                     ),
@@ -230,8 +228,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 icon: Icons.auto_stories_rounded,
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ReadingScreen()));
+                  Navigator.of(context).pushUltraSmooth(const ReadingScreen());
                 },
                 width: double.infinity,
               ),

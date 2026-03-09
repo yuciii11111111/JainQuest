@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/providers/app_providers.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/widgets/animated_gradient_background.dart';
 import '../../../core/widgets/liquid_glass.dart';
@@ -96,9 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        _buildFadeRoute(const LoginScreen()),
-      );
+      Navigator.of(context).pushReplacementUltraSmooth(const LoginScreen());
       return;
     }
 
@@ -108,20 +107,7 @@ class _SplashScreenState extends State<SplashScreen>
     container.read(userProfileProvider.notifier).refresh();
     container.read(progressProvider.notifier).refresh();
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      _buildFadeRoute(const HomeScreen()),
-    );
-  }
-
-  PageRouteBuilder<void> _buildFadeRoute(Widget screen) {
-    return PageRouteBuilder<void>(
-      pageBuilder: (_, __, ___) => screen,
-      transitionsBuilder: (_, animation, __, child) => FadeTransition(
-        opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-        child: child,
-      ),
-      transitionDuration: const Duration(milliseconds: 500),
-    );
+    Navigator.of(context).pushReplacementUltraSmooth(const HomeScreen());
   }
 
   @override

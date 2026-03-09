@@ -13,6 +13,7 @@ import '../../../core/providers/theme_provider.dart';
 import '../../../core/models/user_models.dart';
 import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../profile/presentation/profile_screen.dart' show ProfileScreen;
 import '../../guru/presentation/guru_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
@@ -85,9 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onShowGuide: _showTutorial,
             onLessonTap: (lesson) {
               ref.read(lessonRunnerProvider.notifier).startLesson(lesson);
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const LessonRunnerScreen()),
-              );
+              Navigator.of(context).pushUltraSmooth(const LessonRunnerScreen());
             },
           ),
           const ResourcesScreen(),
@@ -332,9 +331,7 @@ class _HomeTab extends StatelessWidget {
                 _GlassActionIcon(
                   icon: Icons.settings_rounded,
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                    );
+                    Navigator.of(context).pushUltraSmooth(const SettingsScreen());
                   },
                 ),
               ],
@@ -551,9 +548,7 @@ class _HomeTab extends StatelessWidget {
                   child: FloatingCard(
                     height: 50,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const UnitPathScreen()),
-                      );
+                      Navigator.of(context).pushUltraSmooth(const UnitPathScreen());
                     },
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,

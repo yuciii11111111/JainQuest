@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/localization/app_language.dart';
 import '../../../core/localization/app_strings.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/widgets/glass_card.dart';
@@ -115,9 +116,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           );
         }
 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-              builder: (_) => const HomeScreen(showTutorialOnLoad: true)),
+        Navigator.of(context).pushAndRemoveUntilUltraSmooth(
+          const HomeScreen(showTutorialOnLoad: true),
           (route) => false,
         );
       }

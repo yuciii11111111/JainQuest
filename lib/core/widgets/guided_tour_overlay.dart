@@ -47,7 +47,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       if (navigator == null) {
         return;
       }
-      navigator.push(MaterialPageRoute(builder: (_) => page));
+      navigator.pushUltraSmooth(page);
     }
 
     void setHomeTab(int index) {

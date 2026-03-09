@@ -8,6 +8,7 @@ import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
+import '../../../core/navigation/app_navigator.dart';
 import '../../lesson_runner/presentation/lesson_runner_screen.dart';
 
 class UnitPathScreen extends ConsumerStatefulWidget {
@@ -147,9 +148,7 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                       onTap: progress.isLessonUnlocked(unit.lessons[i].lessonId)
                           ? () {
                               ref.read(lessonRunnerProvider.notifier).startLesson(unit.lessons[i]);
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const LessonRunnerScreen()),
-                              );
+                              Navigator.of(context).pushUltraSmooth(const LessonRunnerScreen());
                             }
                           : null,
                     ),
