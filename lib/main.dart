@@ -10,9 +10,8 @@ import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/providers/theme_provider.dart';
-import 'core/widgets/animated_gradient_background.dart';
-import 'core/widgets/video_background.dart';
 import 'core/widgets/guided_tour_overlay.dart';
+import 'core/widgets/wave_background.dart';
 import 'core/navigation/app_navigator.dart';
 import 'features/splash/presentation/splash_screen.dart';
 import 'core/localization/language_provider.dart';
@@ -86,15 +85,34 @@ class JainQuestApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       builder: (context, child) {
-        return VideoBackground(
-          child: AnimatedGradientBackground(
-            child: Stack(
-              children: [
-                child ?? const SizedBox.shrink(),
-                const GuidedTourOverlay(),
-              ],
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            const WaveBackground(
+              strokeColor: Color(0xD9FFFFFF),
+              backgroundColor: Color(0xFF000000),
+              pointerColor: Color(0xFFFFFFFF),
+              pointerSize: 8,
+              lineSpacingX: 12,
+              lineSpacingY: 12,
             ),
-          ),
+            IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.12),
+                      Colors.black.withValues(alpha: 0.5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            child ?? const SizedBox.shrink(),
+            const GuidedTourOverlay(),
+          ],
         );
       },
       home: const SplashScreen(),

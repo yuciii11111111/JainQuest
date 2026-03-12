@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/services/storage_service.dart';
-import '../../../core/widgets/animated_gradient_background.dart';
 import '../../../core/widgets/liquid_glass.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../home/presentation/home_screen.dart';
@@ -24,7 +23,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   static const Duration _writeDuration = Duration(milliseconds: 3200);
-  static const Duration _holdAfterWrite = Duration(milliseconds: 1400);
   static const int _languageCycleMilliseconds = 3200 + 1400;
   static const Duration _languageCycleDuration = Duration(
     milliseconds: _languageCycleMilliseconds,
@@ -120,25 +118,31 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedGradientBackground(
-        forceDark: true,
-        initialCycleDelay: const Duration(milliseconds: 700),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 360),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                child: _BrandReveal(
-                  key: ValueKey('brand_reveal_$_languageIndex'),
-                  animationController: _animationController,
-                  writeAnimation: _writeAnimation,
-                  message: _languageMessages[_languageIndex],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 360),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      child: _BrandReveal(
+                        key: ValueKey('brand_reveal_$_languageIndex'),
+                        animationController: _animationController,
+                        writeAnimation: _writeAnimation,
+                        message: _languageMessages[_languageIndex],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

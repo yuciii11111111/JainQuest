@@ -114,7 +114,7 @@ class _LessonCompleteScreenWidgetState
                             const SizedBox(width: AppSpacing.xs),
                             Text(
                               context.t('perfect_score_bonus'),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
