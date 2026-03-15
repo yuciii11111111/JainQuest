@@ -8,6 +8,7 @@ import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/typewriter_sequence.dart';
 import '../../resources/data/resource_data.dart';
 import 'reading_screen.dart';
+import '../../../core/localization/app_strings.dart';
 
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
@@ -20,29 +21,23 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
   static const List<_QuickGuide> _quickGuides = [
     _QuickGuide(
       id: 'ahimsa_daily_life',
-      title: 'Ahimsa in Daily Life',
-      description:
-          'A simple checklist for practicing non-violence in speech, thought, and action.',
-      body:
-          'Pause before you speak. Swap harsh words with kindness. Choose plant-based meals today. Notice tiny lives around you.',
+      titleKey: 'guide_ahimsa_title',
+      descriptionKey: 'guide_ahimsa_desc',
+      bodyKey: 'guide_ahimsa_body',
       icon: Icons.spa_rounded,
     ),
     _QuickGuide(
       id: 'jiva_vs_ajiva',
-      title: 'Jiva vs Ajiva',
-      description:
-          'A quick way to spot living vs non-living using the senses ladder.',
-      body:
-          'Living beings sense, breathe, and move in subtle ways. Ajiva is matter and time - supporting life but not alive.',
+      titleKey: 'guide_jiva_title',
+      descriptionKey: 'guide_jiva_desc',
+      bodyKey: 'guide_jiva_body',
       icon: Icons.bubble_chart_rounded,
     ),
     _QuickGuide(
       id: 'karma_and_emotion',
-      title: 'Karma & Emotion',
-      description:
-          'How emotions affect karmic binding and how to slow the chain.',
-      body:
-          'Strong emotions bind karma quickly. Slow down with breath, gratitude, and gentle speech.',
+      titleKey: 'guide_karma_title',
+      descriptionKey: 'guide_karma_desc',
+      bodyKey: 'guide_karma_body',
       icon: Icons.bolt_rounded,
     ),
   ];
@@ -70,7 +65,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 gap: AppSpacing.xs,
                 items: [
                   TypewriterSequenceItem(
-                    text: 'Resources',
+                    text: context.t('resources_header'),
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                           fontWeight: FontWeight.w900,
                         ),
@@ -78,7 +73,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                   ),
                   TypewriterSequenceItem(
                     text:
-                        'Read a knowledgeable book teaching the fundamentals of Jainism in great depth.',
+                        context.t('resources_desc'),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: onSurface.withOpacityValue(0.7),
                         ),
@@ -93,17 +88,17 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'FundJain Reader',
+                      context.t('fundjain_reader'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Immersive reading with adjustable font, themes, and animated page turns.',
+                      context.t('reader_desc'),
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     GradientButton(
-                      label: 'Start Reading',
+                      label: context.t('start_reading'),
                       icon: Icons.auto_stories_rounded,
                       onPressed: () {
                         Navigator.of(context).pushUltraSmooth(const ReadingScreen());
@@ -114,7 +109,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Quick Guides',
+              Text(context.t('quick_guides'),
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               ..._quickGuides.asMap().entries.map((entry) {
@@ -126,8 +121,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                         index == _quickGuides.length - 1 ? 0 : AppSpacing.md,
                   ),
                   child: _ResourceTile(
-                    title: guide.title,
-                    description: guide.description,
+                    title: context.t(guide.titleKey),
+                    description: context.t(guide.descriptionKey),
                     icon: guide.icon,
                     isCompleted: _guideCompletions[guide.id] ?? false,
                     onTap: () => _openGuide(guide),
@@ -136,7 +131,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               }),
               const SizedBox(height: AppSpacing.xl),
               const SizedBox(height: AppSpacing.lg),
-              Text('Video Library',
+              Text(context.t('video_library'),
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               ...ResourceData.categories.map((category) {
@@ -173,7 +168,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               Row(
                 children: [
                   Text(
-                    guide.title,
+                    context.t(guide.titleKey),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const Spacer(),
@@ -185,7 +180,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                guide.body,
+                context.t(guide.bodyKey),
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
@@ -209,7 +204,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                           size: 16, color: Colors.green),
                       const SizedBox(width: 6),
                       Text(
-                        'Completed',
+                        context.t('completed'),
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                     ],
@@ -220,11 +215,11 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 OutlinedButton.icon(
                   onPressed: () => Navigator.of(context).pop(true),
                   icon: const Icon(Icons.check_circle_outline_rounded),
-                  label: const Text('Mark as Completed'),
+                  label: Text(context.t('mark_completed')),
                 ),
               if (!isCompleted) const SizedBox(height: AppSpacing.sm),
               GradientButton(
-                label: 'Open Reader',
+                label: context.t('open_reader'),
                 icon: Icons.auto_stories_rounded,
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -249,16 +244,16 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
 
 class _QuickGuide {
   final String id;
-  final String title;
-  final String description;
-  final String body;
+  final String titleKey;
+  final String descriptionKey;
+  final String bodyKey;
   final IconData icon;
 
   const _QuickGuide({
     required this.id,
-    required this.title,
-    required this.description,
-    required this.body,
+    required this.titleKey,
+    required this.descriptionKey,
+    required this.bodyKey,
     required this.icon,
   });
 }
@@ -318,7 +313,7 @@ class _ResourceTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppRadius.small),
                         ),
                         child: Text(
-                          'Completed',
+                          context.t('completed'),
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
@@ -352,7 +347,7 @@ class _CategoryTile extends StatelessWidget {
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open link')),
+            SnackBar(content: Text(context.t('could_not_open'))),
           );
         }
       }

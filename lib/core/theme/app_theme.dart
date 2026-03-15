@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../navigation/app_navigator.dart';
+
 // ============================================================================
 // Premium Dark Theme Colors
 // ============================================================================
@@ -192,11 +194,11 @@ class AppTheme {
   static const PageTransitionsTheme _smoothPageTransitions =
       PageTransitionsTheme(
     builders: {
-      TargetPlatform.android: ZoomPageTransitionsBuilder(),
+      TargetPlatform.android: AppSmoothTransitionsBuilder(),
       TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.linux: ZoomPageTransitionsBuilder(),
-      TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+      TargetPlatform.linux: AppSmoothTransitionsBuilder(),
+      TargetPlatform.windows: AppSmoothTransitionsBuilder(),
     },
   );
 

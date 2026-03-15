@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_motion.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/progress_ring.dart';
@@ -9,7 +11,9 @@ import '../../../core/widgets/floating_card.dart';
 import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
 import '../../../core/navigation/app_navigator.dart';
+import '../../../core/widgets/tr_text.dart';
 import '../../lesson_runner/presentation/lesson_runner_screen.dart';
+import '../../../core/widgets/motion_pressable.dart';
 
 class UnitPathScreen extends ConsumerStatefulWidget {
   const UnitPathScreen({super.key});
@@ -37,8 +41,8 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
         if (targetContext != null && mounted) {
           Scrollable.ensureVisible(
             targetContext,
-            duration: const Duration(milliseconds: 450),
-            curve: Curves.easeOutCubic,
+            duration: AppMotion.screenEnter,
+            curve: AppMotion.enterCurve,
             alignment: 0.35,
           );
         }
@@ -57,9 +61,11 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                 children: [
                   GlassCard(
                     padding: EdgeInsets.zero,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      onPressed: () => Navigator.of(context).pop(),
+                    child: MotionPressable(
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_rounded),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -67,7 +73,7 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
+                        TrText(
                           unit.title,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
@@ -78,7 +84,7 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${(unitProgress * 100).round()}% - ${progress.completedLessons.length}/${unit.lessons.length} lessons',
+                          '${(unitProgress * 100).round()}% - ${progress.completedLessons.length}/${unit.lessons.length} ${context.t('lessons_plural')}',
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ],
@@ -102,25 +108,26 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(AppRadius.small),
                       ),
-                      child: const Icon(Icons.spa_rounded, color: Colors.white, size: 30),
+                      child: const Icon(Icons.spa_rounded,
+                          color: Colors.white, size: 30),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          TrText(
                             unit.title,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Learn the core principles and history',
+                            context.t('core_principles'),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${unit.lessons.length} lessons',
+                            '${unit.lessons.length} ${context.t('lessons_plural')}',
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ],
@@ -130,7 +137,8 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Learning Path', style: Theme.of(context).textTheme.headlineSmall),
+              Text(context.t('learning_path'),
+                  style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.md),
               Column(
                 children: [
@@ -142,13 +150,18 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                       lesson: unit.lessons[i],
                       index: i,
                       alignLeft: i.isEven,
-                      isCompleted: progress.isLessonCompleted(unit.lessons[i].lessonId),
-                      isCurrent: progress.isLessonUnlocked(unit.lessons[i].lessonId) &&
+                      isCompleted:
+                          progress.isLessonCompleted(unit.lessons[i].lessonId),
+                      isCurrent: progress
+                              .isLessonUnlocked(unit.lessons[i].lessonId) &&
                           !progress.isLessonCompleted(unit.lessons[i].lessonId),
                       onTap: progress.isLessonUnlocked(unit.lessons[i].lessonId)
                           ? () {
-                              ref.read(lessonRunnerProvider.notifier).startLesson(unit.lessons[i]);
-                              Navigator.of(context).pushUltraSmooth(const LessonRunnerScreen());
+                              ref
+                                  .read(lessonRunnerProvider.notifier)
+                                  .startLesson(unit.lessons[i]);
+                              Navigator.of(context)
+                                  .pushUltraSmooth(const LessonRunnerScreen());
                             }
                           : null,
                     ),
@@ -161,7 +174,9 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              _BossCheckpoint(isUnlocked: progress.completedLessons.length >= unit.lessons.length),
+              _BossCheckpoint(
+                  isUnlocked:
+                      progress.completedLessons.length >= unit.lessons.length),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -235,8 +250,9 @@ class _PathStep extends StatelessWidget {
       ),
     );
 
-    return GestureDetector(
+    return MotionPressable(
       onTap: onTap,
+      enabled: onTap != null,
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -247,7 +263,8 @@ class _PathStep extends StatelessWidget {
               children: [
                 if (!alignLeft) const Expanded(child: SizedBox()),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: horizontalInset),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: horizontalInset),
                   child: node,
                 ),
                 if (alignLeft) const Expanded(child: SizedBox()),
@@ -257,11 +274,12 @@ class _PathStep extends StatelessWidget {
             SizedBox(
               key: lessonTitleKey,
               width: 180,
-              child: Text(
+              child: TrText(
                 lesson.title,
                 textAlign: alignLeft ? TextAlign.left : TextAlign.right,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: isLocked ? scheme.onSurfaceVariant : scheme.onSurface,
+                      color:
+                          isLocked ? scheme.onSurfaceVariant : scheme.onSurface,
                     ),
               ),
             ),
@@ -375,7 +393,9 @@ class _BossCheckpoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      borderColor: isUnlocked ? AppColors.warning : Theme.of(context).colorScheme.outline,
+      borderColor: isUnlocked
+          ? AppColors.warning
+          : Theme.of(context).colorScheme.outline,
       borderWidth: isUnlocked ? 2 : 1,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -389,7 +409,9 @@ class _BossCheckpoint extends StatelessWidget {
                   : Theme.of(context).colorScheme.surfaceContainerHighest,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isUnlocked ? AppColors.warning : Theme.of(context).colorScheme.outline,
+                color: isUnlocked
+                    ? AppColors.warning
+                    : Theme.of(context).colorScheme.outline,
                 width: 3,
               ),
             ),
@@ -404,7 +426,7 @@ class _BossCheckpoint extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Boss Checkpoint',
+                context.t('boss_checkpoint'),
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: isUnlocked
                           ? AppColors.warning
@@ -414,8 +436,8 @@ class _BossCheckpoint extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 isUnlocked
-                    ? 'Test your mastery!'
-                    : 'Complete all lessons to unlock',
+                    ? context.t('test_mastery')
+                    : context.t('complete_to_unlock'),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

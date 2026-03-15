@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
+import '../../../core/widgets/motion_pressable.dart';
 import '../data/forum_models.dart';
 import '../data/forum_service.dart';
+import '../../../core/localization/app_strings.dart';
 
 class ForumScreen extends StatefulWidget {
   const ForumScreen({super.key});
@@ -45,7 +47,7 @@ class _ForumScreenState extends State<ForumScreen> {
 
   Future<void> _openPostComposer() async {
     if (_availableCategories.isEmpty) {
-      _showSnack('No community is available right now.');
+      _showSnack(context.t('no_community'));
       return;
     }
     await showModalBottomSheet<void>(
@@ -57,7 +59,6 @@ class _ForumScreenState extends State<ForumScreen> {
           service: _service,
           categories: _availableCategories,
           initialCategory: _activeCategoryId,
-          onError: _showSnack,
         );
       },
     );
@@ -74,9 +75,8 @@ class _ForumScreenState extends State<ForumScreen> {
           onCreated: (communityId) {
             if (!mounted) return;
             setState(() => _activeCategoryId = communityId);
-            _showSnack('Community created. You are the admin.');
+            _showSnack(context.t('community_created'));
           },
-          onError: _showSnack,
         );
       },
     );
@@ -95,21 +95,22 @@ class _ForumScreenState extends State<ForumScreen> {
           post: post,
           parent: parent,
           service: _service,
-          onError: _showSnack,
         );
       },
     );
   }
 
   Future<void> _deletePost(ForumPost post) async {
+    final deleteOwnPostMessage = context.t('delete_own_post');
     try {
       await _service.deletePost(postId: post.id, authorId: post.authorId);
     } catch (_) {
-      _showSnack('You can only delete your own post.');
+      _showSnack(deleteOwnPostMessage);
     }
   }
 
   Future<void> _deleteReply(ForumReply reply) async {
+    final deleteOwnReplyMessage = context.t('delete_own_reply');
     try {
       await _service.deleteReply(
         postId: reply.postId,
@@ -117,7 +118,54 @@ class _ForumScreenState extends State<ForumScreen> {
         authorId: reply.authorId,
       );
     } catch (_) {
-      _showSnack('You can only delete your own reply.');
+      _showSnack(deleteOwnReplyMessage);
+    }
+  }
+
+  Future<bool> _confirmDelete({
+    required String title,
+    required String message,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.t('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              context.t('delete'),
+              style: const TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
+  }
+
+  Future<void> _confirmDeletePost(ForumPost post) async {
+    final confirmed = await _confirmDelete(
+      title: context.t('delete_post_confirm_title'),
+      message: context.t('delete_post_confirm_message'),
+    );
+    if (confirmed) {
+      await _deletePost(post);
+    }
+  }
+
+  Future<void> _confirmDeleteReply(ForumReply reply) async {
+    final confirmed = await _confirmDelete(
+      title: context.t('delete_reply_confirm_title'),
+      message: context.t('delete_reply_confirm_message'),
+    );
+    if (confirmed) {
+      await _deleteReply(reply);
     }
   }
 
@@ -128,7 +176,7 @@ class _ForumScreenState extends State<ForumScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Community Forum'),
+        title: Text(context.t('community_forum')),
       ),
       body: SafeArea(
         child: StreamBuilder<List<ForumCommunity>>(
@@ -179,7 +227,7 @@ class _ForumScreenState extends State<ForumScreen> {
                       if (posts.isEmpty) {
                         return Center(
                           child: Text(
-                            'No posts yet. Start the conversation!',
+                            context.t('no_posts_yet'),
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         );
@@ -197,16 +245,20 @@ class _ForumScreenState extends State<ForumScreen> {
                             currentUserId: _currentUserId,
                             onLike: () => _service.toggleLike(post),
                             onReply: () => _openReplyComposer(post: post),
-                            onDelete: () => _deletePost(post),
+                            onDelete: () => _confirmDeletePost(post),
                             timeLabel: _formatTime(post.createdAt),
-                            repliesBuilder: _RepliesSection(
-                              post: post,
-                              currentUserId: _currentUserId,
-                              service: _service,
-                              onReply: (reply) =>
-                                  _openReplyComposer(post: post, parent: reply),
-                              onDelete: _deleteReply,
-                            ),
+                            repliesBuilder: post.repliesCount > 0
+                                ? _RepliesSection(
+                                    post: post,
+                                    currentUserId: _currentUserId,
+                                    service: _service,
+                                    onReply: (reply) => _openReplyComposer(
+                                      post: post,
+                                      parent: reply,
+                                    ),
+                                    onDelete: _confirmDeleteReply,
+                                  )
+                                : const SizedBox.shrink(),
                           );
                         },
                       );
@@ -228,13 +280,14 @@ class _ForumScreenState extends State<ForumScreen> {
   }
 
   String _formatTime(DateTime? timestamp) {
-    if (timestamp == null) return 'just now';
+    if (timestamp == null) return context.t('just_now');
     final diff = DateTime.now().difference(timestamp);
-    if (diff.inSeconds < 60) return 'just now';
+    if (diff.inSeconds < 60) return context.t('just_now');
     if (diff.inMinutes < 60) return '${diff.inMinutes}m';
     if (diff.inHours < 24) return '${diff.inHours}h';
     if (diff.inDays < 7) return '${diff.inDays}d';
-    return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
+    return MaterialLocalizations.of(context)
+        .formatShortDate(timestamp.toLocal());
   }
 }
 
@@ -264,7 +317,7 @@ class _CategoryStrip extends StatelessWidget {
             child: Row(
               children: [
                 _CategoryChip(
-                  label: 'All',
+                  label: context.t('all_category'),
                   isActive: activeCategoryId == null,
                   onTap: onShowAll,
                 ),
@@ -285,7 +338,7 @@ class _CategoryStrip extends StatelessWidget {
         TextButton.icon(
           onPressed: onAddCommunity,
           icon: const Icon(Icons.group_add_rounded, size: 18),
-          label: const Text('Add'),
+          label: Text(context.t('add')),
           style: TextButton.styleFrom(
             foregroundColor: scheme.onSurfaceVariant,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -310,26 +363,28 @@ class _CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary
-              : scheme.surfaceContainerHighest.withOpacityValue(0.7),
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          border: Border.all(
-            color: isActive ? AppColors.primary : scheme.outline,
+    return MotionPressable(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive
+                ? AppColors.primary
+                : scheme.surfaceContainerHighest.withOpacityValue(0.7),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            border: Border.all(
+              color: isActive ? AppColors.primary : scheme.outline,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: isActive ? Colors.white : scheme.onSurfaceVariant,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              ),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: isActive ? Colors.white : scheme.onSurfaceVariant,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                ),
+          ),
         ),
       ),
     );
@@ -395,6 +450,7 @@ class _PostCard extends StatelessWidget {
               if (isOwner)
                 IconButton(
                   onPressed: onDelete,
+                  tooltip: context.t('delete_post'),
                   icon: const Icon(Icons.delete_outline_rounded),
                   color: scheme.onSurfaceVariant,
                 ),
@@ -453,7 +509,7 @@ class _PostCard extends StatelessWidget {
               const Spacer(),
               TextButton(
                 onPressed: onReply,
-                child: const Text('Reply'),
+                child: Text(context.t('reply')),
               ),
             ],
           ),
@@ -595,11 +651,12 @@ class _ReplyNode extends StatelessWidget {
                 const Spacer(),
                 TextButton(
                   onPressed: onReply,
-                  child: const Text('Reply'),
+                  child: Text(context.t('reply')),
                 ),
                 if (isOwner)
                   IconButton(
                     onPressed: onDelete,
+                    tooltip: context.t('delete_reply'),
                     icon: const Icon(Icons.delete_outline_rounded, size: 18),
                     color: scheme.onSurfaceVariant,
                   ),
@@ -636,23 +693,25 @@ class _PostMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              label,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(color: color),
-            ),
-          ],
+    return MotionPressable(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                label,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall
+                    ?.copyWith(color: color),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -669,13 +728,11 @@ class _ReplyComposerSheet extends StatefulWidget {
   final ForumPost post;
   final ForumReply? parent;
   final ForumService service;
-  final ValueChanged<String> onError;
 
   const _ReplyComposerSheet({
     required this.post,
     required this.parent,
     required this.service,
-    required this.onError,
   });
 
   @override
@@ -684,17 +741,49 @@ class _ReplyComposerSheet extends StatefulWidget {
 
 class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
   late final TextEditingController _controller;
+  late final FocusNode _replyFocusNode;
+  String? _replyError;
+  String? _submitError;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _replyFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _replyFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final text = _controller.text.trim();
+    setState(() {
+      _replyError = null;
+      _submitError = null;
+    });
+    if (text.isEmpty) {
+      setState(() {
+        _replyError = context.t('reply_required');
+      });
+      _replyFocusNode.requestFocus();
+      return;
+    }
+    try {
+      await widget.service.addReply(
+        postId: widget.post.id,
+        content: text,
+        parentId: widget.parent?.id,
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      setState(() {
+        _submitError = context.t('could_not_post_reply');
+      });
+    }
   }
 
   @override
@@ -719,8 +808,10 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
             children: [
               Text(
                 widget.parent == null
-                    ? 'Reply to ${widget.post.authorName}'
-                    : 'Reply to ${widget.parent!.authorName}',
+                    ? context
+                        .t('reply_to', args: {'name': widget.post.authorName})
+                    : context.t('reply_to',
+                        args: {'name': widget.parent!.authorName}),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -735,12 +826,25 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
               const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: _controller,
+                focusNode: _replyFocusNode,
                 maxLines: 4,
                 minLines: 1,
-                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
                 style: Theme.of(context).textTheme.bodyMedium,
+                onChanged: (_) {
+                  if (_replyError == null && _submitError == null) {
+                    return;
+                  }
+                  setState(() {
+                    _replyError = null;
+                    _submitError = null;
+                  });
+                },
                 decoration: InputDecoration(
-                  hintText: 'Write your reply...',
+                  labelText: context.t('reply'),
+                  hintText: context.t('write_reply'),
+                  errorText: _replyError,
+                  alignLabelWithHint: true,
                   filled: true,
                   fillColor:
                       scheme.surfaceContainerHighest.withOpacityValue(0.6),
@@ -750,35 +854,30 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                   ),
                 ),
               ),
+              if (_submitError != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  _submitError!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.danger,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Text(
-                    'Be respectful.',
+                    context.t('be_respectful'),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
                   ),
                   const Spacer(),
                   ElevatedButton.icon(
-                    onPressed: () async {
-                      final text = _controller.text.trim();
-                      if (text.isEmpty) {
-                        return;
-                      }
-                      try {
-                        await widget.service.addReply(
-                          postId: widget.post.id,
-                          content: text,
-                          parentId: widget.parent?.id,
-                        );
-                        if (mounted) Navigator.of(context).pop();
-                      } catch (e) {
-                        widget.onError('Could not post reply.');
-                      }
-                    },
+                    onPressed: _submit,
                     icon: const Icon(Icons.send_rounded, size: 18),
-                    label: const Text('Reply'),
+                    label: Text(context.t('reply')),
                   ),
                 ],
               ),
@@ -793,12 +892,10 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
 class _CommunityComposerSheet extends StatefulWidget {
   final ForumService service;
   final ValueChanged<String> onCreated;
-  final ValueChanged<String> onError;
 
   const _CommunityComposerSheet({
     required this.service,
     required this.onCreated,
-    required this.onError,
   });
 
   @override
@@ -809,25 +906,37 @@ class _CommunityComposerSheet extends StatefulWidget {
 class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
+  late final FocusNode _nameFocusNode;
+  String? _nameError;
+  String? _submitError;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
     _descriptionController = TextEditingController();
+    _nameFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     final name = _nameController.text.trim();
+    setState(() {
+      _nameError = null;
+      _submitError = null;
+    });
     if (name.isEmpty) {
-      widget.onError('Community name is required.');
+      setState(() {
+        _nameError = context.t('community_name_required');
+      });
+      _nameFocusNode.requestFocus();
       return;
     }
 
@@ -839,7 +948,9 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
       widget.onCreated(communityId);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
-      widget.onError('Could not create community. Try again.');
+      setState(() {
+        _submitError = context.t('could_not_create_community');
+      });
     }
   }
 
@@ -865,12 +976,12 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Create Community',
+                context.t('create_community'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'You will be the admin of this group.',
+                context.t('admin_note'),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -878,11 +989,22 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
               const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: _nameController,
+                focusNode: _nameFocusNode,
                 maxLength: 40,
-                autofocus: true,
                 style: Theme.of(context).textTheme.bodyMedium,
+                onChanged: (_) {
+                  if (_nameError == null && _submitError == null) {
+                    return;
+                  }
+                  setState(() {
+                    _nameError = null;
+                    _submitError = null;
+                  });
+                },
                 decoration: InputDecoration(
-                  hintText: 'Community name',
+                  labelText: context.t('community_name'),
+                  hintText: context.t('community_name'),
+                  errorText: _nameError,
                   filled: true,
                   fillColor:
                       scheme.surfaceContainerHighest.withOpacityValue(0.6),
@@ -900,7 +1022,9 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
                 maxLength: 120,
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
-                  hintText: 'What is this group about? (optional)',
+                  labelText: context.t('group_about'),
+                  hintText: context.t('group_about'),
+                  alignLabelWithHint: true,
                   filled: true,
                   fillColor:
                       scheme.surfaceContainerHighest.withOpacityValue(0.6),
@@ -910,6 +1034,16 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
                   ),
                 ),
               ),
+              if (_submitError != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  _submitError!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.danger,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
@@ -917,7 +1051,7 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
                   ElevatedButton.icon(
                     onPressed: _submit,
                     icon: const Icon(Icons.group_add_rounded, size: 18),
-                    label: const Text('Create'),
+                    label: Text(context.t('create')),
                   ),
                 ],
               ),
@@ -933,13 +1067,11 @@ class _PostComposerSheet extends StatefulWidget {
   final ForumService service;
   final List<ForumCategory> categories;
   final String? initialCategory;
-  final ValueChanged<String> onError;
 
   const _PostComposerSheet({
     required this.service,
     required this.categories,
     required this.initialCategory,
-    required this.onError,
   });
 
   @override
@@ -949,13 +1081,17 @@ class _PostComposerSheet extends StatefulWidget {
 class _PostComposerSheetState extends State<_PostComposerSheet> {
   late final TextEditingController _contentController;
   late final TextEditingController _tagsController;
+  late final FocusNode _contentFocusNode;
   String? _selectedCategory;
+  String? _contentError;
+  String? _submitError;
 
   @override
   void initState() {
     super.initState();
     _contentController = TextEditingController();
     _tagsController = TextEditingController();
+    _contentFocusNode = FocusNode();
     final hasInitial = widget.initialCategory != null &&
         widget.categories.any((c) => c.id == widget.initialCategory);
     _selectedCategory = hasInitial
@@ -967,6 +1103,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
   void dispose() {
     _contentController.dispose();
     _tagsController.dispose();
+    _contentFocusNode.dispose();
     super.dispose();
   }
 
@@ -982,8 +1119,15 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
 
   Future<void> _submit() async {
     final text = _contentController.text.trim();
+    setState(() {
+      _contentError = null;
+      _submitError = null;
+    });
     if (text.isEmpty) {
-      widget.onError('Write something before posting.');
+      setState(() {
+        _contentError = context.t('write_before_posting');
+      });
+      _contentFocusNode.requestFocus();
       return;
     }
 
@@ -994,8 +1138,10 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
         tags: _parseTags(_tagsController.text),
       );
       if (mounted) Navigator.of(context).pop();
-    } catch (e) {
-      widget.onError('Could not create post. Try again.');
+    } catch (_) {
+      setState(() {
+        _submitError = context.t('could_not_create_post');
+      });
     }
   }
 
@@ -1021,7 +1167,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Create Post',
+                context.t('create_post'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: AppSpacing.md),
@@ -1069,13 +1215,25 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
               const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: _contentController,
+                focusNode: _contentFocusNode,
                 maxLines: 5,
                 minLines: 3,
-                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
                 style: Theme.of(context).textTheme.bodyMedium,
+                onChanged: (_) {
+                  if (_contentError == null && _submitError == null) {
+                    return;
+                  }
+                  setState(() {
+                    _contentError = null;
+                    _submitError = null;
+                  });
+                },
                 decoration: InputDecoration(
-                  hintText:
-                      'Share a thought, ask a question, or start a challenge...',
+                  labelText: context.t('post_content'),
+                  hintText: context.t('share_thought'),
+                  errorText: _contentError,
+                  alignLabelWithHint: true,
                   filled: true,
                   fillColor:
                       scheme.surfaceContainerHighest.withOpacityValue(0.6),
@@ -1090,7 +1248,8 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                 controller: _tagsController,
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
-                  hintText: 'Tags (comma separated)',
+                  labelText: context.t('tags_label'),
+                  hintText: context.t('tags_hint'),
                   prefixIcon: Icon(Icons.tag_rounded,
                       color: scheme.onSurfaceVariant, size: 20),
                   filled: true,
@@ -1102,11 +1261,21 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   ),
                 ),
               ),
+              if (_submitError != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  _submitError!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.danger,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
                   Text(
-                    'Be kind, be curious.',
+                    context.t('be_kind'),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
@@ -1115,7 +1284,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                   ElevatedButton.icon(
                     onPressed: _submit,
                     icon: const Icon(Icons.send_rounded, size: 18),
-                    label: const Text('Post'),
+                    label: Text(context.t('post')),
                   ),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../gamification/gamification_service.dart';
 import '../models/user_models.dart';
 
 class StorageService {
@@ -161,19 +162,7 @@ class StorageService {
 
   static Future<UserProfile> addXp(int xp) async {
     final user = getUserProfile();
-    var newTotalXp = user.totalXp + xp;
-    var newLevel = user.level;
-
-    // Check for level ups
-    while (newTotalXp >= 50 * newLevel) {
-      newLevel++;
-    }
-
-    final updatedUser = user.copyWith(
-      totalXp: newTotalXp,
-      level: newLevel,
-      lastActivityDate: DateTime.now(),
-    );
+    final updatedUser = GamificationService.applyXp(user, xp);
     await saveUserProfile(updatedUser);
     return updatedUser;
   }
@@ -181,7 +170,7 @@ class StorageService {
   static Future<UserProfile> loseHeart() async {
     final user = getUserProfile();
     if (user.hearts > 0) {
-      final updatedUser = user.copyWith(hearts: user.hearts - 1);
+      final updatedUser = GamificationService.applyHeartDelta(user, delta: -1);
       await saveUserProfile(updatedUser);
       return updatedUser;
     }
@@ -190,8 +179,8 @@ class StorageService {
 
   static Future<UserProfile> refillHeart({int amount = 1}) async {
     final user = getUserProfile();
-    final newHearts = (user.hearts + amount).clamp(0, UserProfile.maxHearts);
-    final updatedUser = user.copyWith(hearts: newHearts);
+    final updatedUser =
+        GamificationService.applyHeartDelta(user, delta: amount);
     await saveUserProfile(updatedUser);
     return updatedUser;
   }

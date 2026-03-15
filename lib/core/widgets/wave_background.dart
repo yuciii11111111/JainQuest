@@ -4,7 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 /// Interactive animated line background inspired by the provided web component.
+class WaveBackgroundController extends ChangeNotifier {
+  static const double _positionEpsilonSquared = 0.25;
+  Offset? _pointerPosition;
+
+  Offset? get pointerPosition => _pointerPosition;
+
+  void updatePointer(Offset position) {
+    if (_pointerPosition != null &&
+        (position - _pointerPosition!).distanceSquared <=
+            _positionEpsilonSquared) {
+      return;
+    }
+    _pointerPosition = position;
+    notifyListeners();
+  }
+
+  void clearPointer() {
+    if (_pointerPosition == null) {
+      return;
+    }
+    _pointerPosition = null;
+    notifyListeners();
+  }
+}
+
 class WaveBackground extends StatefulWidget {
+  final WaveBackgroundController? controller;
   final Color strokeColor;
   final Color backgroundColor;
   final Color pointerColor;
@@ -14,6 +40,7 @@ class WaveBackground extends StatefulWidget {
 
   const WaveBackground({
     super.key,
+    this.controller,
     this.strokeColor = const Color(0xFFFFFFFF),
     this.backgroundColor = const Color(0xFF000000),
     this.pointerColor = const Color(0xFFFFFFFF),
@@ -27,7 +54,7 @@ class WaveBackground extends StatefulWidget {
 }
 
 class _WaveBackgroundState extends State<WaveBackground>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final List<List<_WavePoint>> _lines = <List<_WavePoint>>[];
   final _PointerState _pointer = _PointerState();
   final ValueNotifier<int> _repaint = ValueNotifier<int>(0);
@@ -35,18 +62,71 @@ class _WaveBackgroundState extends State<WaveBackground>
   late final Ticker _ticker;
   Size _size = Size.zero;
   int _frame = 0;
+  bool _isAppActive = true;
+  bool _isTickerModeEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker(_tick)..start();
+    WidgetsBinding.instance.addObserver(this);
+    _ticker = createTicker(_tick);
+    _syncTickerState();
+    widget.controller?.addListener(_handleControllerUpdate);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    widget.controller?.removeListener(_handleControllerUpdate);
     _ticker.dispose();
     _repaint.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final tickerModeEnabled = TickerMode.of(context);
+    if (_isTickerModeEnabled == tickerModeEnabled) {
+      return;
+    }
+    _isTickerModeEnabled = tickerModeEnabled;
+    _syncTickerState();
+  }
+
+  @override
+  void didUpdateWidget(covariant WaveBackground oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller == widget.controller) {
+      return;
+    }
+    oldWidget.controller?.removeListener(_handleControllerUpdate);
+    widget.controller?.addListener(_handleControllerUpdate);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final isAppActive = state == AppLifecycleState.resumed;
+
+    if (_isAppActive == isAppActive) {
+      return;
+    }
+    _isAppActive = isAppActive;
+    _syncTickerState();
+  }
+
+  void _syncTickerState() {
+    final shouldAnimate = _isAppActive && _isTickerModeEnabled;
+    if (shouldAnimate) {
+      if (!_ticker.isActive) {
+        _ticker.start();
+      }
+      return;
+    }
+
+    if (_ticker.isActive) {
+      _ticker.stop();
+    }
   }
 
   void _tick(Duration elapsed) {
@@ -57,6 +137,17 @@ class _WaveBackgroundState extends State<WaveBackground>
 
     _frame++;
     _repaint.value = _frame;
+  }
+
+  void _handleControllerUpdate() {
+    final position = widget.controller?.pointerPosition;
+    if (position == null) {
+      if (_size.isEmpty) return;
+      _pointer.x = -10;
+      _pointer.y = _size.height * 0.5;
+      return;
+    }
+    _updatePointer(position);
   }
 
   void _updatePointer(Offset localPosition) {
@@ -221,24 +312,18 @@ class _WaveBackgroundState extends State<WaveBackground>
           _configure(size);
         }
 
-        return Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (event) => _updatePointer(event.localPosition),
-          onPointerHover: (event) => _updatePointer(event.localPosition),
-          onPointerMove: (event) => _updatePointer(event.localPosition),
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: _WavePainter(
-                lines: _lines,
-                pointer: _pointer,
-                strokeColor: widget.strokeColor,
-                backgroundColor: widget.backgroundColor,
-                pointerColor: widget.pointerColor,
-                pointerRadius: widget.pointerSize / 2,
-                repaint: _repaint,
-              ),
-              child: const SizedBox.expand(),
+        return RepaintBoundary(
+          child: CustomPaint(
+            painter: _WavePainter(
+              lines: _lines,
+              pointer: _pointer,
+              strokeColor: widget.strokeColor,
+              backgroundColor: widget.backgroundColor,
+              pointerColor: widget.pointerColor,
+              pointerRadius: widget.pointerSize / 2,
+              repaint: _repaint,
             ),
+            child: const SizedBox.expand(),
           ),
         );
       },
@@ -249,32 +334,31 @@ class _WaveBackgroundState extends State<WaveBackground>
 class _WavePainter extends CustomPainter {
   final List<List<_WavePoint>> lines;
   final _PointerState pointer;
-  final Color strokeColor;
-  final Color backgroundColor;
-  final Color pointerColor;
   final double pointerRadius;
+  final Paint _backgroundPaint;
+  final Paint _linePaint;
+  final Paint _pointerPaint;
 
   _WavePainter({
     required this.lines,
     required this.pointer,
-    required this.strokeColor,
-    required this.backgroundColor,
-    required this.pointerColor,
+    required Color strokeColor,
+    required Color backgroundColor,
+    required Color pointerColor,
     required this.pointerRadius,
     required Listenable repaint,
-  }) : super(repaint: repaint);
+  })  : _backgroundPaint = Paint()..color = backgroundColor,
+        _linePaint = Paint()
+          ..color = strokeColor
+          ..strokeWidth = 1
+          ..style = PaintingStyle.stroke
+          ..isAntiAlias = true,
+        _pointerPaint = Paint()..color = pointerColor,
+        super(repaint: repaint);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final backgroundPaint = Paint()..color = backgroundColor;
-    canvas.drawRect(Offset.zero & size, backgroundPaint);
-
-    final linePaint = Paint()
-      ..color = strokeColor
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = true;
-
+    canvas.drawRect(Offset.zero & size, _backgroundPaint);
     final path = Path();
 
     for (final points in lines) {
@@ -289,12 +373,11 @@ class _WavePainter extends CustomPainter {
         path.lineTo(current.dx, current.dy);
       }
 
-      canvas.drawPath(path, linePaint);
+      canvas.drawPath(path, _linePaint);
     }
 
-    final pointerPaint = Paint()..color = pointerColor;
     canvas.drawCircle(
-        Offset(pointer.sx, pointer.sy), pointerRadius, pointerPaint);
+        Offset(pointer.sx, pointer.sy), pointerRadius, _pointerPaint);
   }
 
   Offset _moved(_WavePoint point, {bool withCursorForce = true}) {

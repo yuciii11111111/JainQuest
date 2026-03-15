@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/gamification/gamification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
 import 'screens/question_intro_screen.dart';
@@ -17,6 +19,9 @@ class LessonRunnerScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
+  _HeartLossAnimationState? _heartLossAnimation;
+  int _heartLossAnimationId = 0;
+
   void _showExitDialog() {
     showDialog(
       context: context,
@@ -24,14 +29,14 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
         ),
-        title: const Text('Leave lesson?'),
-        content: const Text(
-          'Your progress in this lesson will not be saved.',
+        title: Text(context.t('leave_lesson')),
+        content: Text(
+          context.t('leave_lesson_warning'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Stay'),
+            child: Text(context.t('stay')),
           ),
           TextButton(
             onPressed: () {
@@ -39,14 +44,46 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
               ref.read(lessonRunnerProvider.notifier).endLesson();
               Navigator.of(context).pop();
             },
-            child: const Text(
-              'Leave',
-              style: TextStyle(color: AppColors.danger),
+            child: Text(
+              context.t('leave'),
+              style: const TextStyle(color: AppColors.danger),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _playHeartLossAnimation(int heartsBefore) {
+    if (heartsBefore <= 0) return;
+    setState(() {
+      _heartLossAnimation = _HeartLossAnimationState(
+        id: ++_heartLossAnimationId,
+        heartsBefore: heartsBefore,
+        heartsAfter: heartsBefore - 1,
+      );
+    });
+  }
+
+  Future<void> _handleWarmupAnswer(bool isCorrect, int heartsBefore) async {
+    if (!isCorrect) {
+      _playHeartLossAnimation(heartsBefore);
+    }
+    await ref.read(lessonRunnerProvider.notifier).answerWarmup(isCorrect);
+  }
+
+  Future<void> _handleQuizAnswer(bool isCorrect, int heartsBefore) async {
+    if (!isCorrect) {
+      _playHeartLossAnimation(heartsBefore);
+    }
+    await ref.read(lessonRunnerProvider.notifier).answerQuizQuestion(isCorrect);
+  }
+
+  Future<void> _handleLessonComplete() async {
+    final summary =
+        await ref.read(lessonRunnerProvider.notifier).completeLesson();
+    if (!mounted || summary == null) return;
+    ref.read(lessonRunnerProvider.notifier).nextScreen();
   }
 
   @override
@@ -55,8 +92,8 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
     final user = ref.watch(userProfileProvider);
 
     if (lessonState == null) {
-      return const Scaffold(
-        body: Center(child: Text('No lesson loaded')),
+      return Scaffold(
+        body: Center(child: Text(context.t('no_lesson_loaded'))),
       );
     }
 
@@ -84,7 +121,8 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          if (lessonState.currentScreenType == LessonScreenType.lessonComplete) {
+          if (lessonState.currentScreenType ==
+              LessonScreenType.lessonComplete) {
             ref.read(lessonRunnerProvider.notifier).endLesson();
             Navigator.of(context).pop();
           } else {
@@ -108,7 +146,9 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                           onPressed: () {
                             if (lessonState.currentScreenType ==
                                 LessonScreenType.lessonComplete) {
-                              ref.read(lessonRunnerProvider.notifier).endLesson();
+                              ref
+                                  .read(lessonRunnerProvider.notifier)
+                                  .endLesson();
                               Navigator.of(context).pop();
                             } else {
                               _showExitDialog();
@@ -138,6 +178,18 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                 ),
               ],
             ),
+            if (_heartLossAnimation != null)
+              HeartLossOverlay(
+                key: ValueKey(_heartLossAnimation!.id),
+                heartsBefore: _heartLossAnimation!.heartsBefore,
+                heartsAfter: _heartLossAnimation!.heartsAfter,
+                onComplete: () {
+                  if (!mounted) return;
+                  setState(() {
+                    _heartLossAnimation = null;
+                  });
+                },
+              ),
           ],
         ),
       ),
@@ -151,7 +203,7 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
           key: const ValueKey('question_intro'),
           screen: state.lesson.screens.questionIntro,
           onAnswer: (isCorrect) {
-            ref.read(lessonRunnerProvider.notifier).answerWarmup(isCorrect);
+            return _handleWarmupAnswer(isCorrect, user.hearts);
           },
           onContinue: () {
             ref.read(lessonRunnerProvider.notifier).nextScreen();
@@ -181,22 +233,21 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
           currentQuestionIndex: state.currentQuizQuestionIndex,
           hearts: user.hearts,
           onAnswer: (isCorrect) {
-            ref.read(lessonRunnerProvider.notifier).answerQuizQuestion(isCorrect);
+            return _handleQuizAnswer(isCorrect, user.hearts);
           },
           onNextQuestion: () {
             ref.read(lessonRunnerProvider.notifier).advanceQuizQuestion();
           },
           onComplete: () async {
-            await ref.read(lessonRunnerProvider.notifier).completeLesson();
-            ref.read(lessonRunnerProvider.notifier).nextScreen();
+            await _handleLessonComplete();
           },
         );
       case LessonScreenType.lessonComplete:
         return LessonCompleteScreenWidget(
           key: const ValueKey('lesson_complete'),
           screen: state.lesson.screens.lessonComplete,
-          xpEarned: state.totalXpEarned,
-          isPerfect: state.isPerfectQuiz,
+          summary: state.completionSummary ??
+              LessonCompletionSummary(answerXp: state.answerXpEarned),
           streak: user.currentStreak,
           onContinue: () {
             ref.read(lessonRunnerProvider.notifier).endLesson();
@@ -205,4 +256,16 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         );
     }
   }
+}
+
+class _HeartLossAnimationState {
+  const _HeartLossAnimationState({
+    required this.id,
+    required this.heartsBefore,
+    required this.heartsAfter,
+  });
+
+  final int id;
+  final int heartsBefore;
+  final int heartsAfter;
 }

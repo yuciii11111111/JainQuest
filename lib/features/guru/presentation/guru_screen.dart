@@ -15,15 +15,6 @@ class GuruScreen extends ConsumerStatefulWidget {
 }
 
 class _GuruScreenState extends ConsumerState<GuruScreen> {
-  final List<String> _popularQuestions = const [
-    'What is Jainism in one minute?',
-    'Why is Ahimsa important?',
-    'How does karma work?',
-    'What are the 5 vows?',
-    'What is Moksha?',
-    'How can I practice non-attachment daily?',
-  ];
-
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -60,6 +51,14 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
     });
     final state = ref.watch(guruProvider);
     final showSuggestions = state.messages.length <= 1;
+    final popularQuestions = [
+      context.t('guru_q1'),
+      context.t('guru_q2'),
+      context.t('guru_q3'),
+      context.t('guru_q4'),
+      context.t('guru_q5'),
+      context.t('guru_q6'),
+    ];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -98,6 +97,7 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                   IconButton(
                     icon: const Icon(Icons.refresh_rounded),
                     color: scheme.onSurfaceVariant,
+                    tooltip: context.t('refresh_chat'),
                     onPressed: () =>
                         ref.read(guruProvider.notifier).resetChat(),
                   ),
@@ -126,7 +126,7 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   child: Row(
-                    children: _popularQuestions.map((question) {
+                    children: popularQuestions.map((question) {
                       return Padding(
                         padding: const EdgeInsets.only(right: AppSpacing.sm),
                         child: FloatingCard(
@@ -181,7 +181,9 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                         maxLines: 4,
                         textInputAction: TextInputAction.send,
                         onSubmitted: (_) => _sendMessage(),
+                        textCapitalization: TextCapitalization.sentences,
                         decoration: InputDecoration(
+                          labelText: context.t('your_question'),
                           hintText: context.t('type_question'),
                           border: InputBorder.none,
                         ),
@@ -190,6 +192,7 @@ class _GuruScreenState extends ConsumerState<GuruScreen> {
                     IconButton(
                       icon: const Icon(Icons.send_rounded),
                       color: AppColors.primary,
+                      tooltip: context.t('send_message'),
                       onPressed: state.isSending ? null : _sendMessage,
                     ),
                   ],

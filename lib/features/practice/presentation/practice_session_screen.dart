@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/gamification/gamification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/models/lesson_models.dart';
@@ -9,13 +11,15 @@ class PracticeSessionScreen extends ConsumerStatefulWidget {
   const PracticeSessionScreen({super.key});
 
   @override
-  ConsumerState<PracticeSessionScreen> createState() => _PracticeSessionScreenState();
+  ConsumerState<PracticeSessionScreen> createState() =>
+      _PracticeSessionScreenState();
 }
 
 class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
   String? selectedChoiceId;
   bool showFeedback = false;
   bool? isCorrectAnswer;
+  bool isCompletingPractice = false;
 
   void _selectChoice(String choiceId) {
     if (showFeedback) return;
@@ -24,7 +28,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     });
   }
 
-  void _checkAnswer(QuizQuestion question) {
+  Future<void> _checkAnswer(QuizQuestion question) async {
     bool isCorrect;
 
     if (question.format == QuestionFormat.trueFalse) {
@@ -42,31 +46,43 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       isCorrectAnswer = isCorrect;
     });
 
-    ref.read(practiceProvider.notifier).answerQuestion(isCorrect);
+    await ref.read(practiceProvider.notifier).answerQuestion(isCorrect);
   }
 
-  void _nextQuestion() {
+  Future<void> _nextQuestion() async {
     final practiceState = ref.read(practiceProvider);
-    
-    if (practiceState != null && practiceState.isComplete) {
-      // Show completion
-      ref.read(practiceProvider.notifier).completePractice();
-      _showCompletionDialog();
-    } else {
+    if (practiceState == null) return;
+
+    if (practiceState.isOnLastQuestion) {
       setState(() {
-        selectedChoiceId = null;
-        showFeedback = false;
-        isCorrectAnswer = null;
+        isCompletingPractice = true;
       });
+      final summary =
+          await ref.read(practiceProvider.notifier).completePractice();
+      if (!mounted) return;
+      if (summary == null) {
+        setState(() {
+          isCompletingPractice = false;
+        });
+        return;
+      }
+      _showCompletionDialog(summary);
+      return;
     }
+
+    ref.read(practiceProvider.notifier).advanceQuestion();
+    setState(() {
+      selectedChoiceId = null;
+      showFeedback = false;
+      isCorrectAnswer = null;
+    });
   }
 
-  void _showCompletionDialog() {
+  void _showCompletionDialog(PracticeCompletionSummary summary) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        final practiceState = ref.read(practiceProvider);
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
@@ -80,7 +96,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Practice Complete!',
+                context.t('practice_complete'),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: AppSpacing.md),
@@ -90,7 +106,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                   const Icon(Icons.star_rounded, color: AppColors.secondary),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    '+${practiceState?.xpEarned ?? 0} XP',
+                    '+${summary.answerXp} ${context.t('xp')}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -99,22 +115,24 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.favorite_rounded, color: AppColors.danger),
-                  SizedBox(width: AppSpacing.xs),
-                  Text(
-                    '+1 Heart',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.danger,
+              if (summary.heartRefilled) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.favorite_rounded, color: AppColors.danger),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      context.t('heart_refilled'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.danger,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ],
           ),
           actions: [
@@ -125,7 +143,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                   Navigator.of(context).pop(); // Close dialog
                   Navigator.of(context).pop(); // Close practice screen
                 },
-                child: const Text('Done'),
+                child: Text(context.t('done')),
               ),
             ),
           ],
@@ -154,13 +172,13 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'No questions available',
+                context.t('no_questions'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: AppSpacing.lg),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Go Back'),
+                child: Text(context.t('go_back')),
               ),
             ],
           ),
@@ -168,11 +186,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       );
     }
 
-    if (practiceState.isComplete) {
-      // Auto-show completion
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showCompletionDialog();
-      });
+    if (isCompletingPractice) {
       return const Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(child: CircularProgressIndicator()),
@@ -180,7 +194,8 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     }
 
     final question = practiceState.currentQuestion!;
-    final progress = (practiceState.currentIndex + 1) / practiceState.questions.length;
+    final progress =
+        (practiceState.currentIndex + 1) / practiceState.questions.length;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -238,8 +253,8 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                     ),
                     child: Text(
                       practiceState.mode == PracticeMode.review
-                          ? 'Review'
-                          : 'Weak Spots',
+                          ? context.t('review')
+                          : context.t('weak_spots'),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -280,8 +295,8 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
                     FeedbackBanner(
                       isCorrect: isCorrectAnswer ?? false,
                       message: isCorrectAnswer == true
-                          ? 'Great job!'
-                          : 'Keep practicing!',
+                          ? context.t('great_job')
+                          : context.t('keep_practicing'),
                     ),
                   ],
                 ],
@@ -296,17 +311,20 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: showFeedback
                   ? PrimaryButton(
-                      label: practiceState.currentIndex >=
-                              practiceState.questions.length - 1
-                          ? 'Finish'
-                          : 'Next',
+                      label: practiceState.isOnLastQuestion
+                          ? context.t('finish')
+                          : context.t('next'),
                       icon: Icons.arrow_forward_rounded,
-                      onPressed: _nextQuestion,
+                      onPressed: () {
+                        _nextQuestion();
+                      },
                     )
                   : PrimaryButton(
-                      label: 'Check',
+                      label: context.t('check'),
                       onPressed: selectedChoiceId != null
-                          ? () => _checkAnswer(question)
+                          ? () {
+                              _checkAnswer(question);
+                            }
                           : null,
                     ),
             ),
@@ -320,13 +338,13 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
     return Column(
       children: [
         ChoiceButton(
-          label: 'True',
+          label: context.t('true_label'),
           state: _getTrueFalseState('true', question),
           onTap: showFeedback ? null : () => _selectChoice('true'),
         ),
         const SizedBox(height: AppSpacing.md),
         ChoiceButton(
-          label: 'False',
+          label: context.t('false_label'),
           state: _getTrueFalseState('false', question),
           onTap: showFeedback ? null : () => _selectChoice('false'),
         ),

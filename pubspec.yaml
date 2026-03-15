@@ -42,6 +42,10 @@ dependencies:
   # Haptics & Feedback
   vibration: 
   
+  # Image Upload
+  image_picker: ^1.0.0
+  firebase_storage: ^12.0.0
+
   # Sharing
   share_plus:
 
@@ -76,7 +80,6 @@ flutter:
     - assets/animations/
     - assets/content/
     - assets/images/
-    - assets/videos/
   
   fonts:
     - family: Nunito

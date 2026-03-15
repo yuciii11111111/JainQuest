@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/theme/app_motion.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_slider.dart';
+import '../../../core/widgets/motion_pressable.dart';
 import '../../../core/widgets/typewriter_text.dart';
 
 class ReadingScreen extends StatefulWidget {
@@ -106,9 +109,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
               ),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded),
-                    onPressed: () => Navigator.of(context).pop(),
+                  MotionPressable(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
@@ -116,7 +121,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'FundJain Reader',
+                          context.t('fundjain_reader'),
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
@@ -125,7 +130,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                               ),
                         ),
                         Text(
-                          'Read a knowledgeable book teaching the fundamentals of Jainism in great depth',
+                          context.t('resources_desc'),
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: _darkMode
@@ -144,22 +149,25 @@ class _ReadingScreenState extends State<ReadingScreen> {
                           ),
                     ),
                   const SizedBox(width: AppSpacing.xs),
-                  IconButton(
-                    tooltip: _isCurrentPageBookmarked
-                        ? 'Remove bookmark'
-                        : 'Bookmark page',
-                    icon: Icon(
-                      _isCurrentPageBookmarked
-                          ? Icons.bookmark_rounded
-                          : Icons.bookmark_border_rounded,
+                  MotionPressable(
+                    enabled: _pages.isNotEmpty,
+                    child: IconButton(
+                      tooltip: _isCurrentPageBookmarked
+                          ? context.t('remove_bookmark')
+                          : context.t('bookmark_page'),
+                      icon: Icon(
+                        _isCurrentPageBookmarked
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                      ),
+                      color: _isCurrentPageBookmarked
+                          ? AppColors.primary
+                          : (_darkMode
+                              ? AppColors.softCream
+                              : scheme.onSurfaceVariant),
+                      onPressed:
+                          _pages.isEmpty ? null : _toggleCurrentPageBookmark,
                     ),
-                    color: _isCurrentPageBookmarked
-                        ? AppColors.primary
-                        : (_darkMode
-                            ? AppColors.softCream
-                            : scheme.onSurfaceVariant),
-                    onPressed:
-                        _pages.isEmpty ? null : _toggleCurrentPageBookmark,
                   ),
                 ],
               ),
@@ -175,7 +183,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   max: (_pages.length - 1).toDouble(),
                   value: _currentPage.toDouble(),
                   divisions: _pages.length > 1 ? _pages.length - 1 : null,
-                  label: 'Page ${_currentPage + 1}',
+                  label: context
+                      .t('page_label', args: {'num': '${_currentPage + 1}'}),
                   onChanged: (v) {
                     final targetPage = v.round().clamp(0, _pages.length - 1);
                     _pageController.jumpToPage(targetPage);
@@ -197,7 +206,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                             max: 22,
                             value: _fontSize,
                             divisions: 8,
-                            label: 'Font ${_fontSize.toStringAsFixed(0)}',
+                            label: context.t('font_label',
+                                args: {'size': _fontSize.toStringAsFixed(0)}),
                             onChanged: (v) => setState(() => _fontSize = v),
                           ),
                         ),
@@ -206,17 +216,20 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  FloatingActionButton.small(
-                    heroTag: 'themeToggle',
-                    backgroundColor:
-                        _darkMode ? AppColors.softCream : AppColors.inkBlack,
-                    onPressed: () => setState(() => _darkMode = !_darkMode),
-                    child: Icon(
-                      _darkMode
-                          ? Icons.light_mode_rounded
-                          : Icons.dark_mode_rounded,
-                      color:
-                          _darkMode ? AppColors.inkBlack : AppColors.softCream,
+                  MotionPressable(
+                    child: FloatingActionButton.small(
+                      heroTag: 'themeToggle',
+                      backgroundColor:
+                          _darkMode ? AppColors.softCream : AppColors.inkBlack,
+                      onPressed: () => setState(() => _darkMode = !_darkMode),
+                      child: Icon(
+                        _darkMode
+                            ? Icons.light_mode_rounded
+                            : Icons.dark_mode_rounded,
+                        color: _darkMode
+                            ? AppColors.inkBlack
+                            : AppColors.softCream,
+                      ),
                     ),
                   ),
                 ],
@@ -236,15 +249,18 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     spacing: AppSpacing.sm,
                     runSpacing: AppSpacing.xs,
                     children: _bookmarks.map((bookmark) {
-                      return ActionChip(
-                        label: Text('Pg ${bookmark + 1}'),
-                        onPressed: () {
-                          _pageController.animateToPage(
-                            bookmark,
-                            duration: const Duration(milliseconds: 320),
-                            curve: Curves.easeInOut,
-                          );
-                        },
+                      return MotionPressable(
+                        child: ActionChip(
+                          label: Text(context.t('page_abbreviated',
+                              args: {'num': '${bookmark + 1}'})),
+                          onPressed: () {
+                            _pageController.animateToPage(
+                              bookmark,
+                              duration: AppMotion.standard,
+                              curve: AppMotion.enterCurve,
+                            );
+                          },
+                        ),
                       );
                     }).toList(),
                   ),
@@ -304,14 +320,14 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   children: [
                     Expanded(
                       child: SecondaryButton(
-                        label: 'Previous',
+                        label: context.t('previous'),
                         icon: Icons.chevron_left_rounded,
                         onPressed: _currentPage > 0
                             ? () {
                                 _pageController.animateToPage(
                                   _currentPage - 1,
-                                  duration: const Duration(milliseconds: 420),
-                                  curve: Curves.easeInOutCubic,
+                                  duration: AppMotion.standard,
+                                  curve: AppMotion.enterCurve,
                                 );
                               }
                             : null,
@@ -321,15 +337,15 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     Expanded(
                       child: PrimaryButton(
                         label: _currentPage == _pages.length - 1
-                            ? 'Finish'
-                            : 'Next',
+                            ? context.t('finish')
+                            : context.t('next'),
                         icon: Icons.chevron_right_rounded,
                         onPressed: _currentPage < _pages.length - 1
                             ? () {
                                 _pageController.animateToPage(
                                   _currentPage + 1,
-                                  duration: const Duration(milliseconds: 420),
-                                  curve: Curves.easeInOutCubic,
+                                  duration: AppMotion.standard,
+                                  curve: AppMotion.enterCurve,
                                 );
                               }
                             : () => Navigator.of(context).pop(),

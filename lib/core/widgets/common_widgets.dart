@@ -1,8 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../gamification/gamification_rules.dart';
 import '../localization/app_strings.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_theme.dart';
 import 'liquid_glass.dart';
+import 'motion_pressable.dart';
 import 'tr_text.dart';
 
 // ============================================================================
@@ -70,7 +75,7 @@ class XpPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return StatsPill(
       icon: Icons.star_rounded,
-      value: '$xp XP',
+      value: '$xp ${context.t('xp')}',
       color: AppColors.achievementGold,
     );
   }
@@ -91,6 +96,214 @@ class HeartsPill extends StatelessWidget {
       icon: Icons.favorite_rounded,
       value: '$hearts',
       color: AppColors.danger,
+    );
+  }
+}
+
+class HeartLossOverlay extends StatefulWidget {
+  const HeartLossOverlay({
+    super.key,
+    required this.heartsBefore,
+    required this.heartsAfter,
+    this.onComplete,
+  });
+
+  final int heartsBefore;
+  final int heartsAfter;
+  final VoidCallback? onComplete;
+
+  @override
+  State<HeartLossOverlay> createState() => _HeartLossOverlayState();
+}
+
+class _HeartLossOverlayState extends State<HeartLossOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1350),
+  )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onComplete?.call();
+      }
+    });
+
+  late final Animation<double> _fade = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween(begin: 0.0, end: 1.0).chain(
+        CurveTween(curve: Curves.easeOutCubic),
+      ),
+      weight: 18,
+    ),
+    TweenSequenceItem(
+      tween: ConstantTween<double>(1.0),
+      weight: 52,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: 1.0, end: 0.0).chain(
+        CurveTween(curve: Curves.easeInCubic),
+      ),
+      weight: 30,
+    ),
+  ]).animate(_controller);
+
+  late final Animation<double> _scale = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween(begin: 0.84, end: 1.04).chain(
+        CurveTween(curve: Curves.easeOutBack),
+      ),
+      weight: 28,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: 1.04, end: 0.98).chain(
+        CurveTween(curve: Curves.easeOut),
+      ),
+      weight: 34,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: 0.98, end: 0.94).chain(
+        CurveTween(curve: Curves.easeInOut),
+      ),
+      weight: 38,
+    ),
+  ]).animate(_controller);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.heartsBefore <= widget.heartsAfter) {
+      return const SizedBox.shrink();
+    }
+
+    return IgnorePointer(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 104),
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: LiquidGlassContainer(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                borderColor: Colors.white.withOpacityValue(0.32),
+                tintColor: Theme.of(context).colorScheme.surface,
+                tintOpacity: 0.62,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    HeartsSystem.maxHearts,
+                    (index) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                      ),
+                      child: _AnimatedHeartIcon(
+                        index: index,
+                        heartsBefore: widget.heartsBefore,
+                        heartsAfter: widget.heartsAfter,
+                        progress: _controller,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedHeartIcon extends StatelessWidget {
+  const _AnimatedHeartIcon({
+    required this.index,
+    required this.heartsBefore,
+    required this.heartsAfter,
+    required this.progress,
+  });
+
+  final int index;
+  final int heartsBefore;
+  final int heartsAfter;
+  final Animation<double> progress;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFilledHeart = index < heartsAfter;
+    final isBreakingHeart = index == heartsAfter && index < heartsBefore;
+    final iconSize = isBreakingHeart ? 34.0 : 30.0;
+
+    if (isFilledHeart) {
+      return const Icon(
+        Icons.favorite_rounded,
+        size: 30,
+        color: AppColors.danger,
+      );
+    }
+
+    if (!isBreakingHeart) {
+      return Icon(
+        Icons.favorite_border_rounded,
+        size: 30,
+        color: AppColors.danger.withOpacityValue(0.32),
+      );
+    }
+
+    return AnimatedBuilder(
+      animation: progress,
+      builder: (context, _) {
+        final breakProgress = ((progress.value - 0.22) / 0.42).clamp(0.0, 1.0);
+        final settleProgress = ((progress.value - 0.64) / 0.18).clamp(0.0, 1.0);
+        final wobble = math.sin(breakProgress * math.pi * 6) *
+            0.14 *
+            (1.0 - breakProgress);
+        final pulse = 1.0 + (0.18 * (1.0 - (breakProgress - 0.5).abs() * 2));
+
+        final IconData icon;
+        final Color color;
+        if (breakProgress < 0.38) {
+          icon = Icons.favorite_rounded;
+          color = AppColors.danger;
+        } else if (settleProgress < 1.0) {
+          icon = Icons.heart_broken;
+          color = Color.lerp(
+                AppColors.danger,
+                const Color(0xFF7A0B16),
+                breakProgress,
+              ) ??
+              AppColors.danger;
+        } else {
+          icon = Icons.favorite_border_rounded;
+          color = AppColors.danger.withOpacityValue(0.3);
+        }
+
+        return Transform.rotate(
+          angle: wobble,
+          child: Transform.scale(
+            scale: settleProgress < 1.0 ? pulse : 1.0,
+            child: Icon(
+              icon,
+              size: iconSize,
+              color: color,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -127,7 +340,7 @@ class LevelPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return StatsPill(
       icon: Icons.shield_rounded,
-      value: 'Lvl $level',
+      value: '${context.t('level')} $level',
       color: AppColors.primary,
     );
   }
@@ -153,28 +366,57 @@ class AnimatedProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final normalizedProgress = progress.clamp(0.0, 1.0).toDouble();
+    final radius = BorderRadius.circular(height / 2);
+    final fillColor = progressColor ?? AppColors.primary;
+    final duration = AppMotion.resolveDuration(context, AppMotion.progress);
+    final curve = AppMotion.resolveCurve(context, AppMotion.enterCurve);
+
     return Container(
       height: height,
       decoration: BoxDecoration(
         color: backgroundColor ??
             Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(height / 2),
+        borderRadius: radius,
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            children: [
-              Container(
-                width: constraints.maxWidth * progress.clamp(0.0, 1.0),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: normalizedProgress),
+          duration: duration,
+          curve: curve,
+          builder: (context, value, _) {
+            return FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: value,
+              child: Container(
                 height: height,
                 decoration: BoxDecoration(
-                  color: progressColor ?? AppColors.primary,
-                  borderRadius: BorderRadius.circular(height / 2),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      fillColor.withOpacityValue(0.82),
+                      fillColor,
+                      Colors.white.withOpacityValue(0.92),
+                    ],
+                    stops: const [0.0, 0.72, 1.0],
+                  ),
+                  borderRadius: radius,
+                  boxShadow: value > 0
+                      ? [
+                          BoxShadow(
+                            color: fillColor.withOpacityValue(0.3),
+                            blurRadius: 18,
+                            spreadRadius: -6,
+                          ),
+                        ]
+                      : const [],
                 ),
               ),
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -202,46 +444,50 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: fullWidth ? double.infinity : null,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.primary.withOpacityValue(0.5),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.button),
+    final enabled = !isLoading && onPressed != null;
+    return MotionPressable(
+      enabled: enabled,
+      child: SizedBox(
+        width: fullWidth ? double.infinity : null,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: enabled ? onPressed : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: AppColors.primary.withOpacityValue(0.5),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.button),
+            ),
           ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 20),
-                    const SizedBox(width: AppSpacing.sm),
-                  ],
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[
+                      Icon(icon, size: 20),
+                      const SizedBox(width: AppSpacing.sm),
+                    ],
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -267,34 +513,37 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: fullWidth ? double.infinity : null,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.button),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-            ],
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
+    return MotionPressable(
+      enabled: onPressed != null,
+      child: SizedBox(
+        width: fullWidth ? double.infinity : null,
+        height: 56,
+        child: OutlinedButton(
+          onPressed: onPressed,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary, width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.button),
             ),
-          ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 20),
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -353,13 +602,17 @@ class ChoiceButton extends StatelessWidget {
         break;
     }
 
-    return GestureDetector(
-      onTap: state == ChoiceState.normal || state == ChoiceState.selected
-          ? () {
-              HapticFeedback.lightImpact();
-              onTap?.call();
-            }
-          : null,
+    final resolvedOnTap =
+        state == ChoiceState.normal || state == ChoiceState.selected
+            ? () {
+                HapticFeedback.lightImpact();
+                onTap?.call();
+              }
+            : null;
+
+    return MotionPressable(
+      onTap: resolvedOnTap,
+      enabled: resolvedOnTap != null,
       child: LiquidGlassContainer(
         padding: const EdgeInsets.all(AppSpacing.md),
         borderRadius: BorderRadius.circular(AppRadius.button),
@@ -679,43 +932,54 @@ class SocialSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isNetwork = iconAsset.startsWith('http');
+    final enabled = !isLoading && onPressed != null;
+    final iconPixels = (24 * MediaQuery.devicePixelRatioOf(context)).round();
 
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: scheme.onSurface,
-          side: BorderSide(color: scheme.outline),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.button),
+    return MotionPressable(
+      enabled: enabled,
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: OutlinedButton(
+          onPressed: enabled ? onPressed : null,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: scheme.onSurface,
+            side: BorderSide(color: scheme.outline),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.button),
+            ),
+            backgroundColor: scheme.surface.withOpacityValue(0.5),
           ),
-          backgroundColor: scheme.surface.withOpacityValue(0.5),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (isNetwork)
-                    Image.network(iconAsset, width: 24, height: 24)
-                  else
-                    Image.asset(iconAsset, width: 24, height: 24),
-                  const SizedBox(width: AppSpacing.md),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (isNetwork)
+                      Image.network(
+                        iconAsset,
+                        width: 24,
+                        height: 24,
+                        cacheWidth: iconPixels,
+                        cacheHeight: iconPixels,
+                      )
+                    else
+                      Image.asset(iconAsset, width: 24, height: 24),
+                    const SizedBox(width: AppSpacing.md),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+        ),
       ),
     );
   }

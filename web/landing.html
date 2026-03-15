@@ -24,6 +24,7 @@
     }
 
     :root {
+      color-scheme: dark;
       --saffron: #F97316;
       --saffron-light: #FB923C;
       --saffron-dark: #EA580C;
@@ -53,6 +54,43 @@
       overflow-x: hidden;
     }
 
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 150;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      background: rgba(215, 229, 255, 0.94);
+      color: #07101f;
+      text-decoration: none;
+      box-shadow: 0 16px 36px rgba(5, 10, 20, 0.32);
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus-visible {
+      top: 1rem;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(143, 200, 255, 0.96);
+      outline-offset: 4px;
+    }
+
+    .nav-logo:focus-visible,
+    .nav-cta:focus-visible,
+    .btn-primary:focus-visible,
+    .btn-secondary:focus-visible,
+    .cta-btn:focus-visible,
+    footer a:focus-visible {
+      box-shadow: 0 0 0 4px rgba(143, 200, 255, 0.28);
+    }
+
+    main [id] {
+      scroll-margin-top: 6rem;
+    }
+
     /* ── NAV ── */
     nav {
       position: fixed;
@@ -68,7 +106,8 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(249, 115, 22, 0.15);
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, border-color 0.3s ease,
+        box-shadow 0.3s ease;
     }
 
     .nav-logo {
@@ -107,7 +146,8 @@
       font-size: 0.9rem;
       text-decoration: none;
       box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
-      transition: all 0.25s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease,
+        background-color 0.25s ease, border-color 0.25s ease;
     }
 
     .nav-cta:hover {
@@ -125,13 +165,12 @@
       overflow: hidden;
     }
 
-    .hero-bg {
+    #wave-canvas {
       position: absolute;
       inset: 0;
-      background:
-        radial-gradient(ellipse 70% 60% at 60% 40%, rgba(249, 115, 22, 0.10) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 60%),
-        linear-gradient(160deg, #FFF7ED 0%, #FEF3C7 50%, #FFFBEB 100%);
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     /* Decorative blobs */
@@ -266,7 +305,8 @@
       font-size: 1.05rem;
       text-decoration: none;
       box-shadow: 0 8px 28px rgba(249, 115, 22, 0.45);
-      transition: all 0.25s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease,
+        background-color 0.25s ease, border-color 0.25s ease;
       font-family: 'Nunito', sans-serif;
     }
 
@@ -295,7 +335,8 @@
       font-weight: 700;
       font-size: 1rem;
       text-decoration: none;
-      transition: all 0.25s ease;
+      transition: transform 0.25s ease, background-color 0.25s ease,
+        border-color 0.25s ease, color 0.25s ease;
       font-family: 'Nunito', sans-serif;
     }
 
@@ -422,10 +463,6 @@
       animation: floatBubble 6s 0.5s ease-in-out infinite;
     }
 
-    .bubble-emoji {
-      font-size: 1rem;
-    }
-
     /* ── FEATURES SECTION ── */
     .section {
       padding: 5rem 2rem;
@@ -482,7 +519,8 @@
       padding: 2rem;
       border: 1px solid var(--gray-100);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease,
+        border-color 0.3s ease;
       position: relative;
       overflow: hidden;
     }
@@ -516,9 +554,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.7rem;
       margin-bottom: 1.2rem;
       background: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(245, 158, 11, 0.08));
+      color: var(--saffron);
     }
 
     .feature-title {
@@ -595,12 +633,6 @@
       color: white;
       margin: 0 auto 1.2rem;
       box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
-    }
-
-    .step-emoji {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-      display: block;
     }
 
     .step-title {
@@ -764,7 +796,8 @@
       box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5);
       position: relative;
       z-index: 1;
-      transition: all 0.25s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease,
+        background-color 0.25s ease, border-color 0.25s ease;
       font-family: 'Nunito', sans-serif;
     }
 
@@ -975,12 +1008,30 @@
     .reveal {
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.7s ease;
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
     .reveal.visible {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
     }
 
     /* ── DARK GLASS HERO OVERRIDE ── */
@@ -1001,15 +1052,6 @@
       border-bottom: 1px solid rgba(190, 214, 255, 0.2);
     }
 
-    .hero-bg {
-      background:
-        radial-gradient(circle at 16% 20%, rgba(74, 180, 255, 0.32), transparent 42%),
-        radial-gradient(circle at 82% 15%, rgba(249, 115, 22, 0.28), transparent 44%),
-        radial-gradient(circle at 78% 82%, rgba(58, 120, 255, 0.28), transparent 46%),
-        linear-gradient(130deg, #081021 0%, #101a34 38%, #1b1628 100%);
-      background-size: 180% 180%;
-      animation: gradientShift 14s ease-in-out infinite;
-    }
 
     .blob {
       opacity: 0.55;
@@ -1095,42 +1137,31 @@
       border-top: 1px solid rgba(220, 235, 255, 0.2);
     }
 
-    @keyframes gradientShift {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
-    }
   </style>
 </head>
 
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <!-- NAV -->
   <nav>
     <a href="#" class="nav-logo">
-      <img src="web/duo_guide.png" alt="Duo Guide Mascot">
+      <img src="web/duo_guide.png" alt="Duo Guide Mascot" width="36" height="36">
       <span class="nav-logo-text">JainQuest</span>
     </a>
     <a href="index.html?launch=1" class="nav-cta" id="nav-launch-btn">
       Launch App
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round">
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <path d="M5 12h14M12 5l7 7-7 7" />
       </svg>
     </a>
   </nav>
 
+  <main id="main-content" tabindex="-1">
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg"></div>
+    <canvas id="wave-canvas"></canvas>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
@@ -1140,7 +1171,7 @@
       <div class="hero-content">
         <div class="hero-badge">
           <div class="hero-badge-dot"></div>
-          Gamified Jain Learning for Teens
+          Begin your spiritual journey
         </div>
 
         <h1 class="hero-title">
@@ -1158,12 +1189,12 @@
           <a href="index.html?launch=1" class="btn-primary" id="hero-launch-btn">
             Start Your Quest
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </a>
           <a href="#features" class="btn-secondary">
-            ✦ Explore Features
+            Explore Features
           </a>
         </div>
 
@@ -1189,19 +1220,16 @@
           <div class="mascot-glow"></div>
           <div class="mascot-ring mascot-ring-2"></div>
           <div class="mascot-ring mascot-ring-1"></div>
-          <img src="web/duo_guide.png" alt="JainQuest Duo Guide" class="mascot-img">
+          <img src="web/duo_guide.png" alt="JainQuest Duo Guide" class="mascot-img" width="280" height="280">
         </div>
 
         <div class="bubble bubble-1">
-          <span class="bubble-emoji">☮️</span>
           Ahimsa
         </div>
         <div class="bubble bubble-2">
-          <span class="bubble-emoji">🌿</span>
           Aparigraha
         </div>
         <div class="bubble bubble-3">
-          <span class="bubble-emoji">⭐</span>
           +50 XP earned!
         </div>
       </div>
@@ -1219,37 +1247,49 @@
 
     <div class="features-grid">
       <div class="feature-card reveal">
-        <div class="feature-icon">🎮</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="12" rx="4"/><line x1="8" y1="12" x2="12" y2="12"/><line x1="10" y1="10" x2="10" y2="14"/><circle cx="16" cy="11" r="1"/><circle cx="18" cy="13" r="1"/></svg>
+        </div>
         <div class="feature-title">Gamified Learning</div>
         <div class="feature-desc">Earn XP, unlock achievements, and level up as you explore Jain principles through
           interactive challenges and quizzes.</div>
       </div>
       <div class="feature-card reveal">
-        <div class="feature-icon">🤖</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </div>
         <div class="feature-title">AI-Powered Guide</div>
         <div class="feature-desc">Your personal Jain guide answers questions, explains concepts, and adapts to your
           learning pace with AI-driven conversations.</div>
       </div>
       <div class="feature-card reveal">
-        <div class="feature-icon">📖</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
         <div class="feature-title">Deep Content</div>
         <div class="feature-desc">From the five vows (Mahavrats) to Anekantavada — explore rich, well-researched content
           explained in modern, easy language.</div>
       </div>
       <div class="feature-card reveal">
-        <div class="feature-icon">🧘</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="6" r="2"/><path d="M5 22c0-3.87 3.13-7 7-7s7 3.13 7 7"/><path d="M5 13c1.5-2 4-3 7-3s5.5 1 7 3"/></svg>
+        </div>
         <div class="feature-title">Mindful Practices</div>
         <div class="feature-desc">Guided meditations and breathing exercises rooted in Jain philosophy for a calmer,
           more intentional daily life.</div>
       </div>
       <div class="feature-card reveal">
-        <div class="feature-icon">🎵</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
         <div class="feature-title">Sacred Music & Stutis</div>
         <div class="feature-desc">Listen to and practice Jain stutis and hymns, connecting with tradition through the
           power of devotional music.</div>
       </div>
       <div class="feature-card reveal">
-        <div class="feature-icon">📊</div>
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+        </div>
         <div class="feature-title">Track Your Growth</div>
         <div class="feature-desc">Visualize your learning journey with beautiful progress charts, practice history, and
           personalized insights.</div>
@@ -1269,28 +1309,24 @@
     <div class="steps-grid">
       <div class="step reveal">
         <div class="step-number">1</div>
-        <span class="step-emoji">👤</span>
         <div class="step-title">Create Your Profile</div>
         <div class="step-desc">Sign up in seconds and personalize your JainQuest journey with your interests and goals.
         </div>
       </div>
       <div class="step reveal">
         <div class="step-number">2</div>
-        <span class="step-emoji">🎓</span>
         <div class="step-title">Choose Your Path</div>
         <div class="step-desc">Pick from Ahimsa, Anekant, Aparigraha and more — learn what resonates with you most.
         </div>
       </div>
       <div class="step reveal">
         <div class="step-number">3</div>
-        <span class="step-emoji">⚡</span>
         <div class="step-title">Learn & Earn XP</div>
         <div class="step-desc">Complete lessons, answer quizzes, and practice with your AI guide to earn experience
           points.</div>
       </div>
       <div class="step reveal">
         <div class="step-number">4</div>
-        <span class="step-emoji">🏆</span>
         <div class="step-title">Level Up & Grow</div>
         <div class="step-desc">Unlock new content as you grow, and watch your understanding of Jain wisdom deepen
           beautifully.</div>
@@ -1301,8 +1337,8 @@
   <!-- QUOTE -->
   <section class="quote-section">
     <div class="quote-card reveal">
-      <div class="quote-mark">✦</div>
-      <img src="web/duo_guide.png" alt="Duo Guide" class="quote-mascot">
+      <div class="quote-mark">"</div>
+      <img src="web/duo_guide.png" alt="Duo Guide" class="quote-mascot" width="80" height="80">
       <p class="quote-text">
         "The soul comes alone and goes alone, no one companies it, and no one becomes its mate. <span
           class="highlight">The quest for wisdom begins within.</span>"
@@ -1314,17 +1350,17 @@
   <!-- CTA -->
   <section class="cta-section">
     <div class="cta-card">
-      <img src="web/duo_guide.png" alt="Duo Guide Mascot" class="cta-mascot">
+      <img src="web/duo_guide.png" alt="Duo Guide Mascot" class="cta-mascot" width="110" height="110">
       <h2 class="cta-title">
         Ready to begin your<br>
         <span class="highlight">Jain Quest?</span>
       </h2>
       <p class="cta-sub">
         Join thousands of learners discovering the beauty of Jain philosophy.<br>
-        Your guide is waiting. 🌸
+        Your guide is waiting.
       </p>
       <a href="index.html?launch=1" class="cta-btn" id="cta-launch-btn">
-        🚀 Launch JainQuest
+        Launch JainQuest
       </a>
     </div>
   </section>
@@ -1332,29 +1368,37 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-logo">
-      <img src="web/duo_guide.png" alt="JainQuest">
+      <img src="web/duo_guide.png" alt="JainQuest" width="28" height="28">
       <span class="footer-logo-text">JainQuest</span>
     </div>
     <p>Gamified Jain learning for teens — calm, modern, non-preachy.</p>
-    <p style="margin-top: 0.5rem;">Made with 🧡 | <a href="index.html?launch=1">Open App</a></p>
+    <p style="margin-top: 0.5rem;">Made with love | <a href="index.html?launch=1">Open App</a></p>
   </footer>
+  </main>
 
   <script>
     // Intersection Observer for scroll reveal
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              entry.target.classList.add('visible');
-            }, i * 80);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealElements = document.querySelectorAll('.reveal');
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    if (reduceMotion) {
+      revealElements.forEach((element) => element.classList.add('visible'));
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('visible');
+              }, i * 80);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      revealElements.forEach((element) => observer.observe(element));
+    }
 
     // Nav shadow on scroll
     window.addEventListener('scroll', () => {
@@ -1384,6 +1428,117 @@
       `;
       dotsContainer.appendChild(dot);
     }
+  </script>
+  <script>
+    // Wave background animation (canvas)
+    (function () {
+      const canvas = document.getElementById('wave-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let mouseX = -9999, mouseY = -9999;
+      let time = 0;
+
+      function resize() {
+        const hero = canvas.parentElement;
+        canvas.width = hero.offsetWidth;
+        canvas.height = hero.offsetHeight;
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      const hero = canvas.parentElement;
+      if (!reducedMotion) {
+        hero.addEventListener('mousemove', (e) => {
+          const rect = hero.getBoundingClientRect();
+          mouseX = e.clientX - rect.left;
+          mouseY = e.clientY - rect.top;
+        });
+        hero.addEventListener('mouseleave', () => {
+          mouseX = -9999;
+          mouseY = -9999;
+        });
+      }
+
+      function noise2D(x, y) {
+        const ix = Math.floor(x), iy = Math.floor(y);
+        const fx = x - ix, fy = y - iy;
+        function smooth(t) { return t * t * (3 - 2 * t); }
+        function lerp(a, b, t) { return a + t * (b - a); }
+        function rand2(nx, ny) {
+          const n = Math.sin(nx * 127.1 + ny * 311.7) * 43758.5453;
+          return n - Math.floor(n);
+        }
+        return lerp(
+          lerp(rand2(ix, iy), rand2(ix + 1, iy), smooth(fx)),
+          lerp(rand2(ix, iy + 1), rand2(ix + 1, iy + 1), smooth(fx)),
+          smooth(fy)
+        );
+      }
+
+      function draw() {
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, W, H);
+
+        const cols = 32;
+        const rows = 22;
+        const colSpacing = W / cols;
+        const rowSpacing = H / rows;
+        const amplitude = colSpacing * 0.9;
+        const noiseScale = 0.0035;
+        const speed = 0.003;
+        const mouseRadius = 130;
+        const mouseStrength = 70;
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.lineWidth = 1.4;
+
+        for (let col = 0; col <= cols; col++) {
+          const baseX = col * colSpacing;
+          const points = [];
+
+          for (let row = 0; row <= rows; row++) {
+            const y = row * rowSpacing;
+            const n = noise2D(baseX * noiseScale + time, y * noiseScale + time * 0.4);
+            let x = baseX + (n - 0.5) * 2 * amplitude;
+
+            const dx = x - mouseX;
+            const dy = y - mouseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouseRadius && dist > 0) {
+              const force = (1 - dist / mouseRadius) * mouseStrength;
+              x += (dx / dist) * force;
+            }
+
+            points.push([x, y]);
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(points[0][0], points[0][1]);
+          for (let i = 1; i < points.length - 1; i++) {
+            const mx = (points[i][0] + points[i + 1][0]) / 2;
+            const my = (points[i][1] + points[i + 1][1]) / 2;
+            ctx.quadraticCurveTo(points[i][0], points[i][1], mx, my);
+          }
+          ctx.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
+          ctx.stroke();
+        }
+
+        if (reducedMotion) {
+          return;
+        }
+
+        time += speed;
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    })();
   </script>
 </body>
 

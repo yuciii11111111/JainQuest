@@ -36,13 +36,24 @@ class ForumService {
   }
 
   Stream<List<ForumPost>> watchPosts({String? category}) {
-    return _posts.orderBy('createdAt', descending: true).snapshots().map(
+    final query = category == null
+        ? _posts.orderBy('createdAt', descending: true)
+        : _posts.where('category', isEqualTo: category);
+
+    return query.snapshots().map(
       (snapshot) {
         final posts = snapshot.docs.map(ForumPost.fromDoc).toList();
-        if (category == null) {
-          return posts;
+        if (category != null) {
+          posts.sort((a, b) {
+            final aDate = a.createdAt;
+            final bDate = b.createdAt;
+            if (aDate == null && bDate == null) return 0;
+            if (aDate == null) return 1;
+            if (bDate == null) return -1;
+            return bDate.compareTo(aDate);
+          });
         }
-        return posts.where((post) => post.category == category).toList();
+        return posts;
       },
     );
   }

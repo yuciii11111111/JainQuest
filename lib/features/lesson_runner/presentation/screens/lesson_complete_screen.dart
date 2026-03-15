@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/gamification/gamification_service.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/lesson_models.dart';
@@ -11,8 +12,7 @@ import '../../../../core/widgets/tr_text.dart';
 
 class LessonCompleteScreenWidget extends StatefulWidget {
   final LessonCompleteScreen screen;
-  final int xpEarned;
-  final bool isPerfect;
+  final LessonCompletionSummary summary;
   final String? badgeEarned;
   final int streak;
   final VoidCallback onContinue;
@@ -20,8 +20,7 @@ class LessonCompleteScreenWidget extends StatefulWidget {
   const LessonCompleteScreenWidget({
     super.key,
     required this.screen,
-    required this.xpEarned,
-    required this.isPerfect,
+    required this.summary,
     this.badgeEarned,
     required this.streak,
     required this.onContinue,
@@ -36,7 +35,7 @@ class _LessonCompleteScreenWidgetState
     extends State<LessonCompleteScreenWidget> {
   @override
   Widget build(BuildContext context) {
-    final displayedXp = widget.xpEarned;
+    final displayedXp = widget.summary.totalXp;
     return Stack(
       children: [
         // Content
@@ -92,36 +91,67 @@ class _LessonCompleteScreenWidgetState
                         ),
                       ],
                     ),
-                    if (widget.isPerfect) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: AppSpacing.sm,
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacityValue(0.06),
+                        borderRadius: BorderRadius.circular(AppRadius.card),
+                        border: Border.all(
+                          color: Colors.white.withOpacityValue(0.08),
                         ),
-                        decoration: BoxDecoration(
-                          color: AppColors.success,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.emoji_events_rounded,
-                              size: 20,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            Text(
-                              context.t('perfect_score_bonus'),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                      ),
+                      child: Column(
+                        children: [
+                          _RewardBreakdownRow(
+                            label: context.t('answer_xp'),
+                            amount: widget.summary.answerXp,
+                          ),
+                          if (widget.summary.awardedPerfectBonus) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _RewardBreakdownRow(
+                              label: context.t('perfect_score_bonus'),
+                              amount: widget.summary.perfectBonusXp,
+                              highlight: AppColors.success,
                             ),
                           ],
-                        ),
+                          if (widget.summary.awardedFirstCompletionBonus) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _RewardBreakdownRow(
+                              label: context.t('first_completion_bonus'),
+                              amount: widget.summary.firstCompletionBonusXp,
+                              highlight: AppColors.secondary,
+                            ),
+                          ],
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: AppSpacing.sm,
+                            ),
+                            child: Divider(height: 1),
+                          ),
+                          _RewardBreakdownRow(
+                            label: context.t('session_total_xp'),
+                            amount: widget.summary.totalXp,
+                            emphasize: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (widget.summary.awardedPerfectBonus) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _BonusChip(
+                        icon: Icons.emoji_events_rounded,
+                        label: context.t('perfect_score_bonus'),
+                        color: AppColors.success,
+                      ),
+                    ],
+                    if (widget.summary.awardedFirstCompletionBonus) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      _BonusChip(
+                        icon: Icons.rocket_launch_rounded,
+                        label: context.t('first_completion_bonus'),
+                        color: AppColors.secondary,
                       ),
                     ],
                   ],
@@ -220,10 +250,12 @@ class _LessonCompleteScreenWidgetState
                 label: context.t('share_achievement'),
                 icon: Icons.share_rounded,
                 onPressed: () {
-                  Share.share(
-                    context.t(
-                      'share_msg',
-                      args: {'xp': widget.xpEarned.toString()},
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text: context.t(
+                        'share_msg',
+                        args: {'xp': widget.summary.totalXp.toString()},
+                      ),
                     ),
                   );
                 },
@@ -235,6 +267,94 @@ class _LessonCompleteScreenWidgetState
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RewardBreakdownRow extends StatelessWidget {
+  const _RewardBreakdownRow({
+    required this.label,
+    required this.amount,
+    this.highlight,
+    this.emphasize = false,
+  });
+
+  final String label;
+  final int amount;
+  final Color? highlight;
+  final bool emphasize;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = highlight ?? Theme.of(context).colorScheme.onSurface;
+    final textStyle = emphasize
+        ? Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: color,
+            )
+        : Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: color,
+            );
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: textStyle,
+          ),
+        ),
+        Text(
+          '+$amount XP',
+          style: textStyle,
+        ),
+      ],
+    );
+  }
+}
+
+class _BonusChip extends StatelessWidget {
+  const _BonusChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: Colors.white,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

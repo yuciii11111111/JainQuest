@@ -11,10 +11,12 @@ import '../../profile/presentation/profile_setup_screen.dart';
 import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/gamification/gamification_constants.dart';
+import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/models/badge_definition.dart';
 import '../../../core/models/user_models.dart' as user_models;
 import '../../auth/presentation/create_account_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
+import '../../../core/localization/app_strings.dart';
 
 // Import types directly for convenience
 typedef UserProfile = user_models.UserProfile;
@@ -61,7 +63,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Profile',
+                      context.t('profile'),
                       style: Theme.of(context)
                           .textTheme
                           .displaySmall
@@ -71,9 +73,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: const Icon(Icons.settings_rounded),
                       color: scheme.onSurfaceVariant,
                       onPressed: () {
-                        Navigator.of(context).pushUltraSmooth(const SettingsScreen());
+                        Navigator.of(context)
+                            .pushUltraSmooth(const SettingsScreen());
                       },
-                      tooltip: 'Settings',
+                      tooltip: context.t('settings'),
                     ),
                   ],
                 ),
@@ -104,7 +107,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   shape: BoxShape.circle,
                                   color: scheme.surface,
                                 ),
-                                child: _ProfileAvatar(emoji: user.avatarEmoji),
+                                child: _ProfileAvatar(
+                                  avatarUrl: user.avatarUrl,
+                                  emoji: user.avatarEmoji,
+                                ),
                               ),
                             ),
                           ),
@@ -126,7 +132,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        user.displayName ?? 'Learner',
+                        user.displayName ?? context.t('learner'),
                         style: Theme.of(context)
                             .textTheme
                             .headlineMedium
@@ -134,7 +140,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Level ${user.level} - ${LevelSystem.getLevelTitle(user.level)}',
+                        context.t('level_title', args: {
+                          'level': '${user.level}',
+                          'title': LevelSystem.getLevelTitle(user.level),
+                        }),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                             ),
@@ -145,19 +154,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           _QuickStat(
                             icon: Icons.star_rounded,
-                            label: 'Points',
+                            label: context.t('points'),
                             value: '${user.totalXp}',
                             color: AppColors.achievementGold,
                           ),
                           _QuickStat(
                             icon: Icons.public_rounded,
-                            label: 'World',
+                            label: context.t('world'),
                             value: '#${(5000 - user.totalXp).clamp(1, 9999)}',
                             color: AppColors.highlight,
                           ),
                           _QuickStat(
                             icon: Icons.place_rounded,
-                            label: 'Local',
+                            label: context.t('local'),
                             value:
                                 '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
                             color: AppColors.secondary,
@@ -179,7 +188,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: GradientButton(
-                  label: 'Sign out',
+                  label: context.t('sign_out'),
                   icon: Icons.logout_rounded,
                   onPressed: _signOut,
                   width: double.infinity,
@@ -240,12 +249,32 @@ class _QuickStat extends StatelessWidget {
 }
 
 class _ProfileAvatar extends StatelessWidget {
+  final String? avatarUrl;
   final String? emoji;
 
-  const _ProfileAvatar({this.emoji});
+  const _ProfileAvatar({this.avatarUrl, this.emoji});
 
   @override
   Widget build(BuildContext context) {
+    if (avatarUrl != null && avatarUrl!.isNotEmpty) {
+      final targetPixels =
+          (86 * MediaQuery.devicePixelRatioOf(context)).round();
+      return ClipOval(
+        child: Image.network(
+          avatarUrl!,
+          width: 86,
+          height: 86,
+          cacheWidth: targetPixels,
+          cacheHeight: targetPixels,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const Icon(
+            Icons.self_improvement_rounded,
+            size: 48,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
     if (emoji != null && emoji!.trim().isNotEmpty) {
       return Text(
         emoji!,
@@ -273,10 +302,12 @@ class _BadgesTab extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     // Combine all badges
     final combinedBadges = <_BadgeDisplay>[];
+    final seenBadgeIds = <String>{};
 
     // Add lesson badges (BadgeDefinition)
     for (final badge in lessonBadges) {
       final isEarned = progress.earnedBadges.contains(badge.id);
+      seenBadgeIds.add(badge.id);
       combinedBadges.add(_BadgeDisplay(
         id: badge.id,
         name: badge.name,
@@ -288,7 +319,7 @@ class _BadgesTab extends StatelessWidget {
     // Add gamification badges (Badge)
     for (final badge in allBadges) {
       // Skip if already added as lesson badge
-      if (combinedBadges.any((b) => b.id == badge.id)) continue;
+      if (!seenBadgeIds.add(badge.id)) continue;
 
       final isEarned = progress.earnedBadges.contains(badge.id);
       combinedBadges.add(_BadgeDisplay(
@@ -305,12 +336,15 @@ class _BadgesTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your Badges',
+            context.t('your_badges'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            '${combinedBadges.where((b) => b.isEarned).length} of ${combinedBadges.length} earned',
+            context.t('earned_of_total', args: {
+              'earned': '${combinedBadges.where((b) => b.isEarned).length}',
+              'total': '${combinedBadges.length}'
+            }),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -329,67 +363,63 @@ class _BadgesTab extends StatelessWidget {
             itemBuilder: (context, index) {
               final badge = combinedBadges[index];
 
-              return GestureDetector(
-                onTap: () {
-                  _showBadgeDetails(context, badge);
-                },
-                child: FloatingCard(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
+              return FloatingCard(
+                onTap: () => _showBadgeDetails(context, badge),
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: badge.isEarned
+                            ? AppColors.secondary.withOpacityValue(0.16)
+                            : scheme.surfaceContainerHighest,
+                        shape: BoxShape.circle,
+                        border: Border.all(
                           color: badge.isEarned
-                              ? AppColors.secondary.withOpacityValue(0.16)
-                              : scheme.surfaceContainerHighest,
-                          shape: BoxShape.circle,
-                          border: Border.all(
+                              ? AppColors.secondary
+                              : scheme.outline,
+                          width: 2,
+                        ),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(
+                            Icons.workspace_premium_rounded,
+                            size: 26,
                             color: badge.isEarned
                                 ? AppColors.secondary
-                                : scheme.outline,
-                            width: 2,
+                                : scheme.onSurfaceVariant,
                           ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              Icons.workspace_premium_rounded,
-                              size: 26,
-                              color: badge.isEarned
-                                  ? AppColors.secondary
-                                  : scheme.onSurfaceVariant,
-                            ),
-                            if (!badge.isEarned)
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: scheme.surface.withOpacityValue(0.7),
-                                  shape: BoxShape.circle,
-                                ),
+                          if (!badge.isEarned)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: scheme.surface.withOpacityValue(0.7),
+                                shape: BoxShape.circle,
                               ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        badge.name,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: badge.isEarned
-                                  ? scheme.onSurface
-                                  : scheme.onSurfaceVariant,
-                              fontWeight: badge.isEarned
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
                             ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      badge.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: badge.isEarned
+                                ? scheme.onSurface
+                                : scheme.onSurfaceVariant,
+                            fontWeight: badge.isEarned
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -456,7 +486,7 @@ class _BadgesTab extends StatelessWidget {
                           color: AppColors.warning.withOpacityValue(0.3)),
                     ),
                     child: Text(
-                      'Locked - Complete challenges to unlock',
+                      context.t('locked_badge'),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.warning,
                           ),
@@ -465,7 +495,7 @@ class _BadgesTab extends StatelessWidget {
                   ),
                 const SizedBox(height: AppSpacing.lg),
                 GradientButton(
-                  label: 'Close',
+                  label: context.t('close'),
                   onPressed: () => Navigator.of(context).pop(),
                   width: double.infinity,
                 ),
@@ -507,7 +537,7 @@ class _StatsTab extends StatelessWidget {
     final totalLessonsCompleted = progress.completedLessons.length;
     final levelProgress =
         LevelSystem.getLevelProgress(user.level, user.totalXp);
-    final dayLabels = _buildWeekdayLabels();
+    final dayLabels = _buildWeekdayLabels(context);
     final activityCounts = _buildWeeklyLessonCounts(progress);
     final trendPoints = List.generate(
       7,
@@ -528,7 +558,7 @@ class _StatsTab extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Progress',
+                    Text(context.t('progress'),
                         style: Theme.of(context).textTheme.titleMedium),
                     Text('${(levelProgress * 100).round()}%',
                         style: Theme.of(context).textTheme.titleMedium),
@@ -554,7 +584,8 @@ class _StatsTab extends StatelessWidget {
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                           Text(
-                            'Level ${user.level}',
+                            context.t('level_num',
+                                args: {'level': '${user.level}'}),
                             style: Theme.of(context)
                                 .textTheme
                                 .labelSmall
@@ -569,7 +600,7 @@ class _StatsTab extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Keep going to reach the next level.',
+                            context.t('keep_going'),
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: scheme.onSurfaceVariant,
@@ -577,7 +608,7 @@ class _StatsTab extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _DetailRow(
-                            label: 'XP to next level',
+                            label: context.t('xp_to_next_level'),
                             value:
                                 '${LevelSystem.getXpNeededForNextLevel(user.level, user.totalXp)}',
                             icon: Icons.trending_up,
@@ -597,7 +628,7 @@ class _StatsTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Activity',
+                Text(context.t('activity'),
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.md),
                 SizedBox(
@@ -655,7 +686,9 @@ class _StatsTab extends StatelessWidget {
                                   .toInt()
                                   .clamp(0, activityCounts.length - 1);
                               final count = activityCounts[index];
-                              final label = count == 1 ? 'lesson' : 'lessons';
+                              final label = count == 1
+                                  ? context.t('lesson_singular')
+                                  : context.t('lessons_plural');
                               return LineTooltipItem(
                                 '$count $label',
                                 Theme.of(context)
@@ -693,7 +726,7 @@ class _StatsTab extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _DetailRow(
-                        label: 'Lessons completed',
+                        label: context.t('lessons_completed_stat'),
                         value: '$totalLessonsCompleted',
                         icon: Icons.check_circle,
                       ),
@@ -701,7 +734,7 @@ class _StatsTab extends StatelessWidget {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: _DetailRow(
-                        label: 'Badges',
+                        label: context.t('badges_label'),
                         value: '${progress.earnedBadges.length}',
                         icon: Icons.workspace_premium,
                       ),
@@ -738,13 +771,21 @@ class _StatsTab extends StatelessWidget {
     return counts;
   }
 
-  List<String> _buildWeekdayLabels() {
-    const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  List<String> _buildWeekdayLabels(BuildContext context) {
+    final keys = [
+      'day_initial_mon',
+      'day_initial_tue',
+      'day_initial_wed',
+      'day_initial_thu',
+      'day_initial_fri',
+      'day_initial_sat',
+      'day_initial_sun',
+    ];
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     return List.generate(7, (index) {
       final day = today.subtract(Duration(days: 6 - index));
-      return labels[(day.weekday - 1) % 7];
+      return context.t(keys[(day.weekday - 1) % 7]);
     });
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/widgets/glass_card.dart';
 import '../../../core/widgets/floating_card.dart';
+import '../../../core/widgets/motion_pressable.dart';
 import '../../../core/providers/app_providers.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
@@ -19,9 +21,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final user = ref.watch(userProfileProvider);
-    
+
     // Mock leaderboard data - in production, this would come from a provider
-    final leaderboardData = _generateMockLeaderboard(user.id);
+    final leaderboardData = _generateMockLeaderboard(user.id, context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -35,7 +37,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Leaderboard',
+                      context.t('leaderboard'),
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -46,14 +48,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                         children: [
                           Expanded(
                             child: _ToggleButton(
-                              label: 'Weekly',
+                              label: context.t('weekly'),
                               isSelected: _isWeekly,
                               onTap: () => setState(() => _isWeekly = true),
                             ),
                           ),
                           Expanded(
                             child: _ToggleButton(
-                              label: 'All Time',
+                              label: context.t('all_time'),
                               isSelected: !_isWeekly,
                               onTap: () => setState(() => _isWeekly = false),
                             ),
@@ -96,7 +98,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Rankings',
+                      context.t('rankings'),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -121,7 +123,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             width: 40,
                             child: Text(
                               '${index + 4}',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),
                               textAlign: TextAlign.center,
@@ -150,7 +155,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                               children: [
                                 Text(
                                   entry.name,
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
                                         color: isCurrentUser
                                             ? AppColors.primary
                                             : scheme.onSurface,
@@ -158,7 +166,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                       ),
                                 ),
                                 Text(
-                                  '${entry.xp} XP',
+                                  '${entry.xp} ${context.t('xp')}',
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ],
@@ -172,10 +180,12 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(AppRadius.pill),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                             child: Text(
-                              'Lvl ${entry.level}',
+                              context.t('level_abbreviated',
+                                  args: {'level': '${entry.level}'}),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -201,12 +211,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     );
   }
 
-  List<_LeaderboardEntry> _generateMockLeaderboard(String currentUserId) {
+  List<_LeaderboardEntry> _generateMockLeaderboard(
+      String currentUserId, BuildContext context) {
     return [
       _LeaderboardEntry(id: '1', name: 'Aarav', xp: 2500, level: 8),
       _LeaderboardEntry(id: '2', name: 'Priya', xp: 2300, level: 7),
       _LeaderboardEntry(id: '3', name: 'Rohan', xp: 2100, level: 7),
-      _LeaderboardEntry(id: currentUserId, name: 'You', xp: 1800, level: 6),
+      _LeaderboardEntry(
+          id: currentUserId, name: context.t('you'), xp: 1800, level: 6),
       _LeaderboardEntry(id: '4', name: 'Sneha', xp: 1700, level: 6),
       _LeaderboardEntry(id: '5', name: 'Kiran', xp: 1500, level: 5),
       _LeaderboardEntry(id: '6', name: 'Ananya', xp: 1300, level: 5),
@@ -245,7 +257,7 @@ class _ToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return GestureDetector(
+    return MotionPressable(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
@@ -356,7 +368,8 @@ class _PodiumPlace extends StatelessWidget {
           ),
           child: Center(
             child: place == 1
-                ? const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 32)
+                ? const Icon(Icons.emoji_events_rounded,
+                    color: Colors.white, size: 32)
                 : Text(
                     entry.name[0].toUpperCase(),
                     style: const TextStyle(
@@ -381,7 +394,7 @@ class _PodiumPlace extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         // XP
         Text(
-          '${entry.xp} XP',
+          '${entry.xp} ${context.t('xp')}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -451,14 +464,17 @@ class _YourRankCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your Rank',
+                  context.t('your_rank'),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
                 Text(
-                  '${user.totalXp} XP • Level ${user.level}',
+                  context.t('xp_level_stats', args: {
+                    'xp': '${user.totalXp}',
+                    'level': '${user.level}',
+                  }),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],

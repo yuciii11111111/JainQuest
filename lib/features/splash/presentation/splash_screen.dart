@@ -9,8 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/theme/app_motion.dart';
 import '../../../core/widgets/liquid_glass.dart';
-import '../../auth/presentation/login_screen.dart';
+import '../../auth/presentation/create_account_screen.dart';
 import '../../home/presentation/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -64,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _writeAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOutCubic,
+      curve: AppMotion.enterCurve,
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -95,7 +96,9 @@ class _SplashScreenState extends State<SplashScreen>
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacementUltraSmooth(const LoginScreen());
+      Navigator.of(context).pushReplacementUltraSmooth(
+        const CreateAccountScreen(),
+      );
       return;
     }
 
@@ -118,6 +121,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -129,9 +133,9 @@ class _SplashScreenState extends State<SplashScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 360),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
+                      duration: AppMotion.screenEnter,
+                      switchInCurve: AppMotion.enterCurve,
+                      switchOutCurve: AppMotion.exitCurve,
                       child: _BrandReveal(
                         key: ValueKey('brand_reveal_$_languageIndex'),
                         animationController: _animationController,

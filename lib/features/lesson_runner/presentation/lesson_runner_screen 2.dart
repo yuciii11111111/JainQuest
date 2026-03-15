@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/gamification/gamification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
@@ -85,7 +86,8 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          if (lessonState.currentScreenType == LessonScreenType.lessonComplete) {
+          if (lessonState.currentScreenType ==
+              LessonScreenType.lessonComplete) {
             ref.read(lessonRunnerProvider.notifier).endLesson();
             Navigator.of(context).pop();
           } else {
@@ -109,7 +111,9 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
                           onPressed: () {
                             if (lessonState.currentScreenType ==
                                 LessonScreenType.lessonComplete) {
-                              ref.read(lessonRunnerProvider.notifier).endLesson();
+                              ref
+                                  .read(lessonRunnerProvider.notifier)
+                                  .endLesson();
                               Navigator.of(context).pop();
                             } else {
                               _showExitDialog();
@@ -151,8 +155,10 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         return QuestionIntroScreenWidget(
           key: const ValueKey('question_intro'),
           screen: state.lesson.screens.questionIntro,
-          onAnswer: (isCorrect) {
-            ref.read(lessonRunnerProvider.notifier).answerWarmup(isCorrect);
+          onAnswer: (isCorrect) async {
+            await ref
+                .read(lessonRunnerProvider.notifier)
+                .answerWarmup(isCorrect);
           },
           onContinue: () {
             ref.read(lessonRunnerProvider.notifier).nextScreen();
@@ -181,8 +187,10 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
           screen: state.lesson.screens.quiz,
           currentQuestionIndex: state.currentQuizQuestionIndex,
           hearts: user.hearts,
-          onAnswer: (isCorrect) {
-            ref.read(lessonRunnerProvider.notifier).answerQuizQuestion(isCorrect);
+          onAnswer: (isCorrect) async {
+            await ref
+                .read(lessonRunnerProvider.notifier)
+                .answerQuizQuestion(isCorrect);
           },
           onNextQuestion: () {
             ref.read(lessonRunnerProvider.notifier).advanceQuizQuestion();
@@ -196,8 +204,8 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
         return LessonCompleteScreenWidget(
           key: const ValueKey('lesson_complete'),
           screen: state.lesson.screens.lessonComplete,
-          xpEarned: state.totalXpEarned,
-          isPerfect: state.isPerfectQuiz,
+          summary: state.completionSummary ??
+              LessonCompletionSummary(answerXp: state.answerXpEarned),
           streak: user.currentStreak,
           onContinue: () {
             ref.read(lessonRunnerProvider.notifier).endLesson();

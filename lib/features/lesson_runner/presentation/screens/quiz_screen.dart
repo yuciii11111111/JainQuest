@@ -7,15 +7,16 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/liquid_glass.dart';
+import '../../../../core/widgets/motion_pressable.dart';
 import '../../../../core/widgets/tr_text.dart';
 
 class QuizScreenWidget extends StatefulWidget {
   final QuizScreen screen;
   final int currentQuestionIndex;
   final int hearts;
-  final Function(bool isCorrect) onAnswer;
+  final Future<void> Function(bool isCorrect) onAnswer;
   final VoidCallback onNextQuestion;
-  final VoidCallback onComplete;
+  final Future<void> Function() onComplete;
 
   const QuizScreenWidget({
     super.key,
@@ -59,7 +60,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
     if (showFeedback) return;
     // Safe vibration call
     try {
-      if (await Vibration.hasVibrator() ?? false) {
+      if (await Vibration.hasVibrator()) {
         Vibration.vibrate(duration: 50);
       }
     } catch (_) {
@@ -70,7 +71,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
     });
   }
 
-  void _checkAnswer() async {
+  Future<void> _checkAnswer() async {
     if (currentQuestion == null) return;
 
     bool isCorrect;
@@ -82,7 +83,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
         (c) => c.isCorrect,
         orElse: () => currentQuestion!.choices!.first,
       );
-      isCorrect = selectedChoiceId == correctChoice?.choiceId;
+      isCorrect = selectedChoiceId == correctChoice!.choiceId;
     }
 
     setState(() {
@@ -92,7 +93,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
 
     // Haptic feedback and confetti for correct answers
     try {
-      if (await Vibration.hasVibrator() ?? false) {
+      if (await Vibration.hasVibrator()) {
         if (isCorrect) {
           Vibration.vibrate(pattern: [0, 50, 100, 50]);
         } else {
@@ -103,12 +104,12 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
       // Ignore vibration errors
     }
 
-    widget.onAnswer(isCorrect);
+    await widget.onAnswer(isCorrect);
   }
 
-  void _continueToNext() {
+  Future<void> _continueToNext() async {
     if (widget.currentQuestionIndex >= widget.screen.questions.length - 1) {
-      widget.onComplete();
+      await widget.onComplete();
     } else {
       widget.onNextQuestion();
     }
@@ -226,14 +227,19 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
                             ? context.t('complete_quiz')
                             : context.t('next_question'),
                         icon: Icons.arrow_forward_rounded,
-                        onPressed: _continueToNext,
+                        onPressed: () {
+                          _continueToNext();
+                        },
                         width: double.infinity,
                       )
                     : GradientButton(
                         label: context.t('check_answer'),
                         icon: Icons.check_rounded,
-                        onPressed:
-                            selectedChoiceId != null ? _checkAnswer : null,
+                        onPressed: selectedChoiceId != null
+                            ? () {
+                                _checkAnswer();
+                              }
+                            : null,
                         width: double.infinity,
                       ),
               ),
@@ -385,8 +391,9 @@ class _OptionTile extends StatelessWidget {
         break;
     }
 
-    return GestureDetector(
+    return MotionPressable(
       onTap: onTap,
+      enabled: onTap != null,
       child: LiquidGlassContainer(
         padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md, vertical: AppSpacing.md),
@@ -475,8 +482,9 @@ class _TrueFalseButton extends StatelessWidget {
         break;
     }
 
-    return GestureDetector(
+    return MotionPressable(
       onTap: onTap,
+      enabled: onTap != null,
       child: LiquidGlassContainer(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart';
 
+import '../gamification/gamification_rules.dart';
+
 DateTime? _readDateTime(dynamic value) {
   if (value == null) return null;
   if (value is Timestamp) return value.toDate();
@@ -41,6 +43,8 @@ class UserProfile extends Equatable {
 
   final String? avatarEmoji;
 
+  final String? avatarUrl;
+
   final bool showGuidedTour;
 
   final String preferredLanguageCode;
@@ -59,6 +63,7 @@ class UserProfile extends Equatable {
     this.age,
     this.email,
     this.avatarEmoji,
+    this.avatarUrl,
     this.showGuidedTour = false,
     this.preferredLanguageCode = 'en',
   });
@@ -77,6 +82,7 @@ class UserProfile extends Equatable {
     int? age,
     String? email,
     String? avatarEmoji,
+    String? avatarUrl,
     bool? showGuidedTour,
     String? preferredLanguageCode,
   }) {
@@ -94,28 +100,20 @@ class UserProfile extends Equatable {
       age: age ?? this.age,
       email: email ?? this.email,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       showGuidedTour: showGuidedTour ?? this.showGuidedTour,
       preferredLanguageCode:
           preferredLanguageCode ?? this.preferredLanguageCode,
     );
   }
 
-  static const int maxHearts = 5;
+  static const int maxHearts = HeartsSystem.maxHearts;
 
-  int get xpForNextLevel => 50 * level;
-  int get xpProgressInLevel => totalXp - _totalXpForLevel(level - 1);
-  int get xpNeededForLevel => xpForNextLevel - xpProgressInLevel;
-
-  static int _totalXpForLevel(int level) {
-    if (level <= 0) return 0;
-    // Sum of 50*1 + 50*2 + ... + 50*level = 50 * level * (level + 1) / 2
-    return 25 * level * (level + 1);
-  }
-
-  double get levelProgress {
-    final neededForThisLevel = 50 * level;
-    return xpProgressInLevel / neededForThisLevel;
-  }
+  int get xpForNextLevel => LevelSystem.getXpForLevel(level + 1);
+  int get xpProgressInLevel => totalXp - LevelSystem.getXpForLevel(level);
+  int get xpNeededForLevel =>
+      LevelSystem.getXpNeededForNextLevel(level, totalXp);
+  double get levelProgress => LevelSystem.getLevelProgress(level, totalXp);
 
   bool get isProfileComplete {
     return (displayName?.trim().isNotEmpty ?? false) &&
@@ -138,6 +136,7 @@ class UserProfile extends Equatable {
       'age': age,
       'email': email,
       'avatarEmoji': avatarEmoji,
+      'avatarUrl': avatarUrl,
       'showGuidedTour': showGuidedTour,
       'preferredLanguageCode': preferredLanguageCode,
     };
@@ -158,6 +157,7 @@ class UserProfile extends Equatable {
       age: (data['age'] as num?)?.toInt(),
       email: data['email'] as String?,
       avatarEmoji: data['avatarEmoji'] as String?,
+      avatarUrl: data['avatarUrl'] as String?,
       showGuidedTour: data['showGuidedTour'] as bool? ?? false,
       preferredLanguageCode: data['preferredLanguageCode'] as String? ?? 'en',
     );
@@ -178,6 +178,7 @@ class UserProfile extends Equatable {
         age,
         email,
         avatarEmoji,
+        avatarUrl,
         showGuidedTour,
         preferredLanguageCode,
       ];

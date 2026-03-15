@@ -16,6 +16,14 @@ import 'core/navigation/app_navigator.dart';
 import 'features/splash/presentation/splash_screen.dart';
 import 'core/localization/language_provider.dart';
 
+final waveBackgroundControllerProvider = Provider<WaveBackgroundController>((
+  ref,
+) {
+  final controller = WaveBackgroundController();
+  ref.onDispose(controller.dispose);
+  return controller;
+});
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -55,6 +63,16 @@ class JainQuestApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final appLanguage = ref.watch(appLanguageProvider);
+    final waveBackgroundController =
+        ref.watch(waveBackgroundControllerProvider);
+    final mediaQuery = MediaQuery.maybeOf(context);
+    final disableAnimations = mediaQuery?.disableAnimations ?? false;
+    final viewportSize = mediaQuery?.size ?? const Size(1440, 900);
+    final isCompactViewport = viewportSize.width < 900;
+    final lineSpacing = disableAnimations
+        ? 24.0
+        : (isCompactViewport ? 20.0 : 16.0);
+    final pointerSize = isCompactViewport ? 6.0 : 8.0;
 
     // Update system UI overlay style based on theme
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -85,34 +103,65 @@ class JainQuestApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       builder: (context, child) {
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            const WaveBackground(
-              strokeColor: Color(0xD9FFFFFF),
-              backgroundColor: Color(0xFF000000),
-              pointerColor: Color(0xFFFFFFFF),
-              pointerSize: 8,
-              lineSpacingX: 12,
-              lineSpacingY: 12,
-            ),
-            IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.12),
-                      Colors.black.withValues(alpha: 0.5),
-                    ],
+        return Listener(
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: disableAnimations
+              ? null
+              : (event) =>
+                    waveBackgroundController.updatePointer(event.localPosition),
+          onPointerHover: disableAnimations
+              ? null
+              : (event) =>
+                    waveBackgroundController.updatePointer(event.localPosition),
+          onPointerMove: disableAnimations
+              ? null
+              : (event) =>
+                    waveBackgroundController.updatePointer(event.localPosition),
+          onPointerUp: disableAnimations
+              ? null
+              : (_) => waveBackgroundController.clearPointer(),
+          onPointerCancel: disableAnimations
+              ? null
+              : (_) => waveBackgroundController.clearPointer(),
+          child: MouseRegion(
+            opaque: false,
+            onExit: disableAnimations
+                ? null
+                : (_) => waveBackgroundController.clearPointer(),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (disableAnimations)
+                  const ColoredBox(color: Color(0xFF000000))
+                else
+                  WaveBackground(
+                    controller: waveBackgroundController,
+                    strokeColor: const Color(0xD9FFFFFF),
+                    backgroundColor: const Color(0xFF000000),
+                    pointerColor: const Color(0xFFFFFFFF),
+                    pointerSize: pointerSize,
+                    lineSpacingX: lineSpacing,
+                    lineSpacingY: lineSpacing,
+                  ),
+                IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.12),
+                          Colors.black.withValues(alpha: 0.5),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                child ?? const SizedBox.shrink(),
+                const GuidedTourOverlay(),
+              ],
             ),
-            child ?? const SizedBox.shrink(),
-            const GuidedTourOverlay(),
-          ],
+          ),
         );
       },
       home: const SplashScreen(),

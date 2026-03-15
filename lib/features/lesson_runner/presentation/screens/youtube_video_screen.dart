@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/models/lesson_models.dart';
 import '../../../../core/widgets/common_widgets.dart';
 
@@ -106,7 +107,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
     if (kIsWeb) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('External video playback not supported on web')),
+          SnackBar(content: Text(context.t('video_not_supported'))),
         );
       }
       return;
@@ -121,14 +122,14 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open video externally')),
+            SnackBar(content: Text(context.t('could_not_open'))),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Video unavailable: $e')),
+          SnackBar(content: Text('${context.t('video_unavailable')}: $e')),
         );
       }
     }
@@ -203,14 +204,14 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                       children: [
                         Text(
                           _videoSupported
-                              ? 'Video snippet is unavailable.'
-                              : 'Video playback is not supported on this device.',
+                              ? context.t('video_unavailable')
+                              : context.t('video_not_supported'),
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         if (hasVideoAsset) ...[
                           const SizedBox(height: AppSpacing.sm),
                           PrimaryButton(
-                            label: 'Open video externally',
+                            label: context.t('open_externally'),
                             icon: Icons.open_in_new_rounded,
                             onPressed: _openExternally,
                           ),
@@ -291,7 +292,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Text(
-                      'Short video clip for this lesson.',
+                      context.t('video_clip'),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -305,7 +306,7 @@ class _YoutubeVideoScreenWidgetState extends State<YoutubeVideoScreenWidget> {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: PrimaryButton(
-              label: 'Continue',
+              label: context.t('continue'),
               icon: Icons.arrow_forward_rounded,
               onPressed: widget.onContinue,
             ),

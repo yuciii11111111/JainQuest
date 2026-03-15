@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_motion.dart';
 import '../theme/app_theme.dart';
+import 'motion_pressable.dart';
 
 enum LiquidGlassShape { rounded, circle }
 
@@ -41,11 +43,16 @@ class LiquidGlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shapeIsCircle = shape == LiquidGlassShape.circle;
-    final resolvedRadius = borderRadius ?? BorderRadius.circular(AppRadius.card);
+    final resolvedRadius =
+        borderRadius ?? BorderRadius.circular(AppRadius.card);
     final effectiveBorderColor =
         borderColor ?? Colors.white.withOpacityValue(0.32);
+    final duration = AppMotion.resolveDuration(context, AppMotion.standard);
+    final curve = AppMotion.resolveCurve(context, AppMotion.standardCurve);
 
-    Widget childWidget = DecoratedBox(
+    Widget childWidget = AnimatedContainer(
+      duration: duration,
+      curve: curve,
       decoration: BoxDecoration(
         shape: shapeIsCircle ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: shapeIsCircle ? null : resolvedRadius,
@@ -75,7 +82,8 @@ class LiquidGlassContainer extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: shapeIsCircle ? BorderRadius.circular(999) : resolvedRadius,
+          borderRadius:
+              shapeIsCircle ? BorderRadius.circular(999) : resolvedRadius,
           child: childWidget,
         ),
       );
@@ -96,11 +104,18 @@ class LiquidGlassContainer extends StatelessWidget {
             ),
           );
 
+    final interactiveChild = onTap != null
+        ? MotionPressable(
+            hoveredScale: AppMotion.subtleHoverScale,
+            child: clipped,
+          )
+        : clipped;
+
     return Container(
       margin: margin,
       width: width,
       height: height,
-      child: clipped,
+      child: interactiveChild,
     );
   }
 }
@@ -142,7 +157,8 @@ class LiquidGlassIconBubble extends StatelessWidget {
         child: Icon(
           icon,
           size: iconSize,
-          color: iconColor ?? (isLight ? AppColors.lightTextPrimary : Colors.white),
+          color: iconColor ??
+              (isLight ? AppColors.lightTextPrimary : Colors.white),
         ),
       ),
     );

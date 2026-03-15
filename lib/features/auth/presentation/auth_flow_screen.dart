@@ -9,10 +9,13 @@ import '../../../core/navigation/app_navigator.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/theme/app_motion.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/liquid_glass.dart';
+import '../../../core/widgets/motion_pressable.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../profile/presentation/profile_setup_screen.dart';
+import '../../../core/localization/app_strings.dart';
 
 enum AuthIntent { undecided, signUp, signIn }
 
@@ -34,6 +37,9 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
 
   late AuthIntent _intent;
   late _AuthStep _step;
@@ -43,6 +49,10 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   bool _obscureConfirmPassword = true;
   bool _showConfirmPassword = false;
   bool _needsProfileSetup = false;
+  String? _emailError;
+  String? _passwordError;
+  String? _confirmPasswordError;
+  String? _formError;
 
   @override
   void initState() {
@@ -57,19 +67,19 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
   bool get _isSignUp => _intent == AuthIntent.signUp;
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.danger,
-      ),
-    );
+    if (!mounted) return;
+    setState(() {
+      _formError = message;
+    });
   }
 
   bool _isValidEmail(String value) {
@@ -77,8 +87,30 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
     return email.contains('@') && email.contains('.');
   }
 
+  void _clearErrors() {
+    _emailError = null;
+    _passwordError = null;
+    _confirmPasswordError = null;
+    _formError = null;
+  }
+
+  Widget _buildInlineError(String message) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: Text(
+        message,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.danger,
+              fontWeight: FontWeight.w600,
+            ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   void _setStep(_AuthStep step) {
     setState(() {
+      _clearErrors();
       _step = step;
     });
   }
@@ -86,6 +118,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   void _goBack() {
     if (_step == _AuthStep.welcome || _isLoading) return;
     setState(() {
+      _clearErrors();
       if (_step == _AuthStep.password) {
         _showConfirmPassword = false;
       }
@@ -114,14 +147,18 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
-    setState(() => _isLoading = true);
+    final googleSignInFailedMessage = context.t('google_signin_failed');
+    setState(() {
+      _clearErrors();
+      _isLoading = true;
+    });
     try {
       final user = await AuthService.signInWithGoogle();
       if (user == null) return;
 
       await _handleAuthSuccess(user, isNewUserHint: _isSignUp);
     } catch (_) {
-      _showError('Google sign-in failed. Please try again.');
+      _showError(googleSignInFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -130,29 +167,54 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
   }
 
   Future<void> _submitEmailStep() async {
+    setState(_clearErrors);
     if (!_isValidEmail(_emailController.text)) {
-      _showError('Enter a valid email address.');
+      setState(() {
+        _emailError = context.t('enter_valid_email');
+      });
+      _emailFocusNode.requestFocus();
       return;
     }
     _setStep(_AuthStep.password);
   }
 
   Future<void> _submitPasswordStep() async {
+    final passwordMinCharsMessage = context.t('password_min_chars');
+    final unableCreateAccountMessage = context.t('unable_create_account');
+    final unableLoginMessage = context.t('unable_login');
+    final authFailedMessage = context.t('auth_failed');
+    final authFailedRetryMessage = context.t('auth_failed_retry');
+    setState(() {
+      _passwordError = null;
+      _confirmPasswordError = null;
+      _formError = null;
+    });
     final password = _passwordController.text.trim();
     if (password.length < 6) {
-      _showError('Use at least 6 characters for the password.');
+      setState(() {
+        _passwordError = passwordMinCharsMessage;
+      });
+      _passwordFocusNode.requestFocus();
       return;
     }
 
     if (_isSignUp && !_showConfirmPassword) {
       setState(() => _showConfirmPassword = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _confirmPasswordFocusNode.requestFocus();
+        }
+      });
       return;
     }
 
     if (_isSignUp &&
         _confirmPasswordController.text.trim() !=
             _passwordController.text.trim()) {
-      _showError('Passwords do not match.');
+      setState(() {
+        _confirmPasswordError = context.t('passwords_no_match');
+      });
+      _confirmPasswordFocusNode.requestFocus();
       return;
     }
 
@@ -165,7 +227,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
           password: _passwordController.text.trim(),
         );
         final user = result.user;
-        if (user == null) throw StateError('Unable to create account.');
+        if (user == null) throw StateError(unableCreateAccountMessage);
 
         await StorageService.init(user: user);
         final profile = UserProfile(
@@ -183,13 +245,21 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
           password: _passwordController.text.trim(),
         );
         final user = result.user;
-        if (user == null) throw StateError('Unable to log in.');
+        if (user == null) throw StateError(unableLoginMessage);
         await _handleAuthSuccess(user);
       }
     } on FirebaseAuthException catch (error) {
-      _showError(error.message ?? 'Authentication failed.');
+      if (error.code == 'weak-password') {
+        setState(() {
+          _passwordError = passwordMinCharsMessage;
+        });
+        _passwordFocusNode.requestFocus();
+      } else {
+        _showError(error.message ?? authFailedMessage);
+        _passwordFocusNode.requestFocus();
+      }
     } catch (_) {
-      _showError('Authentication failed. Please try again.');
+      _showError(authFailedRetryMessage);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -244,10 +314,14 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
               child: Row(
                 children: [
                   if (_step != _AuthStep.intent && _step != _AuthStep.welcome)
-                    IconButton(
-                      onPressed: _isLoading ? null : _goBack,
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                      color: scheme.onSurface,
+                    MotionPressable(
+                      enabled: !_isLoading,
+                      child: IconButton(
+                        onPressed: _isLoading ? null : _goBack,
+                        tooltip: context.t('back'),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                        color: scheme.onSurface,
+                      ),
                     )
                   else
                     const SizedBox(width: 48),
@@ -279,15 +353,15 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
                 border: Border.all(color: scheme.outline),
               ),
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 260),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
+                duration: AppMotion.standard,
+                switchInCurve: AppMotion.enterCurve,
+                switchOutCurve: AppMotion.exitCurve,
                 transitionBuilder: (child, animation) {
                   return FadeTransition(
                     opacity: animation,
                     child: SlideTransition(
                       position: Tween<Offset>(
-                        begin: const Offset(0.06, 0),
+                        begin: AppMotion.contentOffset,
                         end: Offset.zero,
                       ).animate(animation),
                       child: child,
@@ -296,7 +370,9 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
                 },
                 child: KeyedSubtree(
                   key: ValueKey(_step.name + _showConfirmPassword.toString()),
-                  child: _buildStepContent(context),
+                  child: AutofillGroup(
+                    child: _buildStepContent(context),
+                  ),
                 ),
               ),
             ),
@@ -326,7 +402,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _CleanPrimaryButton(
-          label: 'Sign up',
+          label: context.t('sign_up'),
           onPressed: _isLoading
               ? null
               : () {
@@ -338,7 +414,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         ),
         const SizedBox(height: AppSpacing.md),
         _CleanTextButton(
-          label: 'I already have an account',
+          label: context.t('already_have_account'),
           onPressed: _isLoading
               ? null
               : () {
@@ -357,22 +433,25 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          _isSignUp ? 'Create your account' : 'Welcome back',
+          _isSignUp
+              ? context.t('create_your_account')
+              : context.t('welcome_back_title'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
         ),
+        if (_formError != null) _buildInlineError(_formError!),
         const SizedBox(height: AppSpacing.md),
         _CleanPrimaryButton(
-          label: 'Continue with Google',
+          label: context.t('continue_with_google'),
           onPressed: _isLoading ? null : _signInWithGoogle,
           isLoading: _isLoading,
         ),
         const SizedBox(height: AppSpacing.md),
         _CleanTextButton(
-          label: 'Enter email address',
+          label: context.t('enter_email_address'),
           onPressed: _isLoading ? null : () => _setStep(_AuthStep.email),
         ),
       ],
@@ -384,7 +463,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Enter your email',
+          context.t('enter_your_email'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -394,12 +473,28 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         const SizedBox(height: AppSpacing.md),
         _CleanInput(
           controller: _emailController,
-          hintText: 'Email address',
+          focusNode: _emailFocusNode,
+          labelText: context.t('email_address'),
+          hintText: context.t('email_address'),
           keyboardType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
+          textInputAction: TextInputAction.done,
+          errorText: _emailError,
+          onChanged: (_) {
+            if (_emailError == null && _formError == null) {
+              return;
+            }
+            setState(() {
+              _emailError = null;
+              _formError = null;
+            });
+          },
+          onSubmitted: (_) => _submitEmailStep(),
         ),
+        if (_formError != null) _buildInlineError(_formError!),
         const SizedBox(height: AppSpacing.md),
         _CleanPrimaryButton(
-          label: 'Continue',
+          label: context.t('continue'),
           onPressed: _isLoading ? null : _submitEmailStep,
         ),
       ],
@@ -412,7 +507,9 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          isConfirmVisible ? 'Confirm your password' : 'Set your password',
+          isConfirmVisible
+              ? context.t('confirm_password_title')
+              : context.t('set_password'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -422,12 +519,33 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         const SizedBox(height: AppSpacing.md),
         _CleanInput(
           controller: _passwordController,
-          hintText: 'Password',
+          focusNode: _passwordFocusNode,
+          labelText: context.t('password_hint'),
+          hintText: context.t('password_hint'),
           obscureText: _obscurePassword,
+          autofillHints: _isSignUp
+              ? const [AutofillHints.newPassword]
+              : const [AutofillHints.password],
+          textInputAction:
+              isConfirmVisible ? TextInputAction.next : TextInputAction.done,
+          errorText: _passwordError,
+          onChanged: (_) {
+            if (_passwordError == null && _formError == null) {
+              return;
+            }
+            setState(() {
+              _passwordError = null;
+              _formError = null;
+            });
+          },
+          onSubmitted: (_) => _submitPasswordStep(),
           suffix: IconButton(
             onPressed: () {
               setState(() => _obscurePassword = !_obscurePassword);
             },
+            tooltip: context.t(
+              _obscurePassword ? 'show_password' : 'hide_password',
+            ),
             icon: Icon(
               _obscurePassword
                   ? Icons.visibility_rounded
@@ -440,14 +558,32 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
           const SizedBox(height: AppSpacing.md),
           _CleanInput(
             controller: _confirmPasswordController,
-            hintText: 'Confirm password',
+            focusNode: _confirmPasswordFocusNode,
+            labelText: context.t('confirm_password_hint'),
+            hintText: context.t('confirm_password_hint'),
             obscureText: _obscureConfirmPassword,
+            autofillHints: const [AutofillHints.newPassword],
+            textInputAction: TextInputAction.done,
+            errorText: _confirmPasswordError,
+            onChanged: (_) {
+              if (_confirmPasswordError == null && _formError == null) {
+                return;
+              }
+              setState(() {
+                _confirmPasswordError = null;
+                _formError = null;
+              });
+            },
+            onSubmitted: (_) => _submitPasswordStep(),
             suffix: IconButton(
               onPressed: () {
                 setState(
                   () => _obscureConfirmPassword = !_obscureConfirmPassword,
                 );
               },
+              tooltip: context.t(
+                _obscureConfirmPassword ? 'show_password' : 'hide_password',
+              ),
               icon: Icon(
                 _obscureConfirmPassword
                     ? Icons.visibility_rounded
@@ -457,11 +593,14 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
             ),
           ),
         ],
+        if (_formError != null) _buildInlineError(_formError!),
         const SizedBox(height: AppSpacing.md),
         _CleanPrimaryButton(
           label: _isSignUp
-              ? (isConfirmVisible ? 'Create account' : 'Continue')
-              : 'Log in',
+              ? (isConfirmVisible
+                  ? context.t('create_account')
+                  : context.t('continue'))
+              : context.t('log_in'),
           onPressed: _isLoading ? null : _submitPasswordStep,
           isLoading: _isLoading,
         ),
@@ -474,7 +613,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Welcome',
+          context.t('welcome'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -483,7 +622,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          'Your account is ready.',
+          context.t('account_ready'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -491,7 +630,7 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         _CleanPrimaryButton(
-          label: 'Continue with the app',
+          label: context.t('continue_with_app'),
           onPressed: _continueAfterWelcome,
         ),
       ],
@@ -565,7 +704,7 @@ class _CleanPrimaryButton extends StatelessWidget {
         borderColor: scheme.primary.withOpacityValue(disabled ? 0.35 : 0.72),
         child: Center(
           child: Text(
-            isLoading ? 'Please wait...' : label,
+            isLoading ? context.t('please_wait') : label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: disabled
                       ? scheme.onSurface.withOpacityValue(0.45)
@@ -618,16 +757,30 @@ class _CleanTextButton extends StatelessWidget {
 
 class _CleanInput extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode? focusNode;
+  final String labelText;
   final String hintText;
   final bool obscureText;
   final TextInputType keyboardType;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final Widget? suffix;
 
   const _CleanInput({
     required this.controller,
+    required this.labelText,
     required this.hintText,
+    this.focusNode,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.autofillHints,
+    this.textInputAction,
+    this.errorText,
+    this.onChanged,
+    this.onSubmitted,
     this.suffix,
   });
 
@@ -636,15 +789,25 @@ class _CleanInput extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      autofillHints: autofillHints,
+      textInputAction: textInputAction,
+      onChanged: onChanged,
+      onSubmitted: onSubmitted,
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: scheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
       cursorColor: scheme.onSurface,
       decoration: InputDecoration(
+        labelText: labelText,
         hintText: hintText,
+        errorText: errorText,
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
         hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: scheme.onSurfaceVariant,
             ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/widgets/common_widgets.dart';
+import '../../../core/widgets/motion_pressable.dart';
 import 'practice_session_screen.dart';
 
 class PracticeHubScreen extends ConsumerWidget {
@@ -23,12 +25,12 @@ class PracticeHubScreen extends ConsumerWidget {
           children: [
             // Header
             Text(
-              'Practice',
+              context.t('practice'),
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Strengthen your knowledge and earn rewards',
+              context.t('strengthen_knowledge'),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -62,7 +64,7 @@ class PracticeHubScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'Complete lessons to unlock practice',
+                      context.t('complete_lessons_unlock'),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -70,7 +72,7 @@ class PracticeHubScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Practice sessions are generated from lessons you\'ve completed.',
+                      context.t('practice_from_completed'),
                       style: Theme.of(context).textTheme.bodySmall,
                       textAlign: TextAlign.center,
                     ),
@@ -81,26 +83,35 @@ class PracticeHubScreen extends ConsumerWidget {
               // Practice modes
               _PracticeModeCard(
                 icon: Icons.refresh_rounded,
-                title: 'Review',
-                description: 'Revisit questions from completed lessons using spaced repetition',
+                title: context.t('review'),
+                description: context.t('review_desc'),
                 color: AppColors.primary,
-                rewards: const ['Earn XP', 'Refill hearts'],
+                rewards: [context.t('earn_xp'), context.t('refill_hearts')],
                 onTap: () {
-                  ref.read(practiceProvider.notifier).startPractice(PracticeMode.review);
-                  Navigator.of(context).pushUltraSmooth(const PracticeSessionScreen());
+                  ref
+                      .read(practiceProvider.notifier)
+                      .startPractice(PracticeMode.review);
+                  Navigator.of(context)
+                      .pushUltraSmooth(const PracticeSessionScreen());
                 },
               ),
               const SizedBox(height: AppSpacing.md),
 
               _PracticeModeCard(
                 icon: Icons.gps_fixed_rounded,
-                title: 'Target Weak Spots',
-                description: 'Focus on questions you\'ve answered incorrectly before',
+                title: context.t('target_weak_spots'),
+                description: context.t('weak_spots_desc'),
                 color: AppColors.secondary,
-                rewards: const ['Improve accuracy', 'Refill hearts'],
+                rewards: [
+                  context.t('improve_accuracy'),
+                  context.t('refill_hearts')
+                ],
                 onTap: () {
-                  ref.read(practiceProvider.notifier).startPractice(PracticeMode.targetWeakSpots);
-                  Navigator.of(context).pushUltraSmooth(const PracticeSessionScreen());
+                  ref
+                      .read(practiceProvider.notifier)
+                      .startPractice(PracticeMode.targetWeakSpots);
+                  Navigator.of(context)
+                      .pushUltraSmooth(const PracticeSessionScreen());
                 },
               ),
             ],
@@ -109,7 +120,7 @@ class PracticeHubScreen extends ConsumerWidget {
 
             // Stats section
             Text(
-              'Your Progress',
+              context.t('your_progress'),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: AppSpacing.md),
@@ -120,7 +131,7 @@ class PracticeHubScreen extends ConsumerWidget {
                   child: _StatCard(
                     icon: Icons.check_circle_rounded,
                     value: '${progress.completedLessons.length}',
-                    label: 'Lessons\nCompleted',
+                    label: context.t('lessons_completed_label'),
                     color: AppColors.success,
                   ),
                 ),
@@ -129,7 +140,7 @@ class PracticeHubScreen extends ConsumerWidget {
                   child: _StatCard(
                     icon: Icons.workspace_premium_rounded,
                     value: '${progress.earnedBadges.length}',
-                    label: 'Badges\nEarned',
+                    label: context.t('badges_earned'),
                     color: AppColors.secondary,
                   ),
                 ),
@@ -140,8 +151,8 @@ class PracticeHubScreen extends ConsumerWidget {
 
             // Tips
             Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
                 color: AppColors.primary.withOpacityValue(0.1),
                 borderRadius: BorderRadius.circular(AppRadius.card),
               ),
@@ -157,9 +168,9 @@ class PracticeHubScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Tip',
-                          style: TextStyle(
+                        Text(
+                          context.t('tip'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
@@ -167,7 +178,7 @@ class PracticeHubScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Completing a practice session refills one heart!',
+                          context.t('practice_refills_heart'),
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -202,7 +213,7 @@ class _PracticeModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return MotionPressable(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),

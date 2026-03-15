@@ -7,7 +7,7 @@ import '../../../../core/widgets/tr_text.dart';
 
 class QuestionIntroScreenWidget extends StatefulWidget {
   final QuestionIntroScreen screen;
-  final Function(bool isCorrect) onAnswer;
+  final Future<void> Function(bool isCorrect) onAnswer;
   final VoidCallback onContinue;
   final bool isAnswered;
 
@@ -38,14 +38,14 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
     });
   }
 
-  void _submitAnswer() {
+  Future<void> _submitAnswer() async {
     if (selectedChoice == null) return;
 
     setState(() {
       showFeedback = true;
     });
 
-    widget.onAnswer(selectedChoice!.isCorrect);
+    await widget.onAnswer(selectedChoice!.isCorrect);
   }
 
   ChoiceState _getChoiceState(Choice choice) {
@@ -136,7 +136,11 @@ class _QuestionIntroScreenWidgetState extends State<QuestionIntroScreenWidget> {
           if (!showFeedback)
             PrimaryButton(
               label: context.t('check'),
-              onPressed: selectedChoiceId != null ? _submitAnswer : null,
+              onPressed: selectedChoiceId != null
+                  ? () {
+                      _submitAnswer();
+                    }
+                  : null,
             ),
 
           const SizedBox(height: AppSpacing.xl),

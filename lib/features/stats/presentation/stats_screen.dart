@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/progress_ring.dart';
 import '../../../core/providers/app_providers.dart';
@@ -17,7 +18,7 @@ class StatsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Your Stats'),
+        title: Text(context.t('your_stats')),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -32,7 +33,7 @@ class StatsScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _StatTile(
-                        label: 'Total XP',
+                        label: context.t('total_xp'),
                         value: '${user.totalXp}',
                         icon: Icons.star_rounded,
                         color: AppColors.achievementGold,
@@ -41,7 +42,7 @@ class StatsScreen extends ConsumerWidget {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: _StatTile(
-                        label: 'Level',
+                        label: context.t('level'),
                         value: '${user.level}',
                         icon: Icons.shield_rounded,
                         color: AppColors.primary,
@@ -59,7 +60,7 @@ class StatsScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _StatTile(
-                        label: 'Streak',
+                        label: context.t('streak'),
                         value: '${user.currentStreak}',
                         icon: Icons.local_fire_department_rounded,
                         color: AppColors.warning,
@@ -68,7 +69,7 @@ class StatsScreen extends ConsumerWidget {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: _StatTile(
-                        label: 'Lessons',
+                        label: context.t('lessons_label'),
                         value: '${progress.completedLessons.length}',
                         icon: Icons.book_rounded,
                         color: AppColors.success,
@@ -88,7 +89,7 @@ class StatsScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Time Spent',
+                        context.t('time_spent'),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -106,7 +107,7 @@ class StatsScreen extends ConsumerWidget {
                                   ),
                             ),
                             Text(
-                              'This Week',
+                              context.t('this_week'),
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -128,7 +129,7 @@ class StatsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Weekly Progress',
+                        context.t('weekly_progress'),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -152,7 +153,7 @@ class StatsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'XP Over Time',
+                        context.t('xp_over_time'),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -231,10 +232,10 @@ class _WeeklyChart extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                if (value.toInt() >= 0 && value.toInt() < days.length) {
+                const dayKeys = ['day_mon', 'day_tue', 'day_wed', 'day_thu', 'day_fri', 'day_sat', 'day_sun'];
+                if (value.toInt() >= 0 && value.toInt() < dayKeys.length) {
                   return Text(
-                    days[value.toInt()],
+                    context.t(dayKeys[value.toInt()]),
                     style: TextStyle(
                       color: scheme.onSurfaceVariant,
                       fontSize: 12,

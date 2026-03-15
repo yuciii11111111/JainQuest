@@ -8,9 +8,12 @@ import '../localization/app_strings.dart';
 import '../navigation/app_navigator.dart';
 import '../providers/app_providers.dart';
 import '../services/storage_service.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_theme.dart';
 import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
 import 'floating_guide_overlay.dart';
+import 'motion_pressable.dart';
+import 'tr_text.dart';
 import 'typewriter_text.dart';
 
 class GuidedTourOverlay extends ConsumerStatefulWidget {
@@ -163,7 +166,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     }
 
     step.onTap();
-    await Future<void>.delayed(const Duration(milliseconds: 350));
+    await Future<void>.delayed(AppMotion.standard);
     if (!mounted) {
       return;
     }
@@ -218,18 +221,33 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
     }
 
     final overlayRect = targetRect.inflate(14);
-    final screenSize = MediaQuery.of(context).size;
-    final tooltipWidth = min(260.0, screenSize.width - 32);
-    const tooltipHeight = 96.0;
+    final mediaQuery = MediaQuery.of(context);
+    final screenSize = mediaQuery.size;
+    final safePadding = mediaQuery.padding;
+    const tooltipGap = 16.0;
+    const screenInset = 16.0;
+    final tooltipWidth = min(260.0, screenSize.width - (screenInset * 2));
     final placeBelow = overlayRect.center.dy < screenSize.height * 0.55;
-    final tooltipLeft = (overlayRect.center.dx - tooltipWidth / 2)
-        .clamp(16.0, screenSize.width - tooltipWidth - 16.0);
-    final tooltipTop = placeBelow
-        ? overlayRect.bottom + 16
-        : overlayRect.top - tooltipHeight - 16;
+    final tooltipLeft = (overlayRect.center.dx - tooltipWidth / 2).clamp(
+      screenInset,
+      screenSize.width - tooltipWidth - screenInset,
+    );
+    final tooltipTop = placeBelow ? overlayRect.bottom + tooltipGap : null;
+    final tooltipBottom =
+        placeBelow ? null : screenSize.height - overlayRect.top + tooltipGap;
+    final tooltipMaxHeight = max(
+      96.0,
+      placeBelow
+          ? screenSize.height -
+              overlayRect.bottom -
+              safePadding.bottom -
+              tooltipGap -
+              screenInset
+          : overlayRect.top - safePadding.top - tooltipGap - screenInset,
+    );
     final guideOffset = placeBelow
-        ? Offset(tooltipLeft - 40, tooltipTop - 28)
-        : Offset(tooltipLeft - 36, tooltipTop + tooltipHeight - 24);
+        ? Offset(tooltipLeft - 40, overlayRect.bottom - 12)
+        : Offset(tooltipLeft - 36, overlayRect.top - 40);
 
     return Stack(
       children: [
@@ -243,8 +261,8 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
           ),
         ),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
+          duration: AppMotion.screenEnter,
+          curve: AppMotion.enterCurve,
           left: overlayRect.left,
           top: overlayRect.top,
           width: overlayRect.width,
@@ -260,34 +278,36 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
           ),
         ),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
+          duration: AppMotion.screenEnter,
+          curve: AppMotion.enterCurve,
           left: overlayRect.left,
           top: overlayRect.top,
           width: overlayRect.width,
           height: overlayRect.height,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _advanceStep(step),
-              borderRadius: BorderRadius.circular(22),
+          child: MotionPressable(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _advanceStep(step),
+                borderRadius: BorderRadius.circular(22),
+              ),
             ),
           ),
         ),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeOutCubic,
+          duration: AppMotion.screenEnter,
+          curve: AppMotion.enterCurve,
           left: tooltipLeft,
           top: tooltipTop,
+          bottom: tooltipBottom,
           width: tooltipWidth,
-          height: tooltipHeight,
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 420),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
+            duration: AppMotion.standard,
+            switchInCurve: AppMotion.enterCurve,
+            switchOutCurve: AppMotion.exitCurve,
             transitionBuilder: (child, animation) {
               final slide = Tween<Offset>(
-                begin: const Offset(0, 0.08),
+                begin: AppMotion.tooltipOffset,
                 end: Offset.zero,
               ).animate(animation);
               return FadeTransition(
@@ -297,44 +317,47 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             },
             child: Container(
               key: ValueKey(_currentIndex),
+              constraints: BoxConstraints(maxHeight: tooltipMaxHeight),
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: scheme.surface.withOpacityValue(0.95),
                 borderRadius: BorderRadius.circular(AppRadius.card),
                 border: Border.all(color: scheme.outline),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TypewriterText(
-                    key: ValueKey('guide-title-$_currentIndex'),
-                    text: step.title,
-                    enabled: true,
-                    speed: const Duration(milliseconds: 8),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: scheme.onSurface),
-                  ),
-                  const SizedBox(height: 6),
-                  TypewriterText(
-                    key: ValueKey('guide-message-$_currentIndex'),
-                    text: step.message,
-                    enabled: true,
-                    speed: const Duration(milliseconds: 6),
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TrText(
+                      key: ValueKey('guide-title-$_currentIndex'),
+                      step.title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(color: scheme.onSurface),
+                    ),
+                    const SizedBox(height: 6),
+                    TypewriterText(
+                      key: ValueKey('guide-message-$_currentIndex'),
+                      text: step.message,
+                      enabled: true,
+                      speed: const Duration(milliseconds: 6),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOutBack,
+          duration: AppMotion.screenEnter,
+          curve: AppMotion.enterCurve,
           left: guideOffset.dx,
           top: guideOffset.dy,
           child: Image.asset(
@@ -346,18 +369,20 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
         Positioned(
           right: 16,
           top: 40,
-          child: TextButton(
-            onPressed: () async {
-              await StorageService.markGuidedTourSeen();
-              ref.read(userProfileProvider.notifier).refresh();
-              if (!mounted) return;
-              setState(() => _tourActive = false);
-            },
-            child: Text(
-              context.t('skip'),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+          child: MotionPressable(
+            child: TextButton(
+              onPressed: () async {
+                await StorageService.markGuidedTourSeen();
+                ref.read(userProfileProvider.notifier).refresh();
+                if (!mounted) return;
+                setState(() => _tourActive = false);
+              },
+              child: Text(
+                context.t('skip'),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
             ),
           ),
         ),

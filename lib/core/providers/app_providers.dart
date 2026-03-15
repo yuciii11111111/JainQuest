@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../gamification/gamification_rules.dart';
+import '../gamification/gamification_service.dart';
 import '../models/user_models.dart';
 import '../models/lesson_models.dart';
 import '../models/badge_definition.dart';
@@ -16,20 +18,28 @@ class UserProfileNotifier extends StateNotifier<UserProfile> {
     state = StorageService.getUserProfile();
   }
 
-  Future<void> addXp(int xp) async {
-    state = await StorageService.addXp(xp);
+  Future<UserProfile> addXp(int xp) async {
+    final updatedUser = await StorageService.addXp(xp);
+    state = updatedUser;
+    return updatedUser;
   }
 
-  Future<void> loseHeart() async {
-    state = await StorageService.loseHeart();
+  Future<UserProfile> loseHeart() async {
+    final updatedUser = await StorageService.loseHeart();
+    state = updatedUser;
+    return updatedUser;
   }
 
-  Future<void> refillHeart({int amount = 1}) async {
-    state = await StorageService.refillHeart(amount: amount);
+  Future<UserProfile> refillHeart({int amount = 1}) async {
+    final updatedUser = await StorageService.refillHeart(amount: amount);
+    state = updatedUser;
+    return updatedUser;
   }
 
-  Future<void> updateStreak() async {
-    state = await StorageService.updateStreak();
+  Future<UserProfile> updateStreak() async {
+    final updatedUser = await StorageService.updateStreak();
+    state = updatedUser;
+    return updatedUser;
   }
 
   Future<void> updateDisplayName(String displayName) async {
@@ -170,6 +180,7 @@ class LessonRunnerState {
   final bool warmupAnswered;
   final int currentQuizQuestionIndex;
   final List<bool> quizAnswers;
+  final LessonCompletionSummary? completionSummary;
 
   const LessonRunnerState({
     required this.lesson,
@@ -182,6 +193,7 @@ class LessonRunnerState {
     this.warmupAnswered = false,
     this.currentQuizQuestionIndex = 0,
     this.quizAnswers = const [],
+    this.completionSummary,
   });
 
   LessonRunnerState copyWith({
@@ -195,6 +207,7 @@ class LessonRunnerState {
     bool? warmupAnswered,
     int? currentQuizQuestionIndex,
     List<bool>? quizAnswers,
+    LessonCompletionSummary? completionSummary,
   }) {
     return LessonRunnerState(
       lesson: lesson ?? this.lesson,
@@ -208,10 +221,12 @@ class LessonRunnerState {
       currentQuizQuestionIndex:
           currentQuizQuestionIndex ?? this.currentQuizQuestionIndex,
       quizAnswers: quizAnswers ?? this.quizAnswers,
+      completionSummary: completionSummary ?? this.completionSummary,
     );
   }
 
-  int get totalXpEarned => warmupXp + quizXp;
+  int get answerXpEarned => warmupXp + quizXp;
+  int get totalXpEarned => completionSummary?.totalXp ?? answerXpEarned;
 
   double get quizProgress {
     if (lesson.screens.quiz.questions.isEmpty) return 0;
@@ -264,29 +279,28 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     }
   }
 
-  void answerWarmup(bool isCorrect) {
+  Future<void> answerWarmup(bool isCorrect) async {
     if (state == null || state!.warmupAnswered) return;
 
-    final xp = isCorrect ? 2 : 0;
+    final xp = isCorrect ? XpRewards.warmup : 0;
     state = state!.copyWith(
       warmupAnswered: true,
       warmupXp: xp,
       totalCorrect: state!.totalCorrect + (isCorrect ? 1 : 0),
     );
 
-    // Update user XP and hearts
     if (isCorrect) {
-      ref.read(userProfileProvider.notifier).addXp(xp);
+      await ref.read(userProfileProvider.notifier).addXp(xp);
     } else {
-      ref.read(userProfileProvider.notifier).loseHeart();
+      await ref.read(userProfileProvider.notifier).loseHeart();
     }
   }
 
-  void answerQuizQuestion(bool isCorrect) {
+  Future<void> answerQuizQuestion(bool isCorrect) async {
     if (state == null) return;
 
     final newAnswers = [...state!.quizAnswers, isCorrect];
-    final xpGained = isCorrect ? 3 : 0;
+    final xpGained = isCorrect ? XpRewards.quiz : 0;
 
     state = state!.copyWith(
       quizAnswers: newAnswers,
@@ -294,11 +308,10 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
       totalCorrect: state!.totalCorrect + (isCorrect ? 1 : 0),
     );
 
-    // Update user XP and hearts
     if (isCorrect) {
-      ref.read(userProfileProvider.notifier).addXp(xpGained);
+      await ref.read(userProfileProvider.notifier).addXp(xpGained);
     } else {
-      ref.read(userProfileProvider.notifier).loseHeart();
+      await ref.read(userProfileProvider.notifier).loseHeart();
     }
   }
 
@@ -313,41 +326,38 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     );
   }
 
-  Future<void> completeLesson() async {
-    if (state == null) return;
+  Future<LessonCompletionSummary?> completeLesson() async {
+    if (state == null) return null;
 
     final lesson = state!.lesson;
-    var totalXp = state!.totalXpEarned;
-
-    // Check for perfect quiz bonus
-    if (state!.isPerfectQuiz) {
-      totalXp += 5;
-      await ref.read(userProfileProvider.notifier).addXp(5);
-    }
-
-    // Check for first time completion bonus
     final progress = ref.read(progressProvider);
-    if (!progress.isLessonCompleted(lesson.lessonId)) {
-      totalXp += 5;
-      await ref.read(userProfileProvider.notifier).addXp(5);
+    final summary = GamificationService.buildLessonCompletionSummary(
+      answerXp: state!.answerXpEarned,
+      isPerfectQuiz: state!.isPerfectQuiz,
+      isFirstCompletion: !progress.isLessonCompleted(lesson.lessonId),
+    );
+
+    state = state!.copyWith(completionSummary: summary);
+
+    if (summary.bonusXp > 0) {
+      await ref.read(userProfileProvider.notifier).addXp(summary.bonusXp);
     }
 
-    // Complete lesson in progress
     await ref.read(progressProvider.notifier).completeLesson(
           lesson.lessonId,
           score: state!.scorePercent,
-          xpEarned: totalXp,
+          xpEarned: summary.totalXp,
           nextLessonId: lesson.screens.lessonComplete.nextLessonId,
         );
 
-    // Update streak
     await ref.read(userProfileProvider.notifier).updateStreak();
 
-    // Earn badge
     final badgeId = _getBadgeForLesson(lesson.lessonId);
     if (badgeId != null) {
       await ref.read(progressProvider.notifier).earnBadge(badgeId);
     }
+
+    return summary;
   }
 
   String? _getBadgeForLesson(String lessonId) {
@@ -416,6 +426,8 @@ class PracticeState {
   }
 
   bool get isComplete => currentIndex >= questions.length;
+  bool get isOnLastQuestion =>
+      questions.isEmpty || currentIndex >= questions.length - 1;
   QuizQuestion? get currentQuestion =>
       currentIndex < questions.length ? questions[currentIndex] : null;
 }
@@ -451,32 +463,44 @@ class PracticeNotifier extends StateNotifier<PracticeState?> {
     );
   }
 
-  void answerQuestion(bool isCorrect) {
+  Future<void> answerQuestion(bool isCorrect) async {
     if (state == null) return;
 
-    final xp = isCorrect ? 2 : 0;
+    final xp = isCorrect ? XpRewards.practice : 0;
 
     state = state!.copyWith(
-      currentIndex: state!.currentIndex + 1,
       correctCount: state!.correctCount + (isCorrect ? 1 : 0),
       xpEarned: state!.xpEarned + xp,
     );
 
     if (isCorrect) {
-      ref.read(userProfileProvider.notifier).addXp(xp);
+      await ref.read(userProfileProvider.notifier).addXp(xp);
     }
   }
 
-  Future<void> completePractice() async {
-    if (state == null) return;
+  void advanceQuestion() {
+    if (state == null || state!.isComplete) return;
+    state = state!.copyWith(currentIndex: state!.currentIndex + 1);
+  }
 
-    // Refill a heart for completing practice
-    await ref.read(userProfileProvider.notifier).refillHeart();
+  Future<PracticeCompletionSummary?> completePractice() async {
+    if (state == null) return null;
 
-    // Update streak
+    final xpEarned = state!.xpEarned;
+    final heartsBefore = ref.read(userProfileProvider).hearts;
+    final updatedUser = await ref
+        .read(userProfileProvider.notifier)
+        .refillHeart(amount: HeartsSystem.practiceHeartReward);
     await ref.read(userProfileProvider.notifier).updateStreak();
 
+    final summary = GamificationService.buildPracticeCompletionSummary(
+      answerXp: xpEarned,
+      heartsBefore: heartsBefore,
+      heartsAfter: updatedUser.hearts,
+    );
+
     state = null;
+    return summary;
   }
 
   void endPractice() {
