@@ -1,231 +1,336 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/localization/app_strings.dart';
-import '../../../core/widgets/glass_card.dart';
-import '../../../core/widgets/floating_card.dart';
-import '../../../core/widgets/motion_pressable.dart';
-import '../../../core/providers/app_providers.dart';
 
-class LeaderboardScreen extends ConsumerStatefulWidget {
+import '../../../core/localization/app_strings.dart';
+import '../../../core/models/user_models.dart';
+import '../../../core/providers/app_providers.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/floating_card.dart';
+import '../../../core/widgets/glass_card.dart';
+
+final leaderboardProvider =
+    StreamProvider.autoDispose<List<UserProfile>>((ref) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .orderBy('totalXp', descending: true)
+      .snapshots()
+      .map((snapshot) {
+    final profiles = snapshot.docs
+        .map((doc) => UserProfile.fromMap(doc.data(), fallbackId: doc.id))
+        .toList()
+      ..sort(_compareLeaderboardProfiles);
+    return profiles;
+  });
+});
+
+int _compareLeaderboardProfiles(UserProfile a, UserProfile b) {
+  final xpComparison = b.totalXp.compareTo(a.totalXp);
+  if (xpComparison != 0) {
+    return xpComparison;
+  }
+
+  final levelComparison = b.level.compareTo(a.level);
+  if (levelComparison != 0) {
+    return levelComparison;
+  }
+
+  final nameComparison =
+      _leaderboardSortKey(a).compareTo(_leaderboardSortKey(b));
+  if (nameComparison != 0) {
+    return nameComparison;
+  }
+
+  return a.id.compareTo(b.id);
+}
+
+String _leaderboardSortKey(UserProfile profile) {
+  final displayName = profile.displayName?.trim();
+  if (displayName != null && displayName.isNotEmpty) {
+    return displayName.toLowerCase();
+  }
+
+  final email = profile.email?.trim();
+  if (email != null && email.isNotEmpty) {
+    return email.toLowerCase();
+  }
+
+  return profile.id.toLowerCase();
+}
+
+String _displayNameFor(UserProfile profile, BuildContext context) {
+  final displayName = profile.displayName?.trim();
+  if (displayName != null && displayName.isNotEmpty) {
+    return displayName;
+  }
+
+  final email = profile.email?.trim();
+  if (email != null && email.isNotEmpty) {
+    final username = email.split('@').first.trim();
+    if (username.isNotEmpty) {
+      return username;
+    }
+  }
+
+  return context.t('learner');
+}
+
+String _avatarLabel(String name) {
+  final trimmedName = name.trim();
+  if (trimmedName.isEmpty) {
+    return '?';
+  }
+  return trimmedName[0].toUpperCase();
+}
+
+class LeaderboardScreen extends ConsumerWidget {
   const LeaderboardScreen({super.key});
 
   @override
-  ConsumerState<LeaderboardScreen> createState() => _LeaderboardScreenState();
-}
-
-class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
-  bool _isWeekly = true;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     final user = ref.watch(userProfileProvider);
-
-    // Mock leaderboard data - in production, this would come from a provider
-    final leaderboardData = _generateMockLeaderboard(user.id, context);
+    final leaderboardAsync = ref.watch(leaderboardProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  children: [
-                    Text(
+        child: leaderboardAsync.when(
+          loading: () => const _LeaderboardStateCard(
+            child: CircularProgressIndicator(),
+          ),
+          error: (_, __) => const _LeaderboardStateCard(
+            child: Icon(
+              Icons.emoji_events_rounded,
+              size: 44,
+              color: AppColors.primary,
+            ),
+          ),
+          data: (profiles) {
+            final leaderboardData = profiles
+                .map(
+                  (profile) => _LeaderboardEntry(
+                    id: profile.id,
+                    name: _displayNameFor(profile, context),
+                    xp: profile.totalXp,
+                    level: profile.level,
+                  ),
+                )
+                .toList();
+            final rankIndex =
+                profiles.indexWhere((profile) => profile.id == user.id);
+            final rank = rankIndex >= 0 ? rankIndex + 1 : null;
+
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Text(
                       context.t('leaderboard'),
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    // Toggle
-                    GlassCard(
-                      padding: const EdgeInsets.all(4),
-                      child: Row(
+                  ),
+                ),
+                if (leaderboardData.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _LeaderboardStateCard(
+                      child: Icon(
+                        Icons.people_alt_rounded,
+                        size: 44,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  )
+                else ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                      child: _Podium(
+                        topEntries: leaderboardData.take(3).toList(),
+                        currentUserId: user.id,
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: _YourRankCard(
+                        user: user,
+                        rank: rank,
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: _ToggleButton(
-                              label: context.t('weekly'),
-                              isSelected: _isWeekly,
-                              onTap: () => setState(() => _isWeekly = true),
-                            ),
+                          Text(
+                            context.t('rankings'),
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                          Expanded(
-                            child: _ToggleButton(
-                              label: context.t('all_time'),
-                              isSelected: !_isWeekly,
-                              onTap: () => setState(() => _isWeekly = false),
-                            ),
-                          ),
+                          const SizedBox(height: AppSpacing.md),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final entry = leaderboardData[index];
+                        final isCurrentUser = entry.id == user.id;
+                        final rankColor = index == 0
+                            ? AppColors.achievementGold
+                            : index == 1
+                                ? scheme.onSurfaceVariant
+                                : index == 2
+                                    ? AppColors.warning
+                                    : scheme.onSurfaceVariant;
 
-            // Podium
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: _Podium(
-                  top3: leaderboardData.take(3).toList(),
-                  currentUserId: user.id,
-                ),
-              ),
-            ),
-
-            // Your Rank Card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: _YourRankCard(
-                  user: user,
-                  rank: leaderboardData.indexWhere((e) => e.id == user.id) + 1,
-                ),
-              ),
-            ),
-
-            // Ranking List
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.t('rankings'),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                ),
-              ),
-            ),
-
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final entry = leaderboardData[index + 3];
-                  final isCurrentUser = entry.id == user.id;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: FloatingCard(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Row(
-                        children: [
-                          // Rank
-                          SizedBox(
-                            width: 40,
-                            child: Text(
-                              '${index + 4}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          // Avatar
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: isCurrentUser
-                                ? AppColors.primary
-                                : scheme.surfaceContainerHighest,
-                            child: Text(
-                              entry.name[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          // Name & XP
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: FloatingCard(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Row(
                               children: [
-                                Text(
-                                  entry.name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        color: isCurrentUser
-                                            ? AppColors.primary
-                                            : scheme.onSurface,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                SizedBox(
+                                  width: 40,
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: isCurrentUser
+                                              ? AppColors.primary
+                                              : rankColor,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                                Text(
-                                  '${entry.xp} ${context.t('xp')}',
-                                  style: Theme.of(context).textTheme.bodySmall,
+                                const SizedBox(width: AppSpacing.md),
+                                CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: isCurrentUser
+                                      ? AppColors.primary
+                                      : scheme.surfaceContainerHighest,
+                                  child: Text(
+                                    _avatarLabel(entry.name),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.md),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        entry.name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              color: isCurrentUser
+                                                  ? AppColors.primary
+                                                  : scheme.onSurface,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                      Text(
+                                        '${entry.xp} ${context.t('xp')}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.sm,
+                                    vertical: AppSpacing.xs,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.pill),
+                                  ),
+                                  child: Text(
+                                    context.t(
+                                      'level_abbreviated',
+                                      args: {'level': '${entry.level}'},
+                                    ),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          // Level
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.xs,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
-                            ),
-                            child: Text(
-                              context.t('level_abbreviated',
-                                  args: {'level': '${entry.level}'}),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
+                      childCount: leaderboardData.length,
                     ),
-                  );
-                },
-                childCount: leaderboardData.length - 3,
-              ),
-            ),
-
-            const SliverToBoxAdapter(
-              child: SizedBox(height: AppSpacing.xxl),
-            ),
-          ],
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: AppSpacing.xxl),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  List<_LeaderboardEntry> _generateMockLeaderboard(
-      String currentUserId, BuildContext context) {
-    return [
-      _LeaderboardEntry(id: '1', name: 'Aarav', xp: 2500, level: 8),
-      _LeaderboardEntry(id: '2', name: 'Priya', xp: 2300, level: 7),
-      _LeaderboardEntry(id: '3', name: 'Rohan', xp: 2100, level: 7),
-      _LeaderboardEntry(
-          id: currentUserId, name: context.t('you'), xp: 1800, level: 6),
-      _LeaderboardEntry(id: '4', name: 'Sneha', xp: 1700, level: 6),
-      _LeaderboardEntry(id: '5', name: 'Kiran', xp: 1500, level: 5),
-      _LeaderboardEntry(id: '6', name: 'Ananya', xp: 1300, level: 5),
-      _LeaderboardEntry(id: '7', name: 'Vikram', xp: 1100, level: 4),
-      _LeaderboardEntry(id: '8', name: 'Meera', xp: 900, level: 4),
-      _LeaderboardEntry(id: '9', name: 'Arjun', xp: 700, level: 3),
-    ]..sort((a, b) => b.xp.compareTo(a.xp));
+class _LeaderboardStateCard extends StatelessWidget {
+  final Widget child;
+
+  const _LeaderboardStateCard({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: GlassCard(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              child,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                context.t('leaderboard'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -243,92 +348,74 @@ class _LeaderboardEntry {
   });
 }
 
-class _ToggleButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _ToggleButton({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return MotionPressable(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: isSelected ? Colors.white : scheme.onSurfaceVariant,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _Podium extends StatelessWidget {
-  final List<_LeaderboardEntry> top3;
+  final List<_LeaderboardEntry> topEntries;
   final String currentUserId;
 
   const _Podium({
-    required this.top3,
+    required this.topEntries,
     required this.currentUserId,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    if (top3.length < 3) {
+    if (topEntries.isEmpty) {
       return const SizedBox.shrink();
+    }
+
+    if (topEntries.length == 1) {
+      return Row(
+        children: [
+          const Spacer(),
+          Expanded(
+            child: _PodiumPlace(
+              entry: topEntries[0],
+              place: 1,
+              height: 140,
+              color: AppColors.achievementGold,
+              isCurrentUser: topEntries[0].id == currentUserId,
+            ),
+          ),
+          const Spacer(),
+        ],
+      );
     }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // 2nd Place
         Expanded(
           child: _PodiumPlace(
-            entry: top3[1],
+            entry: topEntries[1],
             place: 2,
             height: 100,
             color: scheme.onSurfaceVariant,
-            isCurrentUser: top3[1].id == currentUserId,
+            isCurrentUser: topEntries[1].id == currentUserId,
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        // 1st Place
         Expanded(
           child: _PodiumPlace(
-            entry: top3[0],
+            entry: topEntries[0],
             place: 1,
             height: 140,
             color: AppColors.achievementGold,
-            isCurrentUser: top3[0].id == currentUserId,
+            isCurrentUser: topEntries[0].id == currentUserId,
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
-        // 3rd Place
-        Expanded(
-          child: _PodiumPlace(
-            entry: top3[2],
-            place: 3,
-            height: 80,
-            color: AppColors.warning,
-            isCurrentUser: top3[2].id == currentUserId,
+        if (topEntries.length > 2) ...[
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _PodiumPlace(
+              entry: topEntries[2],
+              place: 3,
+              height: 80,
+              color: AppColors.warning,
+              isCurrentUser: topEntries[2].id == currentUserId,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -352,14 +439,17 @@ class _PodiumPlace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final avatarBackground =
+        place == 1 ? AppColors.primary : color.withOpacityValue(0.18);
+    final avatarForeground = place == 1 ? Colors.white : color;
+
     return Column(
       children: [
-        // Avatar
         Container(
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: place == 1 ? AppColors.primary : scheme.surface,
+            color: avatarBackground,
             shape: BoxShape.circle,
             border: Border.all(
               color: color,
@@ -368,12 +458,15 @@ class _PodiumPlace extends StatelessWidget {
           ),
           child: Center(
             child: place == 1
-                ? const Icon(Icons.emoji_events_rounded,
-                    color: Colors.white, size: 32)
+                ? const Icon(
+                    Icons.emoji_events_rounded,
+                    color: Colors.white,
+                    size: 32,
+                  )
                 : Text(
-                    entry.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    _avatarLabel(entry.name),
+                    style: TextStyle(
+                      color: avatarForeground,
                       fontWeight: FontWeight.w800,
                       fontSize: 24,
                     ),
@@ -381,7 +474,6 @@ class _PodiumPlace extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        // Name
         Text(
           entry.name,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -392,13 +484,11 @@ class _PodiumPlace extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: AppSpacing.xs),
-        // XP
         Text(
           '${entry.xp} ${context.t('xp')}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: AppSpacing.sm),
-        // Podium
         Container(
           height: height,
           decoration: BoxDecoration(
@@ -424,8 +514,8 @@ class _PodiumPlace extends StatelessWidget {
 }
 
 class _YourRankCard extends StatelessWidget {
-  final dynamic user;
-  final int rank;
+  final UserProfile user;
+  final int? rank;
 
   const _YourRankCard({
     required this.user,
@@ -434,6 +524,7 @@ class _YourRankCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rankLabel = rank == null ? '?' : '$rank';
     return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
       borderColor: AppColors.primary,
@@ -449,7 +540,7 @@ class _YourRankCard extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                '$rank',
+                rankLabel,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,

@@ -11,49 +11,54 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="JainQuest — Gamified Jain learning for teens. Calm, modern, and non-preachy.">
-  <meta name="theme-color" content="#F97316">
+  <meta name="description" content="JainQuest — Calm, modern Jain learning for teens through focused lessons, guided reflection, and thoughtful practice.">
+  <meta name="theme-color" content="#0A0D12">
 
-  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="JainQuest">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
-
-  <title>JainQuest — Learn Jain Wisdom, Gamified</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
+
+  <title>JainQuest — Calm, Modern Jain Learning</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap"
     rel="stylesheet">
 
   <style>
+    :root {
+      color-scheme: dark;
+      --page-background: #05070b;
+      --panel: rgba(10, 13, 18, 0.8);
+      --panel-strong: rgba(8, 10, 15, 0.9);
+      --panel-border: rgba(244, 236, 225, 0.12);
+      --panel-border-strong: rgba(212, 137, 67, 0.28);
+      --surface-soft: rgba(255, 255, 255, 0.03);
+      --text-primary: #f3ede4;
+      --text-secondary: #b7b1a6;
+      --text-tertiary: #8f887c;
+      --accent: #d48943;
+      --accent-soft: rgba(212, 137, 67, 0.14);
+      --hairline: rgba(255, 255, 255, 0.08);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+      --max-width: 1180px;
+      --radius-large: 32px;
+      --radius-medium: 24px;
+      --radius-small: 18px;
+      --nav-height: 88px;
+    }
+
     *,
     *::before,
     *::after {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --saffron: #F97316;
-      --saffron-light: #FB923C;
-      --saffron-dark: #EA580C;
-      --gold: #F59E0B;
-      --gold-light: #FCD34D;
-      --cream: #FFF7ED;
-      --cream-dark: #FEF3C7;
-      --gray-100: #F3F4F6;
-      --gray-200: #E5E7EB;
-      --gray-600: #4B5563;
-      --gray-700: #374151;
-      --gray-800: #1F2937;
-      --gray-900: #111827;
     }
 
     html {
@@ -61,688 +66,654 @@
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
-      background: #fff;
+      min-height: 100vh;
+      background: var(--page-background);
+      color: var(--text-primary);
+      font-family: 'IBM Plex Sans', sans-serif;
       overflow: hidden;
     }
 
-    /* ── LANDING OVERLAY (sits on top of Flutter) ── */
+    a,
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 10001;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      background: #f1ebe2;
+      color: #090b0f;
+      text-decoration: none;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus-visible {
+      top: 1rem;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(241, 235, 226, 0.92);
+      outline-offset: 3px;
+    }
+
     #landing-overlay {
       position: fixed;
       inset: 0;
       z-index: 9999;
       overflow-y: auto;
-      background: var(--cream);
+      background: rgba(4, 6, 10, 0.84);
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
 
     #landing-overlay.launching {
       opacity: 0;
-      transform: scale(1.04);
+      transform: scale(1.015);
       pointer-events: none;
     }
 
-    /* ── NAV ── */
-    nav {
+    #wave-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+    }
+
+    .site-nav {
       position: sticky;
       top: 0;
       z-index: 10;
-      padding: 1rem 2rem;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(5, 7, 11, 0.7);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      min-height: var(--nav-height);
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 247, 237, 0.9);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+      gap: 1rem;
     }
 
-    .nav-logo {
-      display: flex;
+    .brand {
+      display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.9rem;
       text-decoration: none;
     }
 
-    .nav-logo img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .nav-logo-text {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.35rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--saffron-dark), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.4rem;
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      color: white;
-      border-radius: 100px;
+    .brand-mark {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      border: 1px solid var(--panel-border-strong);
+      color: var(--accent);
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: 0.9rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
-      transition: all 0.25s ease;
-      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
     }
 
-    .nav-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12rem;
     }
 
-    /* ── HERO ── */
-    .hero {
-      min-height: calc(100vh - 68px);
+    .brand-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(--text-primary);
+    }
+
+    .brand-note {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
-      padding: 4rem 2rem 4rem;
-      position: relative;
-      overflow: hidden;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 60% at 60% 40%, rgba(249, 115, 22, 0.10) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 60%),
-        linear-gradient(160deg, #FFF7ED 0%, #FEF3C7 50%, #FFFBEB 100%);
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      transition: color 0.2s ease;
     }
 
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.35;
-      pointer-events: none;
+    .nav-link:hover {
+      color: var(--text-primary);
     }
 
-    .blob-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #F97316, #FCD34D);
-      top: -80px;
-      right: -100px;
-      animation: drift 8s ease-in-out infinite alternate;
+    .brand:focus-visible,
+    .nav-link:focus-visible,
+    .button:focus-visible {
+      border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(241, 235, 226, 0.2);
     }
 
-    .blob-2 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, #FCD34D, #F97316);
-      bottom: 60px;
-      left: -80px;
-      animation: drift 10s ease-in-out infinite alternate-reverse;
-    }
-
-    .hero-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-badge {
+    .button {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 1rem;
-      background: rgba(249, 115, 22, 0.12);
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      border-radius: 100px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--saffron-dark);
-      margin-bottom: 1.5rem;
-      animation: fadeInUp 0.6s ease both;
+      justify-content: center;
+      gap: 0.65rem;
+      min-height: 3.15rem;
+      padding: 0.92rem 1.35rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.24s ease, border-color 0.24s ease,
+        background-color 0.24s ease, color 0.24s ease, box-shadow 0.24s ease;
     }
 
-    .hero-badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--saffron);
-      animation: pulse 2s ease infinite;
+    .button svg {
+      flex-shrink: 0;
+      transition: transform 0.24s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button:hover svg {
+      transform: translateX(3px);
+    }
+
+    .button-primary {
+      background: #f1ebe2;
+      color: #090b0f;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    .button-primary:hover {
+      background: #faf5ee;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-primary);
+      border-color: var(--hairline);
+    }
+
+    .button-secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .hero {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      min-height: calc(100vh - var(--nav-height));
+      padding: clamp(3rem, 7vw, 6rem) 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.5rem 0.95rem;
+      border-radius: 999px;
+      background: rgba(8, 10, 14, 0.58);
+      border: 1px solid rgba(212, 137, 67, 0.22);
+      color: #dbd1c3;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(212, 137, 67, 0.35);
     }
 
     .hero-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      font-weight: 800;
-      line-height: 1.15;
-      color: var(--gray-900);
-      margin-bottom: 1.2rem;
-      animation: fadeInUp 0.6s 0.1s ease both;
+      margin-top: 1.4rem;
+      max-width: 11ch;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(3rem, 6vw, 5.4rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      text-wrap: balance;
     }
 
-    .hero-title .highlight {
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero-title .accent {
+      color: #df9b5f;
     }
 
-    .hero-subtitle {
-      font-size: 1.15rem;
-      line-height: 1.7;
-      color: var(--gray-600);
-      margin-bottom: 2rem;
-      max-width: 480px;
-      animation: fadeInUp 0.6s 0.2s ease both;
+    .hero-copy {
+      margin-top: 1.5rem;
+      max-width: 36rem;
+      color: var(--text-secondary);
+      font-size: 1.06rem;
+      line-height: 1.82;
     }
 
     .hero-actions {
+      margin-top: 2.1rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.95rem;
       flex-wrap: wrap;
-      animation: fadeInUp 0.6s 0.3s ease both;
     }
 
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.9rem 2rem;
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      color: white;
-      border-radius: 100px;
-      font-weight: 800;
-      font-size: 1.05rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 28px rgba(249, 115, 22, 0.45);
-      transition: all 0.25s ease;
-      font-family: 'Nunito', sans-serif;
+    .proof-strip {
+      margin-top: 2.75rem;
+      padding-top: 1.35rem;
+      border-top: 1px solid var(--hairline);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 44rem;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 14px 38px rgba(249, 115, 22, 0.55);
+    .proof-item {
+      display: grid;
+      gap: 0.35rem;
     }
 
-    .btn-primary svg {
-      transition: transform 0.25s ease;
+    .proof-label {
+      color: var(--text-tertiary);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
-    .btn-primary:hover svg {
-      transform: translateX(4px);
+    .proof-value {
+      color: var(--text-primary);
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.45;
     }
 
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 1.8rem;
-      background: transparent;
-      color: var(--saffron-dark);
-      border: 2px solid rgba(249, 115, 22, 0.35);
-      border-radius: 100px;
-      font-weight: 700;
-      font-size: 1rem;
-      text-decoration: none;
-      transition: all 0.25s ease;
-      font-family: 'Nunito', sans-serif;
+    .surface-panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-large);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
     }
 
-    .btn-secondary:hover {
-      background: rgba(249, 115, 22, 0.08);
-      border-color: var(--saffron);
-      transform: translateY(-2px);
+    .hero-panels {
+      display: grid;
+      gap: 1rem;
     }
 
-    .hero-stats {
+    .hero-panel-main {
+      padding: 1.6rem;
+    }
+
+    .panel-label {
+      color: var(--text-tertiary);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .panel-title {
+      margin-top: 0.9rem;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-copy {
+      margin-top: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .pill-row {
+      margin-top: 1.3rem;
       display: flex;
-      gap: 2rem;
-      margin-top: 2.5rem;
-      animation: fadeInUp 0.6s 0.4s ease both;
+      flex-wrap: wrap;
+      gap: 0.65rem;
     }
 
-    .stat {
-      text-align: center;
+    .pill {
+      padding: 0.52rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--hairline);
+      color: #e0d6c8;
+      font-size: 0.84rem;
+      line-height: 1;
     }
 
-    .stat-num {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--saffron-dark), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .detail-list {
+      margin-top: 1.45rem;
+      display: grid;
+      gap: 0.95rem;
     }
 
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--gray-600);
+    .detail-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.9rem;
+      padding-top: 0.95rem;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .detail-index {
+      color: var(--accent);
+      font-family: 'Fraunces', serif;
+      font-size: 1.18rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .detail-title {
+      color: var(--text-primary);
+      font-size: 1rem;
       font-weight: 600;
     }
 
-    .hero-visual {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      animation: fadeInRight 0.8s 0.2s ease both;
+    .detail-copy {
+      margin-top: 0.25rem;
+      color: var(--text-secondary);
+      font-size: 0.93rem;
+      line-height: 1.65;
     }
 
-    .mascot-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .hero-panel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
     }
 
-    .mascot-glow {
-      position: absolute;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, rgba(245, 158, 11, 0.12) 50%, transparent 70%);
-      animation: glowPulse 3s ease-in-out infinite;
+    .micro-card {
+      padding: 1.15rem 1.2rem;
+      border-radius: var(--radius-medium);
+      background: var(--panel-strong);
+      border: 1px solid var(--panel-border);
     }
 
-    .mascot-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 2px dashed rgba(249, 115, 22, 0.3);
-      animation: rotateSlow 20s linear infinite;
+    .micro-label {
+      color: var(--text-tertiary);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
-    .mascot-ring-1 {
-      width: 340px;
-      height: 340px;
+    .micro-title {
+      margin-top: 0.55rem;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.45;
     }
 
-    .mascot-ring-2 {
-      width: 420px;
-      height: 420px;
-      border-color: rgba(245, 158, 11, 0.2);
-      animation-duration: 30s;
-      animation-direction: reverse;
+    .content-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 4.5rem;
     }
 
-    .mascot-img {
-      width: 280px;
-      height: 280px;
-      object-fit: contain;
-      position: relative;
-      z-index: 2;
-      animation: float 3.5s ease-in-out infinite;
-      filter: drop-shadow(0 20px 40px rgba(249, 115, 22, 0.3));
-    }
-
-    .bubble {
-      position: absolute;
-      background: white;
-      border-radius: 16px;
-      padding: 0.5rem 0.8rem;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--gray-700);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      z-index: 3;
-      border: 1px solid var(--gray-100);
-    }
-
-    .bubble-1 {
-      top: 10%;
-      left: -15%;
-      animation: floatBubble 4s ease-in-out infinite;
-    }
-
-    .bubble-2 {
-      bottom: 20%;
-      right: -12%;
-      animation: floatBubble 5s 1s ease-in-out infinite;
-    }
-
-    .bubble-3 {
-      top: 55%;
-      left: -18%;
-      animation: floatBubble 6s 0.5s ease-in-out infinite;
-    }
-
-    /* ── FEATURES ── */
-    .section {
-      padding: 5rem 2rem;
-      background: white;
+    main [id] {
+      scroll-margin-top: calc(var(--nav-height) + 1rem);
     }
 
     .section-header {
-      text-align: center;
-      margin-bottom: 3.5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 1.6rem;
     }
 
-    .section-badge {
-      display: inline-block;
-      padding: 0.35rem 1rem;
-      background: rgba(249, 115, 22, 0.1);
-      border-radius: 100px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--saffron-dark);
+    .section-heading-group {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .section-kicker {
+      color: var(--text-tertiary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 1rem;
     }
 
     .section-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 800;
-      color: var(--gray-900);
-      line-height: 1.2;
-      margin-bottom: 0.8rem;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.1rem, 3.6vw, 3.3rem);
+      font-weight: 500;
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+      max-width: 12ch;
     }
 
-    .section-sub {
-      font-size: 1.05rem;
-      color: var(--gray-600);
-      max-width: 520px;
-      margin: 0 auto;
-      line-height: 1.6;
+    .section-copy {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      font-size: 1rem;
+      max-width: 34rem;
     }
 
-    .features-grid {
+    .feature-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
     }
 
     .feature-card {
-      background: var(--cream);
-      border-radius: 24px;
-      padding: 2rem;
-      border: 1px solid rgba(249, 115, 22, 0.1);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      transition: all 0.3s ease;
+      min-height: 18rem;
+      padding: 1.45rem;
       position: relative;
       overflow: hidden;
     }
 
-    .feature-card::before {
+    .feature-card::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--saffron), var(--gold));
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      inset: auto 1.45rem 1.45rem;
+      height: 1px;
+      background: var(--hairline);
     }
 
-    .feature-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 50px rgba(249, 115, 22, 0.15);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.7rem;
-      margin-bottom: 1.2rem;
-      background: white;
+    .feature-index {
+      color: rgba(212, 137, 67, 0.26);
+      font-family: 'Fraunces', serif;
+      font-size: 3rem;
+      line-height: 1;
     }
 
     .feature-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--gray-900);
-      margin-bottom: 0.5rem;
+      margin-top: 2.3rem;
+      font-family: 'Fraunces', serif;
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 11ch;
     }
 
-    .feature-desc {
-      font-size: 0.92rem;
-      color: var(--gray-600);
-      line-height: 1.6;
+    .feature-copy {
+      margin-top: 0.9rem;
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+      line-height: 1.72;
+      max-width: 28rem;
     }
 
-    /* ── HOW IT WORKS ── */
-    .how-section {
-      background: linear-gradient(160deg, #1C1008, #2D1A0A);
-      color: white;
-      padding: 5.5rem 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .how-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 50% at 20% 50%, rgba(249, 115, 22, 0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 80% 30%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
-    }
-
-    .how-section .section-title {
-      color: white;
-    }
-
-    .how-section .section-sub {
-      color: rgba(255, 255, 255, 0.65);
-    }
-
-    .how-section .section-badge {
-      background: rgba(249, 115, 22, 0.2);
-      color: #FCD34D;
-    }
-
-    .steps-grid {
+    .split-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
     }
 
-    .step {
-      text-align: center;
-      padding: 1.5rem;
+    .split-panel {
+      padding: 1.55rem;
     }
 
-    .step-number {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: white;
-      margin: 0 auto 1.2rem;
-      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+    .timeline {
+      margin-top: 1.25rem;
+      display: grid;
+      gap: 1rem;
     }
 
-    .step-emoji {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-      display: block;
+    .timeline-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.9rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--hairline);
     }
 
-    .step-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
+    .timeline-step {
+      width: 2.35rem;
+      height: 2.35rem;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--panel-border-strong);
+      color: var(--accent);
+      font-size: 0.84rem;
       font-weight: 700;
-      color: white;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.08em;
     }
 
-    .step-desc {
-      font-size: 0.88rem;
-      color: rgba(255, 255, 255, 0.6);
-      line-height: 1.6;
+    .timeline-title {
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.45;
     }
 
-    /* ── CTA ── */
-    .cta-section {
-      padding: 5.5rem 2rem;
-      text-align: center;
-      background: white;
+    .timeline-copy {
+      margin-top: 0.25rem;
+      color: var(--text-secondary);
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    .principles-list {
+      margin-top: 1.25rem;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .principle {
+      padding: 1rem 1.05rem;
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+    }
+
+    .principle-title {
+      color: var(--text-primary);
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    .principle-copy {
+      margin-top: 0.3rem;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.62;
     }
 
     .cta-card {
-      max-width: 820px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, #1C1008 0%, #2D1A0A 100%);
-      border-radius: 32px;
-      padding: 4rem 2rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-    }
-
-    .cta-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 70% at 70% 50%, rgba(249, 115, 22, 0.25) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 60% at 10% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 60%);
-    }
-
-    .cta-mascot {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      margin: 0 auto 1.5rem;
-      display: block;
-      position: relative;
-      z-index: 1;
-      animation: float 3.5s ease-in-out infinite;
-      filter: drop-shadow(0 10px 30px rgba(249, 115, 22, 0.5));
+      padding: clamp(1.6rem, 4vw, 2.4rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1.2rem;
+      align-items: center;
     }
 
     .cta-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 800;
-      color: white;
-      margin-bottom: 0.8rem;
-      position: relative;
-      z-index: 1;
-      line-height: 1.2;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 12ch;
     }
 
-    .cta-title .highlight {
-      background: linear-gradient(135deg, var(--saffron-light), var(--gold-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .cta-copy {
+      margin-top: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.78;
+      max-width: 34rem;
     }
 
-    .cta-sub {
-      color: rgba(255, 255, 255, 0.65);
-      font-size: 1.05rem;
-      margin-bottom: 2rem;
-      position: relative;
-      z-index: 1;
+    footer {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem 2rem;
+    }
+
+    .footer-inner {
+      padding-top: 1.3rem;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy {
+      color: var(--text-tertiary);
+      font-size: 0.9rem;
       line-height: 1.6;
     }
 
-    .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 1rem 2.5rem;
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      color: white;
-      border-radius: 100px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5);
-      position: relative;
-      z-index: 1;
-      transition: all 0.25s ease;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    .cta-btn:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 16px 44px rgba(249, 115, 22, 0.6);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: #0D0602;
-      color: rgba(255, 255, 255, 0.5);
-      padding: 2rem;
-      text-align: center;
-      font-size: 0.85rem;
-    }
-
-    .footer-logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .footer-logo img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-    }
-
-    .footer-logo-text {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 800;
-      font-size: 1rem;
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    footer p {
-      line-height: 1.8;
-    }
-
-    /* ── SCROLL REVEAL ── */
     .reveal {
       opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.7s ease;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
     .reveal.visible {
@@ -750,514 +721,669 @@
       transform: translateY(0);
     }
 
-    /* ── ANIMATIONS ── */
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-14px);
-      }
-    }
-
-    @keyframes floatBubble {
-
-      0%,
-      100% {
-        transform: translateY(0) rotate(-2deg);
-      }
-
-      50% {
-        transform: translateY(-10px) rotate(2deg);
-      }
-    }
-
-    @keyframes drift {
-      0% {
-        transform: translate(0, 0) scale(1);
-      }
-
-      100% {
-        transform: translate(30px, 20px) scale(1.1);
-      }
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.6;
-        transform: scale(0.8);
-      }
-    }
-
-    @keyframes glowPulse {
-
-      0%,
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      50% {
-        transform: scale(1.1);
-        opacity: 0.7;
-      }
-    }
-
-    @keyframes rotateSlow {
-      from {
-        transform: rotate(0deg);
-      }
-
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(28px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeInRight {
-      from {
-        opacity: 0;
-        transform: translateX(40px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .hero-container {
+    @media (max-width: 1040px) {
+      .hero {
         grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
       }
 
-      .hero-subtitle {
-        margin: 0 auto 2rem;
+      .hero-title {
+        max-width: 12ch;
       }
 
-      .hero-actions {
-        justify-content: center;
+      .section-header,
+      .cta-card {
+        grid-template-columns: 1fr;
       }
 
-      .hero-stats {
-        justify-content: center;
+      .feature-grid,
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --nav-height: 78px;
       }
 
-      .hero-visual {
-        order: -1;
+      .nav-inner,
+      .hero,
+      .content-section,
+      footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
 
-      .mascot-img {
-        width: 200px;
-        height: 200px;
+      .nav-actions {
+        gap: 0.6rem;
       }
 
-      .mascot-ring-1 {
-        width: 260px;
-        height: 260px;
-      }
-
-      .mascot-ring-2 {
-        width: 330px;
-        height: 330px;
-      }
-
-      .mascot-glow {
-        width: 280px;
-        height: 280px;
-      }
-
-      .bubble-1,
-      .bubble-2,
-      .bubble-3 {
+      .nav-link {
         display: none;
       }
-    }
 
-    /* ── DARK GLASS HERO OVERRIDE ── */
-    :root {
-      --gray-200: rgba(198, 214, 255, 0.2);
-      --gray-600: #b8c4e0;
-      --gray-700: #d6def3;
-      --gray-900: #f5f8ff;
-    }
-
-    body {
-      background: #060a12;
-      color: #f5f8ff;
-    }
-
-    #landing-overlay {
-      background: linear-gradient(155deg, #070b14 0%, #0e1a31 45%, #1d1022 100%);
-    }
-
-    nav {
-      background: rgba(8, 13, 23, 0.6);
-      border-bottom: 1px solid rgba(190, 214, 255, 0.2);
-    }
-
-    .hero-bg {
-      background:
-        radial-gradient(circle at 16% 20%, rgba(74, 180, 255, 0.32), transparent 42%),
-        radial-gradient(circle at 82% 15%, rgba(249, 115, 22, 0.28), transparent 44%),
-        radial-gradient(circle at 78% 82%, rgba(58, 120, 255, 0.28), transparent 46%),
-        linear-gradient(130deg, #081021 0%, #101a34 38%, #1b1628 100%);
-      background-size: 180% 180%;
-      animation: gradientShift 14s ease-in-out infinite;
-    }
-
-    .blob {
-      opacity: 0.55;
-    }
-
-    .hero-badge,
-    .bubble,
-    .feature-icon {
-      background: rgba(190, 214, 255, 0.14);
-      border: 1px solid rgba(220, 235, 255, 0.35);
-      backdrop-filter: blur(14px) saturate(135%);
-      -webkit-backdrop-filter: blur(14px) saturate(135%);
-      box-shadow: 0 14px 35px rgba(4, 8, 16, 0.38);
-      color: #e8efff;
-    }
-
-    .hero-badge-dot {
-      background: #73c5ff;
-      box-shadow: 0 0 12px rgba(115, 197, 255, 0.95);
-    }
-
-    .hero-title {
-      color: #eef3ff;
-      text-shadow: 0 10px 35px rgba(8, 14, 32, 0.55);
-    }
-
-    .hero-title .highlight {
-      background: linear-gradient(130deg, #ff9b45, #ffd27a 52%, #8fc8ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle,
-    .stat-label,
-    .feature-desc,
-    .section-sub {
-      color: #b8c4e0;
-    }
-
-    .nav-cta,
-    .btn-primary,
-    .btn-secondary {
-      background: rgba(190, 214, 255, 0.14);
-      border: 1px solid rgba(226, 236, 255, 0.36);
-      backdrop-filter: blur(14px) saturate(140%);
-      -webkit-backdrop-filter: blur(14px) saturate(140%);
-      color: #f4f8ff;
-      box-shadow: 0 16px 36px rgba(5, 10, 20, 0.42);
-    }
-
-    .btn-primary:hover,
-    .btn-secondary:hover,
-    .nav-cta:hover {
-      transform: translateY(-3px);
-      background: rgba(215, 229, 255, 0.2);
-      border-color: rgba(248, 212, 122, 0.55);
-    }
-
-    .section,
-    .cta-section {
-      background: linear-gradient(170deg, #080f1f 0%, #0e162b 100%);
-    }
-
-    .feature-card,
-    .cta-card {
-      background: rgba(190, 214, 255, 0.12);
-      border: 1px solid rgba(220, 235, 255, 0.24);
-      backdrop-filter: blur(15px) saturate(125%);
-      -webkit-backdrop-filter: blur(15px) saturate(125%);
-      box-shadow: 0 18px 45px rgba(4, 9, 18, 0.35);
-    }
-
-    .section-title,
-    .feature-title,
-    .cta-title,
-    footer p {
-      color: #edf2ff;
-    }
-
-    footer {
-      background: #070d18;
-      border-top: 1px solid rgba(220, 235, 255, 0.2);
-    }
-
-    @keyframes gradientShift {
-      0% {
-        background-position: 0% 50%;
+      .hero {
+        padding-top: 2.6rem;
       }
 
-      50% {
-        background-position: 100% 50%;
+      .hero-title {
+        max-width: 10ch;
       }
 
-      100% {
-        background-position: 0% 50%;
+      .proof-strip,
+      .hero-panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions .button,
+      .cta-card .button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
       }
     }
   </style>
 </head>
 
 <body>
-
-  <!--
-    Flutter renders into the body. The landing overlay sits on top with z-index:9999.
-    When the user clicks Launch, we fade out the overlay and Flutter takes over.
-  -->
-
-  <!-- LANDING OVERLAY (covers Flutter app underneath) -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <div id="landing-overlay">
+    <canvas id="wave-canvas" aria-hidden="true"></canvas>
 
-    <!-- NAV -->
-    <nav>
-      <a href="#" class="nav-logo">
-        <img src="web/duo_guide.png" alt="Duo Guide">
-        <span class="nav-logo-text">JainQuest</span>
-      </a>
-      <button class="nav-cta" onclick="launchApp()">
-        Launch App
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-      </button>
-    </nav>
+    <div class="page">
+      <nav class="site-nav">
+        <div class="nav-inner">
+          <a href="#" class="brand" aria-label="JainQuest home">
+            <span class="brand-mark" aria-hidden="true">JQ</span>
+            <span class="brand-copy">
+              <span class="brand-name">JainQuest</span>
+              <span class="brand-note">Calm learning for teens</span>
+            </span>
+          </a>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-bg"></div>
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-
-      <div class="hero-container">
-        <div class="hero-content">
-          <div class="hero-badge">
-            <div class="hero-badge-dot"></div>
-            Gamified Jain Learning for Teens
-          </div>
-          <h1 class="hero-title">
-            Discover<br>
-            <span class="highlight">Jain Wisdom</span><br>
-            Like Never Before
-          </h1>
-          <p class="hero-subtitle">
-            Explore the timeless values of Jainism through beautiful interactive lessons, quizzes, and guided journeys —
-            calm, modern, and non-preachy.
-          </p>
-          <div class="hero-actions">
-            <button class="btn-primary" onclick="launchApp()">
-              Start Your Quest
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
+          <div class="nav-actions">
+            <a href="#experience" class="nav-link">Experience</a>
+            <a href="#approach" class="nav-link">Approach</a>
+            <button type="button" class="button button-primary" onclick="launchApp()">
+              Launch App
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </button>
-            <a href="#features" class="btn-secondary">✦ Explore Features</a>
-          </div>
-          <div class="hero-stats">
-            <div class="stat">
-              <div class="stat-num">100+</div>
-              <div class="stat-label">Lessons</div>
-            </div>
-            <div class="stat" style="border-left:1px solid var(--gray-200);padding-left:2rem;">
-              <div class="stat-num">AI</div>
-              <div class="stat-label">Powered Guide</div>
-            </div>
-            <div class="stat" style="border-left:1px solid var(--gray-200);padding-left:2rem;">
-              <div class="stat-num">Free</div>
-              <div class="stat-label">To Start</div>
-            </div>
           </div>
         </div>
+      </nav>
 
-        <div class="hero-visual">
-          <div class="mascot-wrapper">
-            <div class="mascot-glow"></div>
-            <div class="mascot-ring mascot-ring-2"></div>
-            <div class="mascot-ring mascot-ring-1"></div>
-            <img src="web/duo_guide.png" alt="JainQuest Duo Guide" class="mascot-img">
+      <main id="main-content" tabindex="-1">
+        <section class="hero">
+          <div class="hero-content reveal">
+            <div class="eyebrow">Calm, modern, non-preachy</div>
+            <h1 class="hero-title">A calm, modern way to study <span class="accent">Jain wisdom.</span></h1>
+            <p class="hero-copy">
+              JainQuest brings lessons, reflection, and guided exploration into one focused experience for teens.
+              Ancient principles stay intact, but the interface, pacing, and tone feel current.
+            </p>
+            <div class="hero-actions">
+              <button type="button" class="button button-primary" onclick="launchApp()">
+                Open the App
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+              <a href="#experience" class="button button-secondary">
+                See the Experience
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+              </a>
+            </div>
+
+            <div class="proof-strip">
+              <div class="proof-item">
+                <div class="proof-label">Lesson Design</div>
+                <div class="proof-value">Short learning loops built around ideas, not clutter.</div>
+              </div>
+              <div class="proof-item">
+                <div class="proof-label">Guided Support</div>
+                <div class="proof-value">Ask questions when a concept needs more context.</div>
+              </div>
+              <div class="proof-item">
+                <div class="proof-label">Steady Practice</div>
+                <div class="proof-value">Return to reflection, progress, and daily consistency.</div>
+              </div>
+            </div>
           </div>
-          <div class="bubble bubble-1">☮️ Ahimsa</div>
-          <div class="bubble bubble-2">🌿 Aparigraha</div>
-          <div class="bubble bubble-3">⭐ +50 XP earned!</div>
-        </div>
-      </div>
-    </section>
 
-    <!-- FEATURES -->
-    <section class="section" id="features">
-      <div class="section-header reveal">
-        <div class="section-badge">Why JainQuest</div>
-        <h2 class="section-title">Everything you need to<br>explore Jain wisdom</h2>
-        <p class="section-sub">A thoughtfully crafted experience that makes ancient philosophy feel fresh and engaging.
-        </p>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card reveal">
-          <div class="feature-icon">🎮</div>
-          <div class="feature-title">Gamified Learning</div>
-          <div class="feature-desc">Earn XP, unlock achievements, and level up as you explore Jain principles through
-            interactive challenges.</div>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">🤖</div>
-          <div class="feature-title">AI-Powered Guide</div>
-          <div class="feature-desc">Your personal Jain guide answers questions and adapts to your learning pace with
-            AI-driven conversations.</div>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">📖</div>
-          <div class="feature-title">Deep Content</div>
-          <div class="feature-desc">From the five vows to Anekantavada — rich, well-researched content explained in
-            modern, easy language.</div>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">🧘</div>
-          <div class="feature-title">Mindful Practices</div>
-          <div class="feature-desc">Guided meditations and breathing exercises rooted in Jain philosophy for a calmer
-            daily life.</div>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">🎵</div>
-          <div class="feature-title">Sacred Music</div>
-          <div class="feature-desc">Listen to and practice Jain stutis and hymns, connecting with tradition through
-            devotional music.</div>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">📊</div>
-          <div class="feature-title">Track Your Growth</div>
-          <div class="feature-desc">Visualize your journey with beautiful progress charts, practice history, and
-            personalized insights.</div>
-        </div>
-      </div>
-    </section>
+          <div class="hero-panels reveal">
+            <article class="surface-panel hero-panel-main">
+              <div class="panel-label">Learning brief</div>
+              <h2 class="panel-title">Designed to make difficult ideas feel approachable.</h2>
+              <p class="panel-copy">
+                Explore principles like ahimsa, aparigraha, and anekantavada through a structure that feels deliberate,
+                calm, and easy to return to.
+              </p>
 
-    <!-- HOW IT WORKS -->
-    <section class="how-section">
-      <div class="section-header reveal">
-        <div class="section-badge">How It Works</div>
-        <h2 class="section-title">Your journey in 4 simple steps</h2>
-        <p class="section-sub">Getting started is as easy as taking a breath.</p>
-      </div>
-      <div class="steps-grid">
-        <div class="step reveal">
-          <div class="step-number">1</div>
-          <span class="step-emoji">👤</span>
-          <div class="step-title">Create Your Profile</div>
-          <div class="step-desc">Sign up in seconds and personalize your JainQuest journey.</div>
-        </div>
-        <div class="step reveal">
-          <div class="step-number">2</div>
-          <span class="step-emoji">🎓</span>
-          <div class="step-title">Choose Your Path</div>
-          <div class="step-desc">Pick from Ahimsa, Anekant, Aparigraha and more.</div>
-        </div>
-        <div class="step reveal">
-          <div class="step-number">3</div>
-          <span class="step-emoji">⚡</span>
-          <div class="step-title">Learn & Earn XP</div>
-          <div class="step-desc">Complete lessons and quizzes to earn experience points.</div>
-        </div>
-        <div class="step reveal">
-          <div class="step-number">4</div>
-          <span class="step-emoji">🏆</span>
-          <div class="step-title">Level Up & Grow</div>
-          <div class="step-desc">Unlock new content as your understanding deepens.</div>
-        </div>
-      </div>
-    </section>
+              <div class="pill-row" aria-label="Key product areas">
+                <span class="pill">Interactive lessons</span>
+                <span class="pill">Reflective prompts</span>
+                <span class="pill">Guided Q&amp;A</span>
+                <span class="pill">Progress tracking</span>
+              </div>
 
-    <!-- CTA -->
-    <section class="cta-section">
-      <div class="cta-card">
-        <img src="web/duo_guide.png" alt="Duo Guide" class="cta-mascot">
-        <h2 class="cta-title">
-          Ready to begin your<br>
-          <span class="highlight">Jain Quest?</span>
-        </h2>
-        <p class="cta-sub">Your guide is waiting. 🌸</p>
-        <button class="cta-btn" onclick="launchApp()">🚀 Launch JainQuest</button>
-      </div>
-    </section>
+              <div class="detail-list">
+                <div class="detail-item">
+                  <div class="detail-index">01</div>
+                  <div>
+                    <div class="detail-title">Foundational topics</div>
+                    <div class="detail-copy">Start with the core principles and move deeper without feeling lost.</div>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-index">02</div>
+                  <div>
+                    <div class="detail-title">Short lesson loops</div>
+                    <div class="detail-copy">Learn, reflect, and check understanding in a single focused session.</div>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-index">03</div>
+                  <div>
+                    <div class="detail-title">Support when questions surface</div>
+                    <div class="detail-copy">Use the built-in guide whenever a concept needs extra explanation.</div>
+                  </div>
+                </div>
+              </div>
+            </article>
 
-    <!-- FOOTER -->
-    <footer>
-      <div class="footer-logo">
-        <img src="web/duo_guide.png" alt="JainQuest">
-        <span class="footer-logo-text">JainQuest</span>
-      </div>
-      <p>Gamified Jain learning for teens — calm, modern, non-preachy.</p>
-    </footer>
+            <div class="hero-panel-grid">
+              <article class="micro-card">
+                <div class="micro-label">Format</div>
+                <div class="micro-title">Lessons that stay focused and easy to revisit.</div>
+              </article>
+              <article class="micro-card">
+                <div class="micro-label">Tone</div>
+                <div class="micro-title">Thoughtful, calm, and clear rather than loud or gamified-for-show.</div>
+              </article>
+              <article class="micro-card">
+                <div class="micro-label">Practice</div>
+                <div class="micro-title">Reflection and repetition built into the learning flow.</div>
+              </article>
+              <article class="micro-card">
+                <div class="micro-label">Progress</div>
+                <div class="micro-title">A place to return, continue, and track growth over time.</div>
+              </article>
+            </div>
+          </div>
+        </section>
 
-  </div><!-- /landing-overlay -->
+        <section class="content-section" id="experience">
+          <div class="section-header reveal">
+            <div class="section-heading-group">
+              <div class="section-kicker">Inside the experience</div>
+              <h2 class="section-title">Everything is built to keep attention on the ideas.</h2>
+            </div>
+            <p class="section-copy">
+              JainQuest pairs guided lessons, reflection, and progress into a learning experience that feels focused
+              from the first screen onward.
+            </p>
+          </div>
 
-  <!-- Flutter bootstrap loads in the BACKGROUND while user reads the landing page -->
+          <div class="feature-grid">
+            <article class="surface-panel feature-card reveal">
+              <div class="feature-index">01</div>
+              <h3 class="feature-title">Curriculum that feels current</h3>
+              <p class="feature-copy">
+                Complex ideas are introduced with clarity, then revisited through short lessons and thoughtful pacing.
+              </p>
+            </article>
+            <article class="surface-panel feature-card reveal">
+              <div class="feature-index">02</div>
+              <h3 class="feature-title">A guide when questions surface</h3>
+              <p class="feature-copy">
+                Support is available when a topic needs context, so curiosity never has to break momentum.
+              </p>
+            </article>
+            <article class="surface-panel feature-card reveal">
+              <div class="feature-index">03</div>
+              <h3 class="feature-title">Progress you can return to</h3>
+              <p class="feature-copy">
+                The experience is meant to be revisited regularly, with reflection and progress tracking built in.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="content-section" id="approach">
+          <div class="split-grid">
+            <article class="surface-panel split-panel reveal">
+              <div class="panel-label">How it flows</div>
+              <h2 class="panel-title">A simple path from curiosity to consistent practice.</h2>
+              <p class="panel-copy">
+                The flow stays direct: create your profile, choose a path, move through lessons, then come back often
+                enough for the ideas to stick.
+              </p>
+
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-step">01</div>
+                  <div>
+                    <div class="timeline-title">Create your profile</div>
+                    <div class="timeline-copy">Start quickly and shape the experience around your level and interests.</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-step">02</div>
+                  <div>
+                    <div class="timeline-title">Choose a topic</div>
+                    <div class="timeline-copy">Move into principles like ahimsa, aparigraha, and anekantavada with a clear starting point.</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-step">03</div>
+                  <div>
+                    <div class="timeline-title">Learn in short sessions</div>
+                    <div class="timeline-copy">Stay with one idea at a time through lessons, questions, and reflection.</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-step">04</div>
+                  <div>
+                    <div class="timeline-title">Return and build consistency</div>
+                    <div class="timeline-copy">Progress tracking and daily practice make the learning feel ongoing rather than one-time.</div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="surface-panel split-panel reveal">
+              <div class="panel-label">Why it works</div>
+              <h2 class="panel-title">The product stays calm so the learning can stay serious.</h2>
+              <p class="panel-copy">
+                Every part of the experience is designed to reduce friction: calm motion, clear hierarchy, and enough
+                structure to help the learning stay centered.
+              </p>
+
+              <div class="principles-list">
+                <div class="principle">
+                  <div class="principle-title">Calm visual rhythm</div>
+                  <div class="principle-copy">A restrained wave background and consistent motion cues make the product feel cohesive from the start.</div>
+                </div>
+                <div class="principle">
+                  <div class="principle-title">Clear structure</div>
+                  <div class="principle-copy">Information is organized into direct sections, small cards, and short paths that are easy to scan.</div>
+                </div>
+                <div class="principle">
+                  <div class="principle-title">Focused attention</div>
+                  <div class="principle-copy">Nothing pulls too hard for attention, so the subject matter can carry the weight of the experience.</div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <div class="surface-panel cta-card reveal">
+            <div>
+              <div class="panel-label">Ready when you are</div>
+              <h2 class="cta-title">Open the app and continue with the full experience.</h2>
+              <p class="cta-copy">
+                Move from the landing page into lessons, reflection, guided questions, and practice without a visual reset.
+              </p>
+            </div>
+
+            <button type="button" class="button button-primary" onclick="launchApp()">
+              Launch App
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true">JQ</span>
+            <span class="brand-copy">
+              <span class="brand-name">JainQuest</span>
+              <span class="brand-note">Modern Jain learning</span>
+            </span>
+          </div>
+          <p class="footer-copy">Focused lessons, guided reflection, and a calmer first impression.</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
 
   <script>
-    // ── Scroll reveal
-    const observer = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        entries.forEach((entry, index) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 70);
+
+          revealObserver.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      {
+        threshold: 0.16,
+        rootMargin: '0px 0px -48px 0px',
+      }
     );
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // ── Launch: fade out landing overlay to reveal Flutter underneath
+    document.querySelectorAll('.reveal').forEach((element) => {
+      revealObserver.observe(element);
+    });
+
+    (function initWaveBackground() {
+      const canvas = document.getElementById('wave-canvas');
+      const overlay = document.getElementById('landing-overlay');
+      if (!canvas || !overlay) {
+        return;
+      }
+
+      const context = canvas.getContext('2d');
+      if (!context) {
+        return;
+      }
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const pointer = {
+        x: -10,
+        y: window.innerHeight * 0.5,
+        lx: -10,
+        ly: window.innerHeight * 0.5,
+        sx: -10,
+        sy: window.innerHeight * 0.5,
+        v: 0,
+        vs: 0,
+        a: 0,
+        set: false,
+      };
+
+      const state = {
+        width: 0,
+        height: 0,
+        dpr: 1,
+        frameId: 0,
+        lines: [],
+        lineSpacingX: 14,
+        lineSpacingY: 14,
+        running: true,
+      };
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function hash2D(x, y) {
+        const n = x * 374761393 + y * 668265263;
+        let hash = (n ^ (n >> 13)) * 1274126177;
+        hash ^= hash >> 16;
+        return (hash & 0x7fffffff) / 0x7fffffff;
+      }
+
+      function valueNoise2D(x, y) {
+        const x0 = Math.floor(x);
+        const y0 = Math.floor(y);
+        const xf = x - x0;
+        const yf = y - y0;
+        const u = xf * xf * (3 - 2 * xf);
+        const v = yf * yf * (3 - 2 * yf);
+
+        const n00 = hash2D(x0, y0);
+        const n10 = hash2D(x0 + 1, y0);
+        const n01 = hash2D(x0, y0 + 1);
+        const n11 = hash2D(x0 + 1, y0 + 1);
+
+        const nx0 = lerp(n00, n10, u);
+        const nx1 = lerp(n01, n11, u);
+        return lerp(nx0, nx1, v) * 2 - 1;
+      }
+
+      function buildLines() {
+        const width = state.width;
+        const height = state.height;
+        const oWidth = width + 200;
+        const oHeight = height + 30;
+        const totalLines = Math.ceil(oWidth / state.lineSpacingX);
+        const totalPoints = Math.ceil(oHeight / state.lineSpacingY);
+        const xStart = (width - state.lineSpacingX * totalLines) / 2;
+        const yStart = (height - state.lineSpacingY * totalPoints) / 2;
+
+        state.lines = Array.from({ length: totalLines }, (_, lineIndex) => {
+          return Array.from({ length: totalPoints }, (_, pointIndex) => {
+            return {
+              x: xStart + state.lineSpacingX * lineIndex,
+              y: yStart + state.lineSpacingY * pointIndex,
+              waveX: 0,
+              waveY: 0,
+              cursorX: 0,
+              cursorY: 0,
+              cursorVx: 0,
+              cursorVy: 0,
+            };
+          });
+        });
+      }
+
+      function resize() {
+        state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        state.width = window.innerWidth;
+        state.height = window.innerHeight;
+        state.lineSpacingX = window.innerWidth < 720 ? 18 : 14;
+        state.lineSpacingY = window.innerWidth < 720 ? 18 : 14;
+
+        canvas.width = Math.floor(state.width * state.dpr);
+        canvas.height = Math.floor(state.height * state.dpr);
+        canvas.style.width = `${state.width}px`;
+        canvas.style.height = `${state.height}px`;
+
+        context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+        buildLines();
+
+        if (!pointer.set) {
+          pointer.y = state.height * 0.5;
+          pointer.sy = pointer.y;
+          pointer.ly = pointer.y;
+        }
+      }
+
+      function updatePointer(clientX, clientY) {
+        pointer.x = clamp(clientX, -10, state.width + 10);
+        pointer.y = clamp(clientY, -10, state.height + 10);
+
+        if (pointer.set) {
+          return;
+        }
+
+        pointer.sx = pointer.x;
+        pointer.sy = pointer.y;
+        pointer.lx = pointer.x;
+        pointer.ly = pointer.y;
+        pointer.set = true;
+      }
+
+      function clearPointer() {
+        pointer.x = -10;
+        pointer.y = state.height * 0.5;
+      }
+
+      function updatePointerSmoothing() {
+        pointer.sx += (pointer.x - pointer.sx) * 0.1;
+        pointer.sy += (pointer.y - pointer.sy) * 0.1;
+
+        const dx = pointer.x - pointer.lx;
+        const dy = pointer.y - pointer.ly;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        pointer.v = distance;
+        pointer.vs += (distance - pointer.vs) * 0.1;
+        pointer.vs = clamp(pointer.vs, 0, 100);
+        pointer.lx = pointer.x;
+        pointer.ly = pointer.y;
+        pointer.a = Math.atan2(dy, dx);
+      }
+
+      function movePoints(timeMs) {
+        state.lines.forEach((points) => {
+          points.forEach((point) => {
+            const move = valueNoise2D(
+              (point.x + timeMs * 0.008) * 0.003,
+              (point.y + timeMs * 0.003) * 0.002
+            ) * Math.PI * 2;
+
+            point.waveX = Math.cos(move) * 12;
+            point.waveY = Math.sin(move) * 6;
+
+            const dx = point.x - pointer.sx;
+            const dy = point.y - pointer.sy;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const limit = Math.max(175, pointer.vs);
+
+            if (distance < limit) {
+              const strength = 1 - distance / limit;
+              const force = Math.cos(distance * 0.001) * strength;
+
+              point.cursorVx += Math.cos(pointer.a) * force * limit * pointer.vs * 0.00035;
+              point.cursorVy += Math.sin(pointer.a) * force * limit * pointer.vs * 0.00035;
+            }
+
+            point.cursorVx += (0 - point.cursorX) * 0.01;
+            point.cursorVy += (0 - point.cursorY) * 0.01;
+            point.cursorVx *= 0.95;
+            point.cursorVy *= 0.95;
+            point.cursorX += point.cursorVx;
+            point.cursorY += point.cursorVy;
+            point.cursorX = clamp(point.cursorX, -50, 50);
+            point.cursorY = clamp(point.cursorY, -50, 50);
+          });
+        });
+      }
+
+      function draw() {
+        if (!state.running || !document.body.contains(canvas)) {
+          return;
+        }
+
+        updatePointerSmoothing();
+        movePoints(reducedMotion ? 0 : performance.now());
+
+        context.clearRect(0, 0, state.width, state.height);
+        context.fillStyle = '#030507';
+        context.fillRect(0, 0, state.width, state.height);
+
+        context.strokeStyle = 'rgba(246, 240, 231, 0.22)';
+        context.lineWidth = 1;
+
+        state.lines.forEach((points) => {
+          if (points.length < 2) {
+            return;
+          }
+
+          context.beginPath();
+          context.moveTo(points[0].x + points[0].waveX, points[0].y + points[0].waveY);
+
+          for (let index = 1; index < points.length; index += 1) {
+            const point = points[index];
+            context.lineTo(
+              point.x + point.waveX + point.cursorX,
+              point.y + point.waveY + point.cursorY
+            );
+          }
+
+          context.stroke();
+        });
+
+        if (pointer.sx > -9) {
+          context.beginPath();
+          context.arc(pointer.sx, pointer.sy, 3.4, 0, Math.PI * 2);
+          context.fillStyle = 'rgba(212, 137, 67, 0.9)';
+          context.fill();
+        }
+
+        state.frameId = requestAnimationFrame(draw);
+      }
+
+      function stop() {
+        state.running = false;
+        cancelAnimationFrame(state.frameId);
+      }
+
+      resize();
+      draw();
+
+      window.addEventListener('resize', resize);
+      window.addEventListener('pointermove', (event) => updatePointer(event.clientX, event.clientY));
+      window.addEventListener('pointerdown', (event) => updatePointer(event.clientX, event.clientY));
+      overlay.addEventListener('pointerleave', clearPointer);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          cancelAnimationFrame(state.frameId);
+          return;
+        }
+
+        if (state.running) {
+          draw();
+        }
+      });
+
+      window.__jainQuestLanding = { stop };
+    })();
+
     function launchApp(skipAnimation = false) {
       const overlay = document.getElementById('landing-overlay');
-      if (!overlay) return;
+      if (!overlay) {
+        return;
+      }
 
       if (skipAnimation) {
+        window.__jainQuestLanding?.stop?.();
         overlay.remove();
         document.body.style.overflow = '';
         return;
       }
 
       overlay.classList.add('launching');
-      // After fade-out transition, remove overlay from DOM entirely
       overlay.addEventListener('transitionend', () => {
+        window.__jainQuestLanding?.stop?.();
         overlay.remove();
         document.body.style.overflow = '';
       }, { once: true });
     }
 
-    // If coming from the standalone information page, enter app directly.
     const launchFromInfoPage = new URLSearchParams(window.location.search).get('launch');
     if (launchFromInfoPage === '1') {
       launchApp(true);

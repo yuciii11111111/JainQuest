@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/gamification/gamification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/localization/app_strings.dart';
+import '../../../core/models/user_models.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/widgets/common_widgets.dart';
+import '../../../core/widgets/heart_lock_dialog.dart';
 import 'screens/question_intro_screen.dart';
 import 'screens/short_text_screen.dart';
 import 'screens/explanation_screen.dart';
@@ -69,14 +71,36 @@ class _LessonRunnerScreenState extends ConsumerState<LessonRunnerScreen> {
     if (!isCorrect) {
       _playHeartLossAnimation(heartsBefore);
     }
-    await ref.read(lessonRunnerProvider.notifier).answerWarmup(isCorrect);
+    final updatedUser =
+        await ref.read(lessonRunnerProvider.notifier).answerWarmup(isCorrect);
+    await _handleHeartLockIfNeeded(isCorrect, updatedUser);
   }
 
   Future<void> _handleQuizAnswer(bool isCorrect, int heartsBefore) async {
     if (!isCorrect) {
       _playHeartLossAnimation(heartsBefore);
     }
-    await ref.read(lessonRunnerProvider.notifier).answerQuizQuestion(isCorrect);
+    final updatedUser = await ref
+        .read(lessonRunnerProvider.notifier)
+        .answerQuizQuestion(isCorrect);
+    await _handleHeartLockIfNeeded(isCorrect, updatedUser);
+  }
+
+  Future<void> _handleHeartLockIfNeeded(
+    bool isCorrect,
+    UserProfile? updatedUser,
+  ) async {
+    if (isCorrect ||
+        updatedUser == null ||
+        updatedUser.hearts > 0 ||
+        !mounted) {
+      return;
+    }
+
+    await showHeartLockDialog(context, user: updatedUser);
+    if (!mounted) return;
+    ref.read(lessonRunnerProvider.notifier).endLesson();
+    Navigator.of(context).pop();
   }
 
   Future<void> _handleLessonComplete() async {

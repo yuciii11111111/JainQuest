@@ -12,6 +12,13 @@ DateTime? _readDateTime(dynamic value) {
   return null;
 }
 
+List<DateTime> _readDateTimes(dynamic value) {
+  if (value is! List) return const <DateTime>[];
+  final timestamps = value.map(_readDateTime).whereType<DateTime>().toList()
+    ..sort((a, b) => a.compareTo(b));
+  return timestamps;
+}
+
 // ============================================================================
 // User Profile
 // ============================================================================
@@ -30,6 +37,8 @@ class UserProfile extends Equatable {
   final int longestStreak;
 
   final int hearts;
+
+  final List<DateTime> heartLossTimestamps;
 
   final DateTime? lastActivityDate;
 
@@ -57,6 +66,7 @@ class UserProfile extends Equatable {
     this.currentStreak = 0,
     this.longestStreak = 0,
     this.hearts = 5,
+    this.heartLossTimestamps = const [],
     this.lastActivityDate,
     this.streakFreezes = 1,
     required this.createdAt,
@@ -76,6 +86,7 @@ class UserProfile extends Equatable {
     int? currentStreak,
     int? longestStreak,
     int? hearts,
+    List<DateTime>? heartLossTimestamps,
     DateTime? lastActivityDate,
     int? streakFreezes,
     DateTime? createdAt,
@@ -94,6 +105,7 @@ class UserProfile extends Equatable {
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
       hearts: hearts ?? this.hearts,
+      heartLossTimestamps: heartLossTimestamps ?? this.heartLossTimestamps,
       lastActivityDate: lastActivityDate ?? this.lastActivityDate,
       streakFreezes: streakFreezes ?? this.streakFreezes,
       createdAt: createdAt ?? this.createdAt,
@@ -121,6 +133,34 @@ class UserProfile extends Equatable {
         (age ?? 0) > 0;
   }
 
+  bool get hasHeartsAvailable => hearts > 0;
+  bool get isHeartRecoveryActive => heartLossTimestamps.isNotEmpty;
+
+  DateTime? get nextHeartAvailableAt {
+    if (heartLossTimestamps.isEmpty) return null;
+
+    const regenDuration = HeartsSystem.heartRegenDuration;
+    DateTime? nextRefillAt;
+    for (final lostAt in heartLossTimestamps) {
+      final candidate = lostAt.add(regenDuration);
+      if (nextRefillAt == null || candidate.isBefore(nextRefillAt)) {
+        nextRefillAt = candidate;
+      }
+    }
+    return nextRefillAt;
+  }
+
+  Duration? timeUntilNextHeart({DateTime? now}) {
+    final nextHeartAt = nextHeartAvailableAt;
+    if (nextHeartAt == null) return null;
+
+    final remaining = nextHeartAt.difference(now ?? DateTime.now());
+    if (remaining.isNegative) {
+      return Duration.zero;
+    }
+    return remaining;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -130,6 +170,7 @@ class UserProfile extends Equatable {
       'currentStreak': currentStreak,
       'longestStreak': longestStreak,
       'hearts': hearts,
+      'heartLossTimestamps': heartLossTimestamps,
       'lastActivityDate': lastActivityDate,
       'streakFreezes': streakFreezes,
       'createdAt': createdAt,
@@ -143,6 +184,19 @@ class UserProfile extends Equatable {
   }
 
   factory UserProfile.fromMap(Map<String, dynamic> data, {String? fallbackId}) {
+    final storedHearts = (data['hearts'] as num?)?.toInt() ?? 5;
+    final rawHeartLossTimestamps = _readDateTimes(data['heartLossTimestamps']);
+    final hasStoredHeartLosses = data.containsKey('heartLossTimestamps');
+    final migratedHeartLossTimestamps =
+        rawHeartLossTimestamps.isNotEmpty || hasStoredHeartLosses
+            ? rawHeartLossTimestamps
+            : List<DateTime>.generate(
+                (maxHearts - storedHearts).clamp(0, maxHearts),
+                (_) => DateTime.now(),
+              );
+    final normalizedHearts =
+        (maxHearts - migratedHeartLossTimestamps.length).clamp(0, maxHearts);
+
     return UserProfile(
       id: (data['id'] as String?) ?? fallbackId ?? const Uuid().v4(),
       displayName: data['displayName'] as String?,
@@ -150,7 +204,8 @@ class UserProfile extends Equatable {
       level: (data['level'] as num?)?.toInt() ?? 1,
       currentStreak: (data['currentStreak'] as num?)?.toInt() ?? 0,
       longestStreak: (data['longestStreak'] as num?)?.toInt() ?? 0,
-      hearts: (data['hearts'] as num?)?.toInt() ?? 5,
+      hearts: normalizedHearts,
+      heartLossTimestamps: migratedHeartLossTimestamps,
       lastActivityDate: _readDateTime(data['lastActivityDate']),
       streakFreezes: (data['streakFreezes'] as num?)?.toInt() ?? 1,
       createdAt: _readDateTime(data['createdAt']) ?? DateTime.now(),
@@ -172,6 +227,7 @@ class UserProfile extends Equatable {
         currentStreak,
         longestStreak,
         hearts,
+        heartLossTimestamps,
         lastActivityDate,
         streakFreezes,
         createdAt,
@@ -222,6 +278,27 @@ class ProgressState extends Equatable {
       completedLessons.contains(lessonId);
   bool isLessonUnlocked(String lessonId) => unlockedLessons.contains(lessonId);
   bool hasBadge(String badgeId) => earnedBadges.contains(badgeId);
+
+  int completedLessonsOn(DateTime date) {
+    final targetYear = date.year;
+    final targetMonth = date.month;
+    final targetDay = date.day;
+    var count = 0;
+
+    for (final lesson in lessonProgress.values) {
+      final completedAt = lesson.lastCompletedAt;
+      if (completedAt == null) {
+        continue;
+      }
+      if (completedAt.year == targetYear &&
+          completedAt.month == targetMonth &&
+          completedAt.day == targetDay) {
+        count += 1;
+      }
+    }
+
+    return count;
+  }
 
   Map<String, dynamic> toMap() {
     final progressMap = <String, dynamic>{};

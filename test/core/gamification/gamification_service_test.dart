@@ -69,4 +69,43 @@ void main() {
     expect(emptied.hearts, 0);
     expect(refilled.hearts, HeartsSystem.maxHearts);
   });
+
+  test('syncHearts restores one heart for each expired loss timer', () {
+    final now = DateTime(2026, 3, 15, 12, 0);
+    final user = UserProfile(
+      id: 'user-3',
+      hearts: 3,
+      heartLossTimestamps: [
+        now.subtract(const Duration(minutes: 31)),
+        now.subtract(const Duration(minutes: 12)),
+      ],
+      createdAt: DateTime(2026, 1, 1),
+    );
+
+    final updated = GamificationService.syncHearts(user, now: now);
+
+    expect(updated.hearts, 4);
+    expect(updated.heartLossTimestamps, hasLength(1));
+    expect(updated.heartLossTimestamps.single,
+        now.subtract(const Duration(minutes: 12)));
+  });
+
+  test('practice refills clear the most recent missing heart first', () {
+    final now = DateTime(2026, 3, 15, 12, 25);
+    final user = UserProfile(
+      id: 'user-4',
+      hearts: 3,
+      heartLossTimestamps: [
+        DateTime(2026, 3, 15, 12, 0),
+        DateTime(2026, 3, 15, 12, 20),
+      ],
+      createdAt: DateTime(2026, 1, 1),
+    );
+
+    final updated =
+        GamificationService.applyHeartDelta(user, delta: 1, now: now);
+
+    expect(updated.hearts, 4);
+    expect(updated.heartLossTimestamps, [DateTime(2026, 3, 15, 12, 0)]);
+  });
 }

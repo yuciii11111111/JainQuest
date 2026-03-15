@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_storage/firebase_storage.dart' show FirebaseException;
 import '../../../core/theme/app_theme.dart';
@@ -65,9 +66,38 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   Future<void> _pickImage() async {
-    final image = await ImageUploadService.pickImage();
-    if (image != null) {
+    try {
+      final image = await ImageUploadService.pickImage();
+      if (!mounted || image == null) {
+        return;
+      }
       setState(() => _pickedImage = image);
+    } on PlatformException catch (error) {
+      debugPrint(
+        'Image picker failed [${error.code}]: ${error.message ?? error.details}',
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.t('photo_picker_failed')),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (error) {
+      debugPrint('Image picker failed: $error');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.t('photo_picker_failed')),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -285,6 +315,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       child: Tooltip(
         message: context.t(hasAvatar ? 'change_photo' : 'tap_to_upload_photo'),
         child: MotionPressable(
+          behavior: HitTestBehavior.opaque,
           onTap: _pickImage,
           child: Stack(
             children: [

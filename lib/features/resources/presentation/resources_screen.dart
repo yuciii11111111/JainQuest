@@ -1,5 +1,6 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/navigation/app_navigator.dart';
@@ -72,8 +73,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                     speed: const Duration(milliseconds: 14),
                   ),
                   TypewriterSequenceItem(
-                    text:
-                        context.t('resources_desc'),
+                    text: context.t('resources_desc'),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: onSurface.withOpacityValue(0.7),
                         ),
@@ -101,9 +101,22 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                       label: context.t('start_reading'),
                       icon: Icons.auto_stories_rounded,
                       onPressed: () {
-                        Navigator.of(context).pushUltraSmooth(const ReadingScreen());
+                        Navigator.of(context)
+                            .pushUltraSmooth(const ReadingScreen());
                       },
                       width: double.infinity,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      context.t(
+                        'read_pages_for_heart',
+                        args: {
+                          'count': '${HeartsSystem.readingPagesPerHeart}',
+                        },
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.primary,
+                          ),
                     ),
                   ],
                 ),

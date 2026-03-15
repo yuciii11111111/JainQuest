@@ -310,6 +310,14 @@ class AppStrings {
       AppLanguage.gujarati:
           'પ્રોફાઇલ સેવ થઈ ગઈ, પરંતુ ફોટો અપલોડ પૂર્ણ થયું નથી. તમે પ્રોફાઇલમાંથી ફોટો ફરી પ્રયત્ન કરી શકો છો.',
     },
+    'photo_picker_failed': {
+      AppLanguage.english:
+          'Could not open your photo library. Check app permissions and try again.',
+      AppLanguage.hindi:
+          'आपकी फोटो लाइब्रेरी नहीं खुल सकी। ऐप की अनुमति जांचें और फिर प्रयास करें।',
+      AppLanguage.gujarati:
+          'તમારી ફોટો લાઇબ્રેરી ખૂલી શકી નથી. એપની પરવાનગીઓ તપાસો અને ફરી પ્રયત્ન કરો.',
+    },
     'min_read': {
       AppLanguage.english: '{count} min read',
       AppLanguage.hindi: '{count} मिनट पढ़ाई',
@@ -1667,6 +1675,19 @@ class AppStrings {
       AppLanguage.english: 'Bookmark page',
       AppLanguage.hindi: 'पेज बुकमार्क करें',
       AppLanguage.gujarati: 'પેજ બુકમાર્ક કરો',
+    },
+    'out_of_hearts_title': {
+      AppLanguage.english: 'Out of hearts',
+    },
+    'out_of_hearts_message': {
+      AppLanguage.english:
+          'Lessons are locked until a heart comes back. Your next heart arrives in {time}. Read {pages} new pages to earn one sooner.',
+    },
+    'read_pages_for_heart': {
+      AppLanguage.english: 'Read {count} more new pages to earn a heart.',
+    },
+    'reading_heart_earned': {
+      AppLanguage.english: 'Reading restored {count} hearts.',
     },
   };
 

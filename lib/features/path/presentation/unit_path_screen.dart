@@ -12,6 +12,7 @@ import '../../../core/models/lesson_models.dart';
 import '../../../core/guide/guide_keys.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/widgets/tr_text.dart';
+import '../../../core/widgets/heart_lock_dialog.dart';
 import '../../lesson_runner/presentation/lesson_runner_screen.dart';
 import '../../../core/widgets/motion_pressable.dart';
 
@@ -156,7 +157,18 @@ class _UnitPathScreenState extends ConsumerState<UnitPathScreen> {
                               .isLessonUnlocked(unit.lessons[i].lessonId) &&
                           !progress.isLessonCompleted(unit.lessons[i].lessonId),
                       onTap: progress.isLessonUnlocked(unit.lessons[i].lessonId)
-                          ? () {
+                          ? () async {
+                              final updatedUser = await ref
+                                  .read(userProfileProvider.notifier)
+                                  .syncHearts();
+                              if (!context.mounted) return;
+                              if (!updatedUser.hasHeartsAvailable) {
+                                await showHeartLockDialog(
+                                  context,
+                                  user: updatedUser,
+                                );
+                                return;
+                              }
                               ref
                                   .read(lessonRunnerProvider.notifier)
                                   .startLesson(unit.lessons[i]);

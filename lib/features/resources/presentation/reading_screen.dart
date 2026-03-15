@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/localization/app_strings.dart';
+import '../../../core/providers/app_providers.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_motion.dart';
 import '../../../core/theme/app_theme.dart';
@@ -9,19 +12,20 @@ import '../../../core/widgets/glass_slider.dart';
 import '../../../core/widgets/motion_pressable.dart';
 import '../../../core/widgets/typewriter_text.dart';
 
-class ReadingScreen extends StatefulWidget {
+class ReadingScreen extends ConsumerStatefulWidget {
   const ReadingScreen({super.key});
 
   @override
-  State<ReadingScreen> createState() => _ReadingScreenState();
+  ConsumerState<ReadingScreen> createState() => _ReadingScreenState();
 }
 
-class _ReadingScreenState extends State<ReadingScreen> {
+class _ReadingScreenState extends ConsumerState<ReadingScreen> {
   static const String _bookId = 'fundjain';
   final PageController _pageController = PageController();
   List<String> _pages = [];
   List<int> _bookmarks = [];
   int _currentPage = 0;
+  int _pagesTowardNextHeart = StorageService.getReadingPagesTowardNextHeart();
   bool _isLoading = true;
   double _fontSize = 16;
   bool _darkMode = false;
@@ -50,6 +54,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   bool get _isCurrentPageBookmarked => _bookmarks.contains(_currentPage);
+
+  int get _pagesUntilNextHeart {
+    final progress = _pagesTowardNextHeart % HeartsSystem.readingPagesPerHeart;
+    return HeartsSystem.readingPagesPerHeart - progress;
+  }
 
   Future<void> _loadBook() async {
     final rawText = await rootBundle.loadString('assets/content/fundjain.txt');
@@ -85,6 +94,39 @@ class _ReadingScreenState extends State<ReadingScreen> {
         _pages = pages;
         _isLoading = false;
       });
+      _registerPageVisit(_currentPage);
+    }
+  }
+
+  Future<void> _registerPageVisit(int pageIndex) async {
+    if (_pages.isEmpty || pageIndex < 0 || pageIndex >= _pages.length) {
+      return;
+    }
+
+    final result =
+        await ref.read(userProfileProvider.notifier).registerReadingPage(
+              bookId: _bookId,
+              pageIndex: pageIndex,
+            );
+    if (!mounted) return;
+
+    if (_pagesTowardNextHeart != result.pagesTowardNextHeart) {
+      setState(() {
+        _pagesTowardNextHeart = result.pagesTowardNextHeart;
+      });
+    }
+
+    if (result.heartsEarned > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.t(
+              'reading_heart_earned',
+              args: {'count': '${result.heartsEarned}'},
+            ),
+          ),
+        ),
+      );
     }
   }
 
@@ -97,6 +139,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final user = ref.watch(userProfileProvider);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -138,9 +181,25 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                         : scheme.onSurfaceVariant,
                                   ),
                         ),
+                        if (user.hearts < HeartsSystem.maxHearts)
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Text(
+                              context.t(
+                                'read_pages_for_heart',
+                                args: {'count': '$_pagesUntilNextHeart'},
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(color: AppColors.primary),
+                            ),
+                          ),
                       ],
                     ),
                   ),
+                  HeartsPill(hearts: user.hearts),
+                  const SizedBox(width: AppSpacing.xs),
                   if (_pages.isNotEmpty)
                     Text(
                       '${_currentPage + 1}/${_pages.length}',
@@ -273,6 +332,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       controller: _pageController,
                       onPageChanged: (index) {
                         setState(() => _currentPage = index);
+                        _registerPageVisit(index);
                       },
                       itemCount: _pages.length,
                       itemBuilder: (context, index) {

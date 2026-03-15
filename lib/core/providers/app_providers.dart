@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../gamification/gamification_rules.dart';
 import '../gamification/gamification_service.dart';
@@ -12,10 +14,24 @@ import '../content/unit1_content.dart';
 // ============================================================================
 
 class UserProfileNotifier extends StateNotifier<UserProfile> {
-  UserProfileNotifier() : super(StorageService.getUserProfile());
+  UserProfileNotifier() : super(StorageService.getUserProfile()) {
+    Future<void>.microtask(syncHearts);
+    _heartSyncTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => syncHearts(),
+    );
+  }
+
+  Timer? _heartSyncTimer;
 
   void refresh() {
     state = StorageService.getUserProfile();
+  }
+
+  Future<UserProfile> syncHearts() async {
+    final updatedUser = await StorageService.syncHearts();
+    state = updatedUser;
+    return updatedUser;
   }
 
   Future<UserProfile> addXp(int xp) async {
@@ -42,6 +58,18 @@ class UserProfileNotifier extends StateNotifier<UserProfile> {
     return updatedUser;
   }
 
+  Future<ReadingHeartRewardResult> registerReadingPage({
+    required String bookId,
+    required int pageIndex,
+  }) async {
+    final result = await StorageService.registerReadingPage(
+      bookId: bookId,
+      pageIndex: pageIndex,
+    );
+    state = result.user;
+    return result;
+  }
+
   Future<void> updateDisplayName(String displayName) async {
     final updatedUser = state.copyWith(displayName: displayName);
     await StorageService.saveUserProfile(updatedUser);
@@ -52,6 +80,12 @@ class UserProfileNotifier extends StateNotifier<UserProfile> {
     final updatedUser = state.copyWith(preferredLanguageCode: languageCode);
     await StorageService.saveUserProfile(updatedUser);
     state = updatedUser;
+  }
+
+  @override
+  void dispose() {
+    _heartSyncTimer?.cancel();
+    super.dispose();
   }
 }
 
@@ -279,8 +313,8 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     }
   }
 
-  Future<void> answerWarmup(bool isCorrect) async {
-    if (state == null || state!.warmupAnswered) return;
+  Future<UserProfile?> answerWarmup(bool isCorrect) async {
+    if (state == null || state!.warmupAnswered) return null;
 
     final xp = isCorrect ? XpRewards.warmup : 0;
     state = state!.copyWith(
@@ -290,14 +324,14 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     );
 
     if (isCorrect) {
-      await ref.read(userProfileProvider.notifier).addXp(xp);
+      return ref.read(userProfileProvider.notifier).addXp(xp);
     } else {
-      await ref.read(userProfileProvider.notifier).loseHeart();
+      return ref.read(userProfileProvider.notifier).loseHeart();
     }
   }
 
-  Future<void> answerQuizQuestion(bool isCorrect) async {
-    if (state == null) return;
+  Future<UserProfile?> answerQuizQuestion(bool isCorrect) async {
+    if (state == null) return null;
 
     final newAnswers = [...state!.quizAnswers, isCorrect];
     final xpGained = isCorrect ? XpRewards.quiz : 0;
@@ -309,9 +343,9 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
     );
 
     if (isCorrect) {
-      await ref.read(userProfileProvider.notifier).addXp(xpGained);
+      return ref.read(userProfileProvider.notifier).addXp(xpGained);
     } else {
-      await ref.read(userProfileProvider.notifier).loseHeart();
+      return ref.read(userProfileProvider.notifier).loseHeart();
     }
   }
 

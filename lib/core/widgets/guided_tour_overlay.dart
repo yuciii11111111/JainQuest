@@ -12,6 +12,7 @@ import '../theme/app_motion.dart';
 import '../theme/app_theme.dart';
 import '../../features/lesson_runner/presentation/lesson_runner_screen.dart';
 import 'floating_guide_overlay.dart';
+import 'heart_lock_dialog.dart';
 import 'motion_pressable.dart';
 import 'tr_text.dart';
 import 'typewriter_text.dart';
@@ -62,14 +63,24 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
         key: GuideKeys.currentLessonCard,
         title: firstLessonTitle,
         message: context.t('guided_start_message'),
-        onTap: () {
+        onTap: () async {
           if (unit.lessons.isEmpty) {
-            return;
+            return false;
+          }
+          final updatedUser =
+              await container.read(userProfileProvider.notifier).syncHearts();
+          if (!context.mounted) {
+            return false;
+          }
+          if (!updatedUser.hasHeartsAvailable) {
+            await showHeartLockDialog(context, user: updatedUser);
+            return false;
           }
           container
               .read(lessonRunnerProvider.notifier)
               .startLesson(unit.lessons.first);
           pushRoute(const LessonRunnerScreen());
+          return true;
         },
       ),
       _TourStep(
@@ -77,7 +88,7 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
         title: context.t('guided_finish_title'),
         message: context.t('guided_finish_message'),
         requiresFirstLessonCompleted: true,
-        onTap: () {
+        onTap: () async {
           final navigator = appNavigatorKey.currentState;
           container.read(lessonRunnerProvider.notifier).endLesson();
           navigator?.maybePop();
@@ -85,31 +96,44 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
             navigator?.maybePop();
           });
           setHomeTab(1);
+          return true;
         },
       ),
       _TourStep(
         key: GuideKeys.resourcesNavItem,
         title: context.t('guided_reading_title'),
         message: context.t('guided_reading_message'),
-        onTap: () => setHomeTab(1),
+        onTap: () async {
+          setHomeTab(1);
+          return true;
+        },
       ),
       _TourStep(
         key: GuideKeys.askGuruNavItem,
         title: context.t('ask_guru'),
         message: context.t('guided_ask_guru_message'),
-        onTap: () => setHomeTab(2),
+        onTap: () async {
+          setHomeTab(2);
+          return true;
+        },
       ),
       _TourStep(
         key: GuideKeys.communityNavItem,
         title: context.t('guided_community_title'),
         message: context.t('guided_community_message'),
-        onTap: () => setHomeTab(3),
+        onTap: () async {
+          setHomeTab(3);
+          return true;
+        },
       ),
       _TourStep(
         key: GuideKeys.profileNavItem,
         title: context.t('guided_profile_title'),
         message: context.t('guided_profile_message'),
-        onTap: () => setHomeTab(4),
+        onTap: () async {
+          setHomeTab(4);
+          return true;
+        },
       ),
     ];
   }
@@ -165,7 +189,10 @@ class _GuidedTourOverlayState extends ConsumerState<GuidedTourOverlay> {
       }
     }
 
-    step.onTap();
+    final completedStep = await step.onTap();
+    if (!completedStep) {
+      return;
+    }
     await Future<void>.delayed(AppMotion.standard);
     if (!mounted) {
       return;
@@ -395,7 +422,7 @@ class _TourStep {
   final GlobalKey key;
   final String title;
   final String message;
-  final VoidCallback onTap;
+  final Future<bool> Function() onTap;
   final bool requiresFirstLessonCompleted;
 
   const _TourStep({

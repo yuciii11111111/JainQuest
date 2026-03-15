@@ -2,8 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../gamification/gamification_rules.dart';
 import '../gamification/gamification_service.dart';
 import '../models/user_models.dart';
+
+class ReadingHeartRewardResult {
+  const ReadingHeartRewardResult({
+    required this.user,
+    required this.countedPage,
+    required this.heartsEarned,
+    required this.pagesTowardNextHeart,
+  });
+
+  final UserProfile user;
+  final bool countedPage;
+  final int heartsEarned;
+  final int pagesTowardNextHeart;
+}
 
 class StorageService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -20,6 +35,8 @@ class StorageService {
   static ThemeMode _themeMode = ThemeMode.dark;
   static Map<String, List<int>> _readingBookmarks = {};
   static Map<String, bool> _quickGuideCompletions = {};
+  static Map<String, List<int>> _readingRewardPages = {};
+  static int _readingPagesTowardNextHeart = 0;
 
   static Future<void> init({User? user}) async {
     final currentUser = user ?? _auth.currentUser;
@@ -131,9 +148,27 @@ class StorageService {
       _quickGuideCompletions = rawGuideCompletions.map(
         (guideId, completed) => MapEntry(guideId, completed == true),
       );
+      final rawRewardPages =
+          readingData['rewardPages'] as Map<String, dynamic>? ?? {};
+      _readingRewardPages = rawRewardPages.map(
+        (bookId, pages) {
+          final values = List<dynamic>.from(pages as List<dynamic>? ?? const [])
+              .whereType<num>()
+              .map((value) => value.toInt())
+              .where((value) => value >= 0)
+              .toSet()
+              .toList()
+            ..sort();
+          return MapEntry(bookId, values);
+        },
+      );
+      _readingPagesTowardNextHeart =
+          (readingData['pagesTowardNextHeart'] as num?)?.toInt() ?? 0;
     } else {
       _readingBookmarks = {};
       _quickGuideCompletions = {};
+      _readingRewardPages = {};
+      _readingPagesTowardNextHeart = 0;
     }
 
     final attemptsSnap = await _attemptsCollection().get();
@@ -147,11 +182,15 @@ class StorageService {
   // =========================================================================
 
   static UserProfile getUserProfile() {
+    _userProfile = GamificationService.syncHearts(_userProfile);
     return _userProfile;
   }
 
   static Future<void> saveUserProfile(UserProfile profile) async {
     _userProfile = profile;
+    if (!_isInitialized || _auth.currentUser == null) {
+      return;
+    }
     await _userDoc().set(profile.toMap(), SetOptions(merge: true));
   }
 
@@ -161,14 +200,23 @@ class StorageService {
   }
 
   static Future<UserProfile> addXp(int xp) async {
-    final user = getUserProfile();
+    final user = await syncHearts();
     final updatedUser = GamificationService.applyXp(user, xp);
     await saveUserProfile(updatedUser);
     return updatedUser;
   }
 
+  static Future<UserProfile> syncHearts() async {
+    final syncedUser = GamificationService.syncHearts(_userProfile);
+    if (syncedUser == _userProfile) {
+      return _userProfile;
+    }
+    await saveUserProfile(syncedUser);
+    return syncedUser;
+  }
+
   static Future<UserProfile> loseHeart() async {
-    final user = getUserProfile();
+    final user = await syncHearts();
     if (user.hearts > 0) {
       final updatedUser = GamificationService.applyHeartDelta(user, delta: -1);
       await saveUserProfile(updatedUser);
@@ -178,7 +226,7 @@ class StorageService {
   }
 
   static Future<UserProfile> refillHeart({int amount = 1}) async {
-    final user = getUserProfile();
+    final user = await syncHearts();
     final updatedUser =
         GamificationService.applyHeartDelta(user, delta: amount);
     await saveUserProfile(updatedUser);
@@ -186,7 +234,7 @@ class StorageService {
   }
 
   static Future<UserProfile> updateStreak() async {
-    final user = getUserProfile();
+    final user = await syncHearts();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
@@ -427,6 +475,10 @@ class StorageService {
     return Map<String, bool>.from(_quickGuideCompletions);
   }
 
+  static int getReadingPagesTowardNextHeart() {
+    return _readingPagesTowardNextHeart;
+  }
+
   static bool isQuickGuideCompleted(String guideId) {
     return _quickGuideCompletions[guideId] ?? false;
   }
@@ -443,6 +495,52 @@ class StorageService {
         SetOptions(merge: true),
       );
     }
+  }
+
+  static Future<ReadingHeartRewardResult> registerReadingPage({
+    required String bookId,
+    required int pageIndex,
+  }) async {
+    final user = await syncHearts();
+    final rewardedPages =
+        List<int>.from(_readingRewardPages[bookId] ?? const <int>[]);
+    final alreadyCounted = rewardedPages.contains(pageIndex);
+    var heartsEarned = 0;
+    var updatedUser = user;
+
+    if (!alreadyCounted && user.hearts < UserProfile.maxHearts) {
+      rewardedPages.add(pageIndex);
+      rewardedPages.sort();
+      _readingRewardPages[bookId] = rewardedPages;
+      _readingPagesTowardNextHeart += 1;
+
+      while (
+          _readingPagesTowardNextHeart >= HeartsSystem.readingPagesPerHeart &&
+              updatedUser.hearts < UserProfile.maxHearts) {
+        _readingPagesTowardNextHeart -= HeartsSystem.readingPagesPerHeart;
+        updatedUser =
+            GamificationService.applyHeartDelta(updatedUser, delta: 1);
+        heartsEarned += 1;
+      }
+
+      await saveUserProfile(updatedUser);
+      if (_isInitialized && _auth.currentUser != null) {
+        await _readingDoc().set(
+          {
+            'rewardPages': _readingRewardPages,
+            'pagesTowardNextHeart': _readingPagesTowardNextHeart,
+          },
+          SetOptions(merge: true),
+        );
+      }
+    }
+
+    return ReadingHeartRewardResult(
+      user: updatedUser,
+      countedPage: !alreadyCounted && user.hearts < UserProfile.maxHearts,
+      heartsEarned: heartsEarned,
+      pagesTowardNextHeart: _readingPagesTowardNextHeart,
+    );
   }
 
   // =========================================================================
@@ -462,6 +560,8 @@ class StorageService {
     batch.set(_readingDoc(), {
       'bookmarks': <String, List<int>>{},
       'quickGuideCompletions': <String, bool>{},
+      'rewardPages': <String, List<int>>{},
+      'pagesTowardNextHeart': 0,
     });
 
     final attemptsSnap = await _attemptsCollection().get();
@@ -477,5 +577,7 @@ class StorageService {
     _attemptLogs = [];
     _readingBookmarks = {};
     _quickGuideCompletions = {};
+    _readingRewardPages = {};
+    _readingPagesTowardNextHeart = 0;
   }
 }

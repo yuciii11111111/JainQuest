@@ -15,6 +15,7 @@ import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/models/badge_definition.dart';
 import '../../../core/models/user_models.dart' as user_models;
 import '../../auth/presentation/create_account_screen.dart';
+import '../../leaderboard/presentation/leaderboard_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../../core/localization/app_strings.dart';
 
@@ -69,14 +70,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           .displaySmall
                           ?.copyWith(fontWeight: FontWeight.w800),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.settings_rounded),
-                      color: scheme.onSurfaceVariant,
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushUltraSmooth(const SettingsScreen());
-                      },
-                      tooltip: context.t('settings'),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.emoji_events_rounded),
+                          color: AppColors.achievementGold,
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushUltraSmooth(const LeaderboardScreen());
+                          },
+                          tooltip: context.t('leaderboard'),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.settings_rounded),
+                          color: scheme.onSurfaceVariant,
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushUltraSmooth(const SettingsScreen());
+                          },
+                          tooltip: context.t('settings'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -160,15 +175,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                           _QuickStat(
                             icon: Icons.public_rounded,
-                            label: context.t('world'),
-                            value: '#${(5000 - user.totalXp).clamp(1, 9999)}',
+                            label: context.t('level'),
+                            value: '${user.level}',
                             color: AppColors.highlight,
                           ),
                           _QuickStat(
-                            icon: Icons.place_rounded,
-                            label: context.t('local'),
-                            value:
-                                '#${(800 - user.currentStreak * 5).clamp(1, 9999)}',
+                            icon: Icons.local_fire_department_rounded,
+                            label: context.t('streak'),
+                            value: '${user.currentStreak}',
                             color: AppColors.secondary,
                           ),
                         ],

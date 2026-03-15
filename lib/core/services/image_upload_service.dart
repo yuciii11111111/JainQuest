@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,6 +23,7 @@ class ImageUploadService {
       maxWidth: 512,
       maxHeight: 512,
       imageQuality: 80,
+      requestFullMetadata: false,
     );
     if (picked == null) return null;
     return SelectedImage(

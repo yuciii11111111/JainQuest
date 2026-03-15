@@ -22,6 +22,7 @@ import '../../../core/widgets/liquid_glass.dart';
 import '../../../core/widgets/motion_pressable.dart';
 import '../../../core/widgets/motion_reveal.dart';
 import '../../../core/widgets/progress_ring.dart';
+import '../../../core/widgets/heart_lock_dialog.dart';
 import '../../forum/presentation/forum_screen.dart';
 import '../../guru/presentation/guru_screen.dart';
 import '../../path/presentation/unit_path_screen.dart';
@@ -174,7 +175,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   streakCardKey: _streakCardKey,
                   currentLessonKey: _currentLessonKey,
                   onShowGuide: _showTutorial,
-                  onLessonTap: (lesson) {
+                  onLessonTap: (lesson) async {
+                    final updatedUser = await ref
+                        .read(userProfileProvider.notifier)
+                        .syncHearts();
+                    if (!context.mounted) return;
+                    if (!updatedUser.hasHeartsAvailable) {
+                      await showHeartLockDialog(context, user: updatedUser);
+                      return;
+                    }
                     ref.read(lessonRunnerProvider.notifier).startLesson(lesson);
                     Navigator.of(context).pushUltraSmooth(
                       const LessonRunnerScreen(),
@@ -394,6 +403,8 @@ class _HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final completedToday = progress.completedLessonsOn(DateTime.now());
+    final dailyGoalCount = completedToday > 3 ? 3 : completedToday;
     final lessons = unit.lessons;
     final levelProgress =
         LevelSystem.getLevelProgress(user.level, user.totalXp);
@@ -657,7 +668,7 @@ class _HomeTab extends StatelessWidget {
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             context.t('lessons_completed_of', args: {
-                              'count': '${progress.completedLessons.length}',
+                              'count': '$dailyGoalCount',
                             }),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
@@ -673,13 +684,10 @@ class _HomeTab extends StatelessWidget {
                             width: 12,
                             height: 12,
                             shape: LiquidGlassShape.circle,
-                            tintColor: index < progress.completedLessons.length
+                            tintColor: index < dailyGoalCount
                                 ? AppColors.primary
                                 : scheme.surface,
-                            tintOpacity:
-                                index < progress.completedLessons.length
-                                    ? 0.5
-                                    : 0.2,
+                            tintOpacity: index < dailyGoalCount ? 0.5 : 0.2,
                             borderColor: scheme.outline.withOpacityValue(0.45),
                             child: const SizedBox.shrink(),
                           ),
