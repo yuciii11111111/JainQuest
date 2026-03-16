@@ -274,6 +274,7 @@ class _ForumScreenState extends State<ForumScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _openPostComposer,
         backgroundColor: scheme.primary,
+        tooltip: context.t('create_post'),
         child: const Icon(Icons.add_rounded, color: Colors.white),
       ),
     );
@@ -338,7 +339,7 @@ class _CategoryStrip extends StatelessWidget {
         TextButton.icon(
           onPressed: onAddCommunity,
           icon: const Icon(Icons.group_add_rounded, size: 18),
-          label: Text(context.t('add')),
+          label: Text(context.t('new_community')),
           style: TextButton.styleFrom(
             foregroundColor: scheme.onSurfaceVariant,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

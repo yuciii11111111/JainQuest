@@ -95,55 +95,79 @@ class LeaderboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: leaderboardAsync.when(
-          loading: () => const _LeaderboardStateCard(
-            child: CircularProgressIndicator(),
-          ),
-          error: (_, __) => const _LeaderboardStateCard(
-            child: Icon(
-              Icons.emoji_events_rounded,
-              size: 44,
-              color: AppColors.primary,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  children: [
+                    _LeaderboardBackButton(
+                      onTap: () => Navigator.of(context).maybePop(),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        context.t('leaderboard'),
+                        style: Theme.of(context).textTheme.displaySmall,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          data: (profiles) {
-            final leaderboardData = profiles
-                .map(
-                  (profile) => _LeaderboardEntry(
-                    id: profile.id,
-                    name: _displayNameFor(profile, context),
-                    xp: profile.totalXp,
-                    level: profile.level,
+            ...leaderboardAsync.when<List<Widget>>(
+              loading: () => const [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _LeaderboardStateCard(
+                    child: CircularProgressIndicator(),
                   ),
-                )
-                .toList();
-            final rankIndex =
-                profiles.indexWhere((profile) => profile.id == user.id);
-            final rank = rankIndex >= 0 ? rankIndex + 1 : null;
-
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Text(
-                      context.t('leaderboard'),
-                      style: Theme.of(context).textTheme.displaySmall,
+                ),
+              ],
+              error: (_, __) => const [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _LeaderboardStateCard(
+                    child: Icon(
+                      Icons.emoji_events_rounded,
+                      size: 44,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
-                if (leaderboardData.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _LeaderboardStateCard(
-                      child: Icon(
-                        Icons.people_alt_rounded,
-                        size: 44,
-                        color: AppColors.primary,
+              ],
+              data: (profiles) {
+                final leaderboardData = profiles
+                    .map(
+                      (profile) => _LeaderboardEntry(
+                        id: profile.id,
+                        name: _displayNameFor(profile, context),
+                        xp: profile.totalXp,
+                        level: profile.level,
+                      ),
+                    )
+                    .toList();
+                final rankIndex =
+                    profiles.indexWhere((profile) => profile.id == user.id);
+                final rank = rankIndex >= 0 ? rankIndex + 1 : null;
+
+                if (leaderboardData.isEmpty) {
+                  return const [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _LeaderboardStateCard(
+                        child: Icon(
+                          Icons.people_alt_rounded,
+                          size: 44,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                  )
-                else ...[
+                  ];
+                }
+
+                return [
                   SliverToBoxAdapter(
                     child: Padding(
                       padding:
@@ -288,10 +312,37 @@ class LeaderboardScreen extends ConsumerWidget {
                   const SliverToBoxAdapter(
                     child: SizedBox(height: AppSpacing.xxl),
                   ),
-                ],
-              ],
-            );
-          },
+                ];
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardBackButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _LeaderboardBackButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Tooltip(
+      message: context.t('back'),
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: GlassCard(
+          onTap: onTap,
+          padding: EdgeInsets.zero,
+          child: Icon(
+            Icons.arrow_back_rounded,
+            color: scheme.onSurface,
+          ),
         ),
       ),
     );

@@ -735,6 +735,7 @@ class Unit1Content {
   // Lesson 1.1: What is Jainism?
   // =========================================================================
 
+  // ignore: unused_field
   static const _lesson1 = Lesson(
     lessonId: 'U01_L01',
     title: 'What is Jainism?',
@@ -859,6 +860,7 @@ class Unit1Content {
   // Lesson 1.2: Jiva and Ajiva
   // =========================================================================
 
+  // ignore: unused_field
   static const _lesson2 = Lesson(
     lessonId: 'U01_L02',
     title: 'Jiva and Ajiva',
@@ -982,6 +984,7 @@ class Unit1Content {
   // Lesson 1.3: The Soul (Jiva)
   // =========================================================================
 
+  // ignore: unused_field
   static const _lesson3 = Lesson(
     lessonId: 'U01_L03',
     title: 'The Soul (Jiva)',
@@ -1094,6 +1097,7 @@ class Unit1Content {
   // Lesson 1.4: Fundamentals of Karma
   // =========================================================================
 
+  // ignore: unused_field
   static const _lesson4 = Lesson(
     lessonId: 'U01_L04',
     title: 'Fundamentals of Karma',

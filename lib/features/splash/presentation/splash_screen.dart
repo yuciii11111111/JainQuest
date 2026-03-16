@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/services/storage_service.dart';
@@ -35,6 +36,8 @@ class _SplashScreenState extends State<SplashScreen>
   Timer? _languageTimer;
   int _languageIndex = 0;
   bool _navigating = false;
+  bool _isProceeding = false;
+  bool _isRestoringSession = false;
 
   static const _languageMessages = <_LocalizedWelcome>[
     _LocalizedWelcome(
@@ -94,6 +97,10 @@ class _SplashScreenState extends State<SplashScreen>
     }
     _navigating = true;
     final authUser = FirebaseAuth.instance.currentUser;
+    setState(() {
+      _isProceeding = true;
+      _isRestoringSession = authUser != null;
+    });
     if (authUser == null) {
       if (!mounted) return;
       Navigator.of(context).pushReplacementUltraSmooth(
@@ -152,26 +159,153 @@ class _SplashScreenState extends State<SplashScreen>
       ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-        child: SizedBox(
-          height: 56,
-          child: LiquidGlassContainer(
-            onTap: _navigateAfterSplash,
-            borderRadius: BorderRadius.circular(28),
-            tintColor: Colors.white,
-            tintOpacity: 0.15,
-            child: const Center(
-              child: Text(
-                'Next',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedSize(
+              duration: AppMotion.standard,
+              curve: AppMotion.enterCurve,
+              child: _isRestoringSession
+                  ? const Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: _AutoLoginStatusCard(),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            SizedBox(
+              height: 56,
+              child: LiquidGlassContainer(
+                onTap: _isProceeding ? null : _navigateAfterSplash,
+                borderRadius: BorderRadius.circular(28),
+                tintColor: Colors.white,
+                tintOpacity: _isProceeding ? 0.22 : 0.15,
+                borderColor: Colors.white.withValues(
+                  alpha: _isProceeding ? 0.48 : 0.3,
+                ),
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: AppMotion.standard,
+                    switchInCurve: AppMotion.enterCurve,
+                    switchOutCurve: AppMotion.exitCurve,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.12),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _isProceeding
+                        ? _SplashFooterLabel(
+                            key: const ValueKey('splash-loading'),
+                            label: context.t('please_wait'),
+                            isLoading: true,
+                          )
+                        : _SplashFooterLabel(
+                            key: const ValueKey('splash-next'),
+                            label: context.t('next'),
+                          ),
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _AutoLoginStatusCard extends StatelessWidget {
+  const _AutoLoginStatusCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return LiquidGlassContainer(
+      borderRadius: BorderRadius.circular(24),
+      tintColor: Colors.white,
+      tintOpacity: 0.12,
+      borderColor: Colors.white.withValues(alpha: 0.24),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  context.t('auto_logging_in'),
+                  style: textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  context.t('restoring_progress'),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SplashFooterLabel extends StatelessWidget {
+  final String label;
+  final bool isLoading;
+
+  const _SplashFooterLabel({
+    super.key,
+    required this.label,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+        );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isLoading) ...[
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Text(label, style: textStyle),
+      ],
     );
   }
 }

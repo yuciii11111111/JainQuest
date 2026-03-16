@@ -87,4 +87,11 @@ class HeartsSystem {
       Duration(minutes: heartRegenMinutes);
   static const int practiceHeartReward = 1;
   static const int readingPagesPerHeart = 5;
+
+  static int calculateHeartsRegenerated(DateTime? lastActivityDate) {
+    if (lastActivityDate == null) return 0;
+    final now = DateTime.now();
+    final minutesPassed = now.difference(lastActivityDate).inMinutes;
+    return (minutesPassed / heartRegenMinutes).floor().clamp(0, maxHearts);
+  }
 }

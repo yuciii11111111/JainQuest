@@ -32,6 +32,10 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  void _openLeaderboard() {
+    Navigator.of(context).pushUltraSmooth(const LeaderboardScreen());
+  }
+
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
@@ -47,6 +51,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final user = ref.watch(userProfileProvider);
     final progress = ref.watch(progressProvider);
     final lessonBadges = ref.watch(badgesProvider);
+    final leaderboardAsync = ref.watch(leaderboardProvider);
+    final leaderboardRank = leaderboardAsync.maybeWhen(
+      data: (profiles) {
+        final rankIndex =
+            profiles.indexWhere((profile) => profile.id == user.id);
+        return rankIndex >= 0 ? rankIndex + 1 : null;
+      },
+      orElse: () => null,
+    );
     // Get all badges from gamification system
     const allBadges = BadgeDefinitions.allBadges;
 
@@ -76,10 +89,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         IconButton(
                           icon: const Icon(Icons.emoji_events_rounded),
                           color: AppColors.achievementGold,
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pushUltraSmooth(const LeaderboardScreen());
-                          },
+                          onPressed: _openLeaderboard,
                           tooltip: context.t('leaderboard'),
                         ),
                         IconButton(
@@ -187,6 +197,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: AppSpacing.lg),
+                      _ProfileRankCard(
+                        rank: leaderboardRank,
+                        onTap: _openLeaderboard,
+                      ),
                     ],
                   ),
                 ),
@@ -258,6 +273,74 @@ class _QuickStat extends StatelessWidget {
               ),
         ),
       ],
+    );
+  }
+}
+
+class _ProfileRankCard extends StatelessWidget {
+  final int? rank;
+  final VoidCallback onTap;
+
+  const _ProfileRankCard({
+    required this.rank,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final rankLabel = rank == null ? '--' : '#$rank';
+
+    return FloatingCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                rankLabel,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.t('your_rank'),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  context.t('leaderboard'),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.arrow_forward_rounded,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
+      ),
     );
   }
 }

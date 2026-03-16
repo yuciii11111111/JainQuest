@@ -76,6 +76,18 @@ class AppStrings {
       AppLanguage.hindi: 'अगला',
       AppLanguage.gujarati: 'આગળ',
     },
+    'auto_logging_in': {
+      AppLanguage.english: 'Auto logging you in...',
+      AppLanguage.hindi: 'आपको अपने-आप लॉग इन किया जा रहा है...',
+      AppLanguage.gujarati: 'તમને આપમેળે લૉગ ઇન કરવામાં આવી રહ્યા છે...',
+    },
+    'restoring_progress': {
+      AppLanguage.english: 'Restoring your progress and getting things ready.',
+      AppLanguage.hindi:
+          'आपकी प्रगति बहाल की जा रही है और सब कुछ तैयार किया जा रहा है।',
+      AppLanguage.gujarati:
+          'તમારી પ્રગતિ ફરી લાવવામાં આવી રહી છે અને બધું તૈયાર કરવામાં આવી રહ્યું છે.',
+    },
     'continue': {
       AppLanguage.english: 'Continue',
       AppLanguage.hindi: 'जारी रखें',
@@ -310,13 +322,43 @@ class AppStrings {
       AppLanguage.gujarati:
           'પ્રોફાઇલ સેવ થઈ ગઈ, પરંતુ ફોટો અપલોડ પૂર્ણ થયું નથી. તમે પ્રોફાઇલમાંથી ફોટો ફરી પ્રયત્ન કરી શકો છો.',
     },
+    'photo_picker_permission_denied': {
+      AppLanguage.english:
+          'Could not access your photos. Check app permissions and try again.',
+      AppLanguage.hindi:
+          'आपकी फ़ोटो तक पहुंच नहीं मिली। ऐप की अनुमति जांचें और फिर प्रयास करें।',
+      AppLanguage.gujarati:
+          'તમારા ફોટાઓનો ઍક્સેસ મળ્યો નથી. એપની પરવાનગીઓ તપાસો અને ફરી પ્રયત્ન કરો.',
+    },
+    'photo_picker_busy': {
+      AppLanguage.english:
+          'Photo picker is already open. Finish that step and try again.',
+      AppLanguage.hindi:
+          'फोटो चुनने वाली विंडो पहले से खुली है। उसे पूरा करके फिर प्रयास करें।',
+      AppLanguage.gujarati:
+          'ફોટો પસંદ કરવાની વિન્ડો પહેલેથી ખુલ્લી છે. તેને પૂર્ણ કરીને ફરી પ્રયત્ન કરો.',
+    },
+    'photo_picker_invalid_image': {
+      AppLanguage.english:
+          'That photo could not be read. Try choosing a different image.',
+      AppLanguage.hindi: 'इस फोटो को पढ़ा नहीं जा सका। कोई दूसरी तस्वीर चुनें।',
+      AppLanguage.gujarati:
+          'આ ફોટો વાંચી શકાયો નથી. કૃપા કરીને બીજી તસવીર પસંદ કરો.',
+    },
+    'photo_picker_unavailable': {
+      AppLanguage.english:
+          'Could not open the photo picker on this device. Try again.',
+      AppLanguage.hindi:
+          'इस डिवाइस पर फोटो चुनने वाली विंडो नहीं खुल सकी। फिर प्रयास करें।',
+      AppLanguage.gujarati:
+          'આ ઉપકરણ પર ફોટો પસંદ કરવાની વિન્ડો ખુલી શકી નથી. ફરી પ્રયત્ન કરો.',
+    },
     'photo_picker_failed': {
       AppLanguage.english:
-          'Could not open your photo library. Check app permissions and try again.',
-      AppLanguage.hindi:
-          'आपकी फोटो लाइब्रेरी नहीं खुल सकी। ऐप की अनुमति जांचें और फिर प्रयास करें।',
+          'Could not choose a photo right now. Please try again.',
+      AppLanguage.hindi: 'अभी फोटो नहीं चुनी जा सकी। कृपया फिर प्रयास करें।',
       AppLanguage.gujarati:
-          'તમારી ફોટો લાઇબ્રેરી ખૂલી શકી નથી. એપની પરવાનગીઓ તપાસો અને ફરી પ્રયત્ન કરો.',
+          'હમણાં ફોટો પસંદ થઈ શક્યો નથી. કૃપા કરીને ફરી પ્રયત્ન કરો.',
     },
     'min_read': {
       AppLanguage.english: '{count} min read',
@@ -864,6 +906,11 @@ class AppStrings {
       AppLanguage.english: 'Add',
       AppLanguage.hindi: 'जोड़ें',
       AppLanguage.gujarati: 'ઉમેરો',
+    },
+    'new_community': {
+      AppLanguage.english: 'New community',
+      AppLanguage.hindi: 'नया समुदाय',
+      AppLanguage.gujarati: 'નવો સમુદાય',
     },
     'reply': {
       AppLanguage.english: 'Reply',

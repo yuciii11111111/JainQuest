@@ -25,6 +25,8 @@ class ResourceLink {
 }
 
 class ResourceData {
+  // Direct watch links should stay only when they have been verified recently.
+  // Search links are more durable for topics where videos disappear over time.
   static const List<ResourceCategory> categories = [
     ResourceCategory(
       title: 'Core Jain Philosophy',
@@ -36,24 +38,15 @@ class ResourceData {
                 'https://www.youtube.com/results?search_query=Three+Jewels+of+Jainism+Ratnatraya',
             isSearch: true),
         ResourceLink(
-            title: 'Three Jewels - Video',
-            url: 'https://www.youtube.com/watch?v=0Qy7W4QkY8A'),
-        ResourceLink(
             title: 'Five Great Vows (Mahavrata) - Search',
             url:
                 'https://www.youtube.com/results?search_query=Five+Great+Vows+Mahavrata+Jainism',
             isSearch: true),
         ResourceLink(
-            title: 'Five Great Vows - Video',
-            url: 'https://www.youtube.com/watch?v=H7k2M6sQ9hM'),
-        ResourceLink(
             title: 'Anuvrata (Small Vows) - Search',
             url:
                 'https://www.youtube.com/results?search_query=Anuvrata+Jainism+explained',
             isSearch: true),
-        ResourceLink(
-            title: 'Anuvrata - Video',
-            url: 'https://www.youtube.com/watch?v=2mF1hXQ8c3g'),
       ],
     ),
     ResourceCategory(
@@ -73,9 +66,6 @@ class ResourceData {
             url:
                 'https://www.youtube.com/results?search_query=Satya+truthfulness+Jainism',
             isSearch: true),
-        ResourceLink(
-            title: 'Satya - Video',
-            url: 'https://www.youtube.com/watch?v=8pJ7Y4WZ1uQ'),
         ResourceLink(
             title: 'Asteya (Non-Stealing) - Search',
             url:
@@ -106,9 +96,6 @@ class ResourceData {
                 'https://www.youtube.com/results?search_query=Anekantavada+Jainism+explained',
             isSearch: true),
         ResourceLink(
-            title: 'Anekantavada - Video',
-            url: 'https://www.youtube.com/watch?v=Yp3Q1FQjZ6U'),
-        ResourceLink(
             title: 'Syadvada (Conditional Truth) - Search',
             url:
                 'https://www.youtube.com/results?search_query=Syadvada+Jainism',
@@ -129,9 +116,6 @@ class ResourceData {
             url:
                 'https://www.youtube.com/results?search_query=Nav+Tattva+Jainism',
             isSearch: true),
-        ResourceLink(
-            title: 'Nav Tattva - Video',
-            url: 'https://www.youtube.com/watch?v=9Z0mZ9j1R5o'),
         ResourceLink(
             title: 'Eight Types of Karma - Search',
             url:

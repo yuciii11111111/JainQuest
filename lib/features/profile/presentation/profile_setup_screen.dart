@@ -38,6 +38,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final FocusNode _ageFocusNode = FocusNode();
   AppLanguage _selectedLanguage = AppLanguage.english;
   bool _isLoading = false;
+  bool _isPickingImage = false;
   SelectedImage? _pickedImage;
   String? _existingAvatarUrl;
   String? _nameError;
@@ -66,6 +67,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   Future<void> _pickImage() async {
+    if (_isPickingImage) {
+      return;
+    }
+
+    setState(() => _isPickingImage = true);
+
     try {
       final image = await ImageUploadService.pickImage();
       if (!mounted || image == null) {
@@ -79,26 +86,46 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.t('photo_picker_failed')),
-          backgroundColor: AppColors.danger,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showPhotoPickerSnackBar(error);
+    } on StateError catch (error) {
+      debugPrint('Image picker failed: $error');
+      if (!mounted) {
+        return;
+      }
+      _showPhotoPickerSnackBar(error);
     } catch (error) {
       debugPrint('Image picker failed: $error');
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.t('photo_picker_failed')),
-          backgroundColor: AppColors.danger,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showPhotoPickerSnackBar(error);
+    } finally {
+      if (mounted) {
+        setState(() => _isPickingImage = false);
+      }
     }
+  }
+
+  void _showPhotoPickerSnackBar(Object error) {
+    final failure = ImageUploadService.classifyPickerError(error);
+    final messageKey = switch (failure) {
+      PhotoPickerFailure.permissionDenied => 'photo_picker_permission_denied',
+      PhotoPickerFailure.busy => 'photo_picker_busy',
+      PhotoPickerFailure.invalidImage => 'photo_picker_invalid_image',
+      PhotoPickerFailure.unavailable => 'photo_picker_unavailable',
+      PhotoPickerFailure.unknown => 'photo_picker_failed',
+    };
+    final backgroundColor = failure == PhotoPickerFailure.busy
+        ? AppColors.warning
+        : AppColors.danger;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.t(messageKey)),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _saveProfile() async {
@@ -316,6 +343,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         message: context.t(hasAvatar ? 'change_photo' : 'tap_to_upload_photo'),
         child: MotionPressable(
           behavior: HitTestBehavior.opaque,
+          enabled: !_isPickingImage,
           onTap: _pickImage,
           child: Stack(
             children: [
@@ -328,6 +356,25 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ),
                 child: Center(child: avatarContent),
               ),
+              if (_isPickingImage)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.32),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 bottom: 0,
                 right: 0,
