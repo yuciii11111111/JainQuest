@@ -1,6 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
-import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/navigation/app_navigator.dart';
@@ -108,12 +107,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      context.t(
-                        'read_pages_for_heart',
-                        args: {
-                          'count': '${HeartsSystem.readingPagesPerHeart}',
-                        },
-                      ),
+                      context.t('daily_reading_reward_hint'),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.primary,
                           ),

@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../gamification/gamification_rules.dart';
 import '../gamification/gamification_service.dart';
 import '../models/user_models.dart';
+import '../../features/resources/data/reading_bonus_logic.dart';
 
 class ReadingHeartRewardResult {
   const ReadingHeartRewardResult({
@@ -12,12 +13,16 @@ class ReadingHeartRewardResult {
     required this.countedPage,
     required this.heartsEarned,
     required this.pagesTowardNextHeart,
+    required this.dailyPagesRead,
+    required this.dailyHeartEarned,
   });
 
   final UserProfile user;
   final bool countedPage;
   final int heartsEarned;
   final int pagesTowardNextHeart;
+  final int dailyPagesRead;
+  final bool dailyHeartEarned;
 }
 
 class StorageService {
@@ -36,6 +41,9 @@ class StorageService {
   static Map<String, List<int>> _readingBookmarks = {};
   static Map<String, bool> _quickGuideCompletions = {};
   static Map<String, List<int>> _readingRewardPages = {};
+  static Map<String, bool> _readingQuizCompletions = {};
+  static Map<String, List<int>> _dailyReadingPages = {};
+  static Map<String, bool> _dailyReadingHeartRewards = {};
   static int _readingPagesTowardNextHeart = 0;
 
   static Future<void> init({User? user}) async {
@@ -162,12 +170,39 @@ class StorageService {
           return MapEntry(bookId, values);
         },
       );
+      final rawQuizCompletions =
+          readingData['quizCompletions'] as Map<String, dynamic>? ?? {};
+      _readingQuizCompletions = rawQuizCompletions.map(
+        (quizId, completed) => MapEntry(quizId, completed == true),
+      );
+      final rawDailyReadingPages =
+          readingData['dailyPages'] as Map<String, dynamic>? ?? {};
+      _dailyReadingPages = rawDailyReadingPages.map(
+        (dayKey, pages) {
+          final values = List<dynamic>.from(pages as List<dynamic>? ?? const [])
+              .whereType<num>()
+              .map((value) => value.toInt())
+              .where((value) => value >= 0)
+              .toSet()
+              .toList()
+            ..sort();
+          return MapEntry(dayKey, values);
+        },
+      );
+      final rawDailyHeartRewards =
+          readingData['dailyHeartRewards'] as Map<String, dynamic>? ?? {};
+      _dailyReadingHeartRewards = rawDailyHeartRewards.map(
+        (dayKey, completed) => MapEntry(dayKey, completed == true),
+      );
       _readingPagesTowardNextHeart =
           (readingData['pagesTowardNextHeart'] as num?)?.toInt() ?? 0;
     } else {
       _readingBookmarks = {};
       _quickGuideCompletions = {};
       _readingRewardPages = {};
+      _readingQuizCompletions = {};
+      _dailyReadingPages = {};
+      _dailyReadingHeartRewards = {};
       _readingPagesTowardNextHeart = 0;
     }
 
@@ -479,8 +514,28 @@ class StorageService {
     return _readingPagesTowardNextHeart;
   }
 
+  static int getReadingDailyPagesRead(
+    String bookId, {
+    DateTime? date,
+  }) {
+    final key = _readingDayKey(bookId, date ?? DateTime.now());
+    return (_dailyReadingPages[key] ?? const <int>[]).length;
+  }
+
+  static bool hasEarnedReadingDailyHeart(
+    String bookId, {
+    DateTime? date,
+  }) {
+    final key = _readingDayKey(bookId, date ?? DateTime.now());
+    return _dailyReadingHeartRewards[key] ?? false;
+  }
+
   static bool isQuickGuideCompleted(String guideId) {
     return _quickGuideCompletions[guideId] ?? false;
+  }
+
+  static bool isReadingQuizCompleted(String quizId) {
+    return _readingQuizCompletions[quizId] ?? false;
   }
 
   static Future<void> markQuickGuideCompleted(
@@ -497,6 +552,20 @@ class StorageService {
     }
   }
 
+  static Future<void> markReadingQuizCompleted(
+    String quizId, {
+    bool completed = true,
+  }) async {
+    _readingQuizCompletions[quizId] = completed;
+
+    if (_isInitialized && _auth.currentUser != null) {
+      await _readingDoc().set(
+        {'quizCompletions': _readingQuizCompletions},
+        SetOptions(merge: true),
+      );
+    }
+  }
+
   static Future<ReadingHeartRewardResult> registerReadingPage({
     required String bookId,
     required int pageIndex,
@@ -507,12 +576,14 @@ class StorageService {
     final alreadyCounted = rewardedPages.contains(pageIndex);
     var heartsEarned = 0;
     var updatedUser = user;
+    var shouldPersistReadingData = false;
 
     if (!alreadyCounted && user.hearts < UserProfile.maxHearts) {
       rewardedPages.add(pageIndex);
       rewardedPages.sort();
       _readingRewardPages[bookId] = rewardedPages;
       _readingPagesTowardNextHeart += 1;
+      shouldPersistReadingData = true;
 
       while (
           _readingPagesTowardNextHeart >= HeartsSystem.readingPagesPerHeart &&
@@ -522,17 +593,50 @@ class StorageService {
             GamificationService.applyHeartDelta(updatedUser, delta: 1);
         heartsEarned += 1;
       }
+    }
 
+    final todayKey = _readingDayKey(bookId, DateTime.now());
+    final previousDailyState = DailyReadingProgress(
+      pageIndices:
+          List<int>.from(_dailyReadingPages[todayKey] ?? const <int>[]),
+      hasEarnedHeart: _dailyReadingHeartRewards[todayKey] ?? false,
+    );
+    final dailyUpdate = ReadingBonusLogic.registerDailyPageVisit(
+      progress: previousDailyState,
+      pageIndex: pageIndex,
+      pagesRequired: HeartsSystem.dailyReadingPagesForHeart,
+      canEarnHeart: updatedUser.hearts < UserProfile.maxHearts,
+    );
+    _dailyReadingPages[todayKey] = dailyUpdate.pageIndices;
+    _dailyReadingHeartRewards[todayKey] = dailyUpdate.hasEarnedHeart;
+
+    if (dailyUpdate.countedPage ||
+        previousDailyState.hasEarnedHeart != dailyUpdate.hasEarnedHeart) {
+      shouldPersistReadingData = true;
+    }
+
+    if (dailyUpdate.heartsEarned > 0) {
+      updatedUser = GamificationService.applyHeartDelta(updatedUser,
+          delta: dailyUpdate.heartsEarned);
+      heartsEarned += dailyUpdate.heartsEarned;
+    }
+
+    if (updatedUser != user) {
       await saveUserProfile(updatedUser);
-      if (_isInitialized && _auth.currentUser != null) {
-        await _readingDoc().set(
-          {
-            'rewardPages': _readingRewardPages,
-            'pagesTowardNextHeart': _readingPagesTowardNextHeart,
-          },
-          SetOptions(merge: true),
-        );
-      }
+    }
+
+    if (shouldPersistReadingData &&
+        _isInitialized &&
+        _auth.currentUser != null) {
+      await _readingDoc().set(
+        {
+          'rewardPages': _readingRewardPages,
+          'pagesTowardNextHeart': _readingPagesTowardNextHeart,
+          'dailyPages': _dailyReadingPages,
+          'dailyHeartRewards': _dailyReadingHeartRewards,
+        },
+        SetOptions(merge: true),
+      );
     }
 
     return ReadingHeartRewardResult(
@@ -540,7 +644,16 @@ class StorageService {
       countedPage: !alreadyCounted && user.hearts < UserProfile.maxHearts,
       heartsEarned: heartsEarned,
       pagesTowardNextHeart: _readingPagesTowardNextHeart,
+      dailyPagesRead: dailyUpdate.pagesRead,
+      dailyHeartEarned: dailyUpdate.hasEarnedHeart,
     );
+  }
+
+  static String _readingDayKey(String bookId, DateTime date) {
+    final day = DateTime(date.year, date.month, date.day);
+    final month = day.month.toString().padLeft(2, '0');
+    final dayOfMonth = day.day.toString().padLeft(2, '0');
+    return '$bookId-${day.year}-$month-$dayOfMonth';
   }
 
   // =========================================================================
@@ -561,6 +674,9 @@ class StorageService {
       'bookmarks': <String, List<int>>{},
       'quickGuideCompletions': <String, bool>{},
       'rewardPages': <String, List<int>>{},
+      'quizCompletions': <String, bool>{},
+      'dailyPages': <String, List<int>>{},
+      'dailyHeartRewards': <String, bool>{},
       'pagesTowardNextHeart': 0,
     });
 
@@ -578,6 +694,9 @@ class StorageService {
     _readingBookmarks = {};
     _quickGuideCompletions = {};
     _readingRewardPages = {};
+    _readingQuizCompletions = {};
+    _dailyReadingPages = {};
+    _dailyReadingHeartRewards = {};
     _readingPagesTowardNextHeart = 0;
   }
 }

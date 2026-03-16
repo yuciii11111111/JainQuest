@@ -51,13 +51,13 @@ const List<_LessonSeed> _lessonSeeds = [
         'Compassionate non-violence, open-mindedness, and contentment in daily choices',
     warmupWrong: 'Rituals alone, without lifestyle change',
     coreIdea:
-        'The book presents Jainism as a practical operating system for modern life, centered on Triple A: Ahimsa (non-violence), Anekantvad (many-sided understanding), and Aparigraha (non-possessiveness). These are not abstract ideals; they are daily disciplines for reducing harm, ego, and excess while building clarity and inner stability.',
+        'Jainism can be lived as a practical operating system for modern life, centered on Triple A: Ahimsa (non-violence), Anekantvad (many-sided understanding), and Aparigraha (non-possessiveness). These are not abstract ideals; they are daily disciplines for reducing harm, ego, and excess while building clarity and inner stability.',
     whyItMatters:
         'When the AAA framework is practiced consistently, it improves relationships, lowers inner conflict, and creates a values-based way to navigate technology, social pressure, politics, and consumer culture. It turns spirituality into a repeatable life method.',
     practiceTip:
         'Before major choices, run a three-point check: Does this reduce harm? Does this respect other viewpoints? Does this reduce unnecessary attachment?',
     explanationKey:
-        'The text emphasizes that timeless principles remain valid, but application must evolve for the modern world. AAA becomes the bridge between ancient wisdom and contemporary life complexity.',
+        'These timeless principles remain valid, but their application must evolve for the modern world. AAA becomes the bridge between ancient wisdom and contemporary life complexity.',
     explanationPractice:
         'Use AAA as a daily reflection template in the morning and evening to convert values from belief into measurable behavior.',
     quizPrompt: 'The Jain AAA framework refers to:',
@@ -84,7 +84,7 @@ const List<_LessonSeed> _lessonSeeds = [
     practiceTip:
         'Translate "Live and Let Live" into one concrete behavior each day, such as patient listening, mindful food choices, or non-reactive speech.',
     explanationKey:
-        'The book repeatedly frames Jain principles as actionable guidance for contemporary dilemmas, not only religious instruction for temple settings.',
+        'Jain principles work as actionable guidance for contemporary dilemmas, not only as religious instruction for temple settings.',
     explanationPractice:
         'When conflict appears, ask: "How can I protect truth, compassion, and dignity at the same time?"',
     quizPrompt: 'Jainism in this course is best described as:',
@@ -101,12 +101,12 @@ const List<_LessonSeed> _lessonSeeds = [
       'Respect diversity in belief while preserving core values',
       'Build inclusive Jain identity without dilution of ethics',
     ],
-    warmupPrompt: 'The Jain spectrum chapter teaches that:',
+    warmupPrompt: 'The Jain spectrum teaches that:',
     warmupCorrect:
         'People can engage Jainism in different ways while staying grounded in core values',
     warmupWrong: 'Only one cultural style is authentic',
     coreIdea:
-        'The text describes a broad Jain spectrum: deeply traditional practitioners, modern seekers, value-centered AAA practitioners, and newcomers. The unifying core is ethical alignment, especially Ahimsa, Anekantvad, and Aparigraha.',
+        'Jain identity can span a broad spectrum: deeply traditional practitioners, modern seekers, value-centered AAA practitioners, and newcomers. The unifying core is ethical alignment, especially Ahimsa, Anekantvad, and Aparigraha.',
     whyItMatters:
         'A spectrum model reduces judgment and encourages participation across generations, geographies, and backgrounds. It helps communities stay both principled and welcoming.',
     practiceTip:
@@ -133,13 +133,13 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Thoughts, words, actions, and lifestyle impact',
     warmupWrong: 'Only avoiding physical aggression',
     coreIdea:
-        'Ahimsa is presented as the central force of Jain living. The chapter expands non-violence from direct physical harm to emotional harm, verbal harm, systemic harm, and ecological harm, while highlighting forgiveness and compassion as active strengths.',
+        'Ahimsa is presented as the central force of Jain living. It expands non-violence from direct physical harm to emotional harm, verbal harm, systemic harm, and ecological harm, while highlighting forgiveness and compassion as active strengths.',
     whyItMatters:
         'Without this expanded definition, people may avoid obvious violence but still cause damage through speech, consumption, and indifference. Full Ahimsa builds trustworthy character and social healing.',
     practiceTip:
         'Pause before response: verify facts, soften tone, and choose language that protects truth without humiliating anyone.',
     explanationKey:
-        'The text links Ahimsa to practical ladders and circles of practice, starting with self-regulation and extending to family, society, animals, and environment.',
+        'Ahimsa grows through practical ladders and circles of practice, starting with self-regulation and extending to family, society, animals, and environment.',
     explanationPractice:
         'End each day by reviewing one moment where anger could have become violence and redesign how you will respond next time.',
     quizPrompt: 'The most complete definition of Ahimsa is:',
@@ -160,13 +160,13 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'No single viewpoint captures all aspects of truth',
     warmupWrong: 'Truth does not exist',
     coreIdea:
-        'Anekantvad in the book is a method for reducing dogmatism and improving dialogue. It does not deny truth; it trains us to recognize partial truths, context limits, and the need for humility when making claims.',
+        'Anekantvad is a method for reducing dogmatism and improving dialogue. It does not deny truth; it trains us to recognize partial truths, context limits, and the need for humility when making claims.',
     whyItMatters:
         'In an era of social media conflict and ideological certainty, this practice prevents intellectual violence and supports wiser decisions in family, civic, and professional settings.',
     practiceTip:
         'When disagreement arises, first articulate the strongest version of the other person\'s view before presenting your own.',
     explanationKey:
-        'The chapter links open-mindedness to emotional maturity and social cohesion, especially in intergenerational and interfaith conversations.',
+        'Open-mindedness supports emotional maturity and social cohesion, especially in intergenerational and interfaith conversations.',
     explanationPractice:
         'Use phrases like "from one perspective" and "in this context" to keep claims precise, respectful, and testable.',
     quizPrompt: 'Anekantvad helps us:',
@@ -186,13 +186,13 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Reducing clinging while using resources responsibly',
     warmupWrong: 'Rejecting all ownership without context',
     coreIdea:
-        'The chapter frames Aparigraha as freedom from compulsive accumulation, status anxiety, and identity built on possessions. It encourages conscious boundaries around buying, storing, showcasing, and consuming.',
+        'Aparigraha is freedom from compulsive accumulation, status anxiety, and identity built on possessions. It encourages conscious boundaries around buying, storing, showcasing, and consuming.',
     whyItMatters:
         'Attachment increases fear of loss, comparison, and chronic dissatisfaction. Non-possessiveness restores gratitude, generosity, and emotional balance.',
     practiceTip:
         'Create three categories for belongings: essential, useful, and excess; reduce one excess category each month.',
     explanationKey:
-        'The text links minimalism and contentment to both spiritual calm and practical wellbeing in family finance and environmental impact.',
+        'Minimalism and contentment support both spiritual calm and practical wellbeing in family finance and environmental impact.',
     explanationPractice:
         'Before purchasing, ask: "Will this serve my values long-term, or only my impulse right now?"',
     quizPrompt: 'Aparigraha primarily develops:',
@@ -212,7 +212,7 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Shared ethics and mutual respect across traditions',
     warmupWrong: 'Ignoring all differences and context',
     coreIdea:
-        'The book emphasizes that diversity in ritual, language, and community practice can coexist with deep unity in Jain principles. The goal is not forced sameness but value-based solidarity.',
+        'Diversity in ritual, language, and community practice can coexist with deep unity in Jain principles. The goal is not forced sameness but value-based solidarity.',
     whyItMatters:
         'Communities become resilient when they reduce internal fragmentation and focus on collective transmission of values to younger generations.',
     practiceTip:
@@ -234,21 +234,21 @@ const List<_LessonSeed> _lessonSeeds = [
       'Connect ethics with happiness, leadership, and mental wellbeing',
       'Develop confidence in sharing Jain values publicly',
     ],
-    warmupPrompt: 'The "24 reasons" chapter mainly argues that Jain living is:',
+    warmupPrompt: 'The "24 reasons" lesson mainly argues that Jain living is:',
     warmupCorrect:
         'Spiritually deep and practically validated by modern outcomes',
     warmupWrong: 'Useful only in ancient social settings',
     coreIdea:
-        'This chapter compiles practical, scientific, and social reasons to live and share Jain values, including emotional regulation, healthier habits, stronger leadership, environmental responsibility, and compassionate social behavior.',
+        'This lesson compiles practical, scientific, and social reasons to live and share Jain values, including emotional regulation, healthier habits, stronger leadership, environmental responsibility, and compassionate social behavior.',
     whyItMatters:
-        'Students and families often ask whether ancient principles remain relevant today. The chapter answers with applied evidence and lived examples.',
+        'Students and families often ask whether ancient principles remain relevant today. This lesson answers with applied evidence and lived examples.',
     practiceTip:
         'Choose three reasons most meaningful to your life and convert each into a weekly habit goal.',
     explanationKey:
-        'The text presents Jain values as high-functioning life tools for children, professionals, families, and communities.',
+        'Jain values function as powerful life tools for children, professionals, families, and communities.',
     explanationPractice:
         'When explaining Jainism to others, combine value language with practical outcomes rather than abstract doctrine alone.',
-    quizPrompt: 'The 24 reasons chapter positions Jain practice as:',
+    quizPrompt: 'The 24 reasons lesson positions Jain practice as:',
     quizCorrect:
         'A life system that supports wellbeing, ethics, and social harmony',
     quizWrong: 'A private belief with no practical impact',
@@ -262,20 +262,20 @@ const List<_LessonSeed> _lessonSeeds = [
       'Distinguish unmindful vegetarianism from value-based practice',
       'Create a realistic path toward balanced vegan choices',
     ],
-    warmupPrompt: 'A Jain-aligned food path in the book emphasizes:',
+    warmupPrompt: 'A Jain-aligned food path emphasizes:',
     warmupCorrect: 'Compassionate, mindful, and informed plant-based decisions',
     warmupWrong: 'Food rules without ethical understanding',
     coreIdea:
-        'The food chapters frame diet as daily ethics: what we eat directly expresses non-violence, restraint, and responsibility. The text also encourages practical transitions, ingredient awareness, and gratitude toward all contributors in the food chain.',
+        'A Jain food ethic treats diet as daily ethics: what we eat directly expresses non-violence, restraint, and responsibility. It also encourages practical transitions, ingredient awareness, and gratitude toward all contributors in the food chain.',
     whyItMatters:
         'Food is the most frequent moral decision we make. Aligning diet with values reduces hidden harm and strengthens integrity between belief and behavior.',
     practiceTip:
         'Audit one week of meals, label each as compassionate or compromise-based, then plan one clear improvement for the next week.',
     explanationKey:
-        'The self-evaluation model in the book supports gradual, honest progress rather than guilt-based perfectionism.',
+        'This self-evaluation model supports gradual, honest progress rather than guilt-based perfectionism.',
     explanationPractice:
         'Learn food labels carefully, ask respectful questions while eating out, and share your rationale through compassion rather than judgment.',
-    quizPrompt: 'The chapter\'s food ethic centers on:',
+    quizPrompt: 'This lesson\'s food ethic centers on:',
     quizCorrect: 'Compassionate, mindful, and progressively plant-based living',
     quizWrong: 'Identity signaling through food labels only',
     nextLessonId: 'U01_L15',
@@ -292,7 +292,7 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Short, consistent, and value-focused',
     warmupWrong: 'Long but irregular and unsustainable',
     coreIdea:
-        'The book offers a practical morning-evening structure that can be done in minutes: mindful prayer, brief meditation, value recall, and self-review. The emphasis is consistency over intensity.',
+        'A practical morning-evening structure can be done in minutes: mindful prayer, brief meditation, value recall, and self-review. The emphasis is consistency over intensity.',
     whyItMatters:
         'Without daily rhythm, values remain inspirational but unstable. Small routines create compounding inner discipline and emotional steadiness.',
     practiceTip:
@@ -318,7 +318,7 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Increase awareness and guide steady improvement',
     warmupWrong: 'Create guilt and comparison',
     coreIdea:
-        'The progress framework in the book encourages staged growth from unawareness to mindful and enriched practice. It emphasizes truthful self-assessment, gratitude, and visible next steps.',
+        'The progress framework encourages staged growth from unawareness to mindful and enriched practice. It emphasizes truthful self-assessment, gratitude, and visible next steps.',
     whyItMatters:
         'What is not measured is rarely improved. Reflection with compassion creates momentum and prevents denial or performative spirituality.',
     practiceTip:
@@ -344,13 +344,13 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'Caring for mental and physical wellbeing as part of dharma',
     warmupWrong: 'Ignoring health in the name of spirituality',
     coreIdea:
-        'The chapter expands Jain discipline into mental and physical wellbeing, showing that ethical living requires a stable mind and healthy body. Habits, rest, movement, and mindful attention all support better choices.',
+        'Jain discipline includes mental and physical wellbeing, showing that ethical living requires a stable mind and healthy body. Habits, rest, movement, and mindful attention all support better choices.',
     whyItMatters:
         'A distressed mind increases reactivity, anger, and attachment. Mental and bodily care strengthens capacity for Ahimsa and equanimity.',
     practiceTip:
         'Anchor one daily reset: breath awareness, short walk, mindful eating, or digital pause before sleep.',
     explanationKey:
-        'The text treats wellbeing practices as spiritual infrastructure, not optional lifestyle extras.',
+        'Wellbeing practices are spiritual infrastructure, not optional lifestyle extras.',
     explanationPractice:
         'Notice triggers that weaken your restraint and redesign your routine to protect calm and clarity.',
     quizPrompt: 'Caring for mind and body in Jain practice is:',
@@ -371,7 +371,7 @@ const List<_LessonSeed> _lessonSeeds = [
         'Do these things serve life, or do they control my attention?',
     warmupWrong: 'How can I display more status quickly?',
     coreIdea:
-        'This chapter reframes possessions as tools, not identity markers. It encourages thoughtful acquisition, maintenance, sharing, and release so material life supports, rather than dominates, inner life.',
+        'This lesson reframes possessions as tools, not identity markers. It encourages thoughtful acquisition, maintenance, sharing, and release so material life supports, rather than dominates, inner life.',
     whyItMatters:
         'Unchecked possession patterns drain time, money, and attention while increasing ego comparison and anxiety.',
     practiceTip:
@@ -398,13 +398,13 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'What we eat, watch, buy, repeat, and mentally absorb',
     warmupWrong: 'Only the food we consume',
     coreIdea:
-        'The self-evaluation chapter highlights that consumption is multidimensional: diet, digital media, entertainment, purchasing, and emotional content. Each input shapes consciousness and conduct.',
+        'Self-evaluation shows that consumption is multidimensional: diet, digital media, entertainment, purchasing, and emotional content. Each input shapes consciousness and conduct.',
     whyItMatters:
         'Unfiltered consumption drives agitation, imitation, and attachment. Mindful curation protects focus and character.',
     practiceTip:
         'Run a weekly input audit: identify one nourishing input to increase and one harmful input to reduce.',
     explanationKey:
-        'The text links awareness-based consumption to both spiritual clarity and practical mental health.',
+        'Awareness-based consumption supports both spiritual clarity and practical mental health.',
     explanationPractice:
         'Before consuming content, ask whether it increases compassion, wisdom, and calm or fuels craving and reactivity.',
     quizPrompt: 'Mindful consumption in JWOL is:',
@@ -426,13 +426,13 @@ const List<_LessonSeed> _lessonSeeds = [
         'Daily personal choices in food, transport, waste, and consumption',
     warmupWrong: 'Waiting for institutions alone to act',
     coreIdea:
-        'The chapter expands Ahimsa to planetary scale, showing that climate, pollution, waste, and animal exploitation are ethical as well as ecological concerns. Personal habits are treated as moral votes.',
+        'Ahimsa extends to planetary scale, showing that climate, pollution, waste, and animal exploitation are ethical as well as ecological concerns. Personal habits are treated as moral votes.',
     whyItMatters:
         'Jain non-violence loses force if limited to interpersonal behavior while ignoring environmental harm that affects countless life forms.',
     practiceTip:
         'Choose one high-impact practice this month: reduce food waste, lower disposable use, or shift to lower-harm transport habits.',
     explanationKey:
-        'The book positions environmentalism as a direct extension of Jain compassion and restraint.',
+        'Environmental responsibility is a direct extension of Jain compassion and restraint.',
     explanationPractice:
         'Evaluate recurring routines by footprint: what can be reduced, repaired, reused, or replaced with lower-harm alternatives?',
     quizPrompt: 'A Jain ecological ethic is:',
@@ -453,7 +453,7 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'A progressive path of purification and awareness',
     warmupWrong: 'A sudden event with no preparation',
     coreIdea:
-        'The spiritual progress chapters present growth as gradual refinement of belief, knowledge, and conduct. Movement happens by reducing anger, ego, deceit, and greed while strengthening discipline and equanimity.',
+        'Spiritual progress is a gradual refinement of belief, knowledge, and conduct. Movement happens by reducing anger, ego, deceit, and greed while strengthening discipline and equanimity.',
     whyItMatters:
         'A staged model prevents frustration and helps practitioners remain committed during setbacks.',
     practiceTip:
@@ -475,11 +475,11 @@ const List<_LessonSeed> _lessonSeeds = [
       'Recognize subtle violence in intent and indifference',
       'Design prevention strategies in daily life',
     ],
-    warmupPrompt: 'The chapter on Himsa teaches that violence can be:',
+    warmupPrompt: 'A deep study of Himsa teaches that violence can be:',
     warmupCorrect: 'Direct, indirect, subtle, systemic, and normalized',
     warmupWrong: 'Only physical injury',
     coreIdea:
-        'The text broadens awareness by showing how harm appears in lifestyle, language, commerce, and social systems. It invites practitioners to detect violence not just in obvious acts but in normalized patterns that degrade life.',
+        'This lesson broadens awareness by showing how harm appears in lifestyle, language, commerce, and social systems. It invites practitioners to detect violence not just in obvious acts but in normalized patterns that degrade life.',
     whyItMatters:
         'Without this lens, people unknowingly cooperate with harmful systems while believing they are non-violent.',
     practiceTip:
@@ -506,13 +506,13 @@ const List<_LessonSeed> _lessonSeeds = [
         'Nutrition, compassion, ingredient awareness, and ethical purchasing',
     warmupWrong: 'Taste preference without ethical review',
     coreIdea:
-        'The food section combines non-violence with practical nutrition and purchasing discipline. It covers balanced plant-based choices, ingredient transparency, restaurant strategy, and gratitude-driven food culture.',
+        'This lesson combines non-violence with practical nutrition and purchasing discipline. It covers balanced plant-based choices, ingredient transparency, restaurant strategy, and gratitude-driven food culture.',
     whyItMatters:
         'Food behavior influences health, emotion, environment, and moral consistency every single day.',
     practiceTip:
         'Prepare a values-first food plan before social events so convenience does not override conviction.',
     explanationKey:
-        'The book encourages informed and compassionate decision-making rather than rigid identity posturing.',
+        'A Jain food ethic encourages informed and compassionate decision-making rather than rigid identity posturing.',
     explanationPractice:
         'Ask where food comes from, how it is produced, and who is affected across the full supply chain.',
     quizPrompt: 'Food dharma in this lesson means:',
@@ -534,16 +534,16 @@ const List<_LessonSeed> _lessonSeeds = [
         'Core values are discussed early, clearly, and practiced consistently',
     warmupWrong: 'Assumptions replace communication',
     coreIdea:
-        'The family chapters provide concrete guidance for raising children, setting marriage expectations, and building a values-aligned home culture. Diet, communication, conflict style, and spiritual routines are treated as foundational agreements.',
+        'This lesson provides concrete guidance for raising children, setting marriage expectations, and building a values-aligned home culture. Diet, communication, conflict style, and spiritual routines are treated as foundational agreements.',
     whyItMatters:
         'Many future conflicts in relationships come from unspoken expectations. Value clarity protects trust and long-term harmony.',
     practiceTip:
         'Create a written family value charter covering food, speech norms, celebrations, giving, and digital boundaries.',
     explanationKey:
-        'The text frames family as the primary training ground where Jain values are transmitted by behavior, not lectures.',
+        'Family is the primary training ground where Jain values are transmitted by behavior, not lectures.',
     explanationPractice:
         'Use regular family check-ins to review alignment and gently correct drift without blame.',
-    quizPrompt: 'In this chapter, strong Jain family culture is built through:',
+    quizPrompt: 'In this lesson, strong Jain family culture is built through:',
     quizCorrect:
         'Early value alignment, clear commitments, and regular practice',
     quizWrong: 'Reactive decisions without shared principles',
@@ -562,13 +562,13 @@ const List<_LessonSeed> _lessonSeeds = [
         'Reflection, healthy routines, support systems, and mindful practices',
     warmupWrong: 'Suppressing emotions and avoiding help',
     coreIdea:
-        'These chapters connect Jain reflection practices with modern insights on mental fitness and neuroplasticity. Repeated habits, thought patterns, and intentional routines can reshape emotional resilience and behavioral outcomes.',
+        'Jain reflection practices connect with modern insights on mental fitness and neuroplasticity. Repeated habits, thought patterns, and intentional routines can reshape emotional resilience and behavioral outcomes.',
     whyItMatters:
         'Untreated stress and comparison loops can erode ethics, relationships, and self-control. Mental wellbeing is not separate from spiritual progress.',
     practiceTip:
         'Build a daily 3-step reset: breath practice, journaling one reflection, and one act of gratitude or forgiveness.',
     explanationKey:
-        'The book emphasizes destigmatizing mental health care and combining spiritual discipline with professional support when needed.',
+        'A healthy Jain approach destigmatizes mental health care and combines spiritual discipline with professional support when needed.',
     explanationPractice:
         'Treat emotional distress with honesty and compassion; seeking help is responsibility, not weakness.',
     quizPrompt: 'A Jain-aligned mental health approach includes:',
@@ -617,13 +617,13 @@ const List<_LessonSeed> _lessonSeeds = [
         'High performance aligned with compassion, integrity, and restraint',
     warmupWrong: 'Results regardless of harm',
     coreIdea:
-        'The workplace chapters show how Jain values support leadership quality, trust, collaboration, and long-term credibility. Ethical investing extends this logic by aligning capital with non-harm and social responsibility.',
+        'Jain values support leadership quality, trust, collaboration, and long-term credibility in the workplace. Ethical investing extends this logic by aligning capital with non-harm and social responsibility.',
     whyItMatters:
         'Professional influence and financial choices shape many lives. Values must travel with us into boardrooms, markets, and decision systems.',
     practiceTip:
         'Use an ethics screen for career and investment decisions: harm profile, transparency, fairness, and sustainability.',
     explanationKey:
-        'The text frames Jain ethics as competitive strengths in complex professional environments, not obstacles to achievement.',
+        'Jain ethics can become competitive strengths in complex professional environments, not obstacles to achievement.',
     explanationPractice:
         'Lead with clarity and empathy: protect people while solving problems decisively.',
     quizPrompt: 'Ethical Jain professionalism combines:',
@@ -643,7 +643,7 @@ const List<_LessonSeed> _lessonSeeds = [
     warmupCorrect: 'End cycles of resentment and restore inner freedom',
     warmupWrong: 'Ignore wrongdoing without discernment',
     coreIdea:
-        'The forgiveness chapter presents release as emotional non-violence that protects both inner health and social harmony. It includes asking forgiveness, granting forgiveness, and making behavioral correction.',
+        'Forgiveness is emotional non-violence that protects both inner health and social harmony. It includes asking forgiveness, granting forgiveness, and making behavioral correction.',
     whyItMatters:
         'Resentment drains attention, hardens ego, and perpetuates conflict across families and communities. Forgiveness interrupts the violence cycle.',
     practiceTip:
@@ -671,7 +671,7 @@ const List<_LessonSeed> _lessonSeeds = [
         'Renew vows, humility, and compassion, not only social excitement',
     warmupWrong: 'Focus only on display and consumption',
     coreIdea:
-        'The life celebration chapters connect rituals, festivals, and major life transitions to inner transformation. They also discuss death awareness as preparation for peaceful detachment and value-centered living.',
+        'Life events and festivals can connect rituals and major transitions to inner transformation. They also include death awareness as preparation for peaceful detachment and value-centered living.',
     whyItMatters:
         'When festivals lose ethical focus, they become performative. When linked to reflection and vows, they become engines of renewal.',
     practiceTip:
@@ -698,7 +698,7 @@ const List<_LessonSeed> _lessonSeeds = [
         'Regular self-review, repentance, correction, and recommitment',
     warmupWrong: 'A one-time ritual event',
     coreIdea:
-        'The concluding chapters emphasize that Jain life is a cycle of awareness, lapse detection, repair, and recommitment. Equanimity (Samayik spirit) and Pratikraman keep the practitioner honest, humble, and steadily improving.',
+        'Jain life is a cycle of awareness, lapse detection, repair, and recommitment. Equanimity (Samayik spirit) and Pratikraman keep the practitioner honest, humble, and steadily improving.',
     whyItMatters:
         'Without reflection and correction, values decay into identity language. Renewal practices maintain spiritual credibility over decades.',
     practiceTip:

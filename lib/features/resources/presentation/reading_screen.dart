@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/gamification/gamification_rules.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
@@ -11,6 +12,8 @@ import '../../../core/widgets/common_widgets.dart';
 import '../../../core/widgets/glass_slider.dart';
 import '../../../core/widgets/motion_pressable.dart';
 import '../../../core/widgets/typewriter_text.dart';
+import '../data/fundjain_book_data.dart';
+import 'reading_quiz_session_screen.dart';
 
 class ReadingScreen extends ConsumerStatefulWidget {
   const ReadingScreen({super.key});
@@ -21,11 +24,15 @@ class ReadingScreen extends ConsumerStatefulWidget {
 
 class _ReadingScreenState extends ConsumerState<ReadingScreen> {
   static const String _bookId = 'fundjain';
+
   final PageController _pageController = PageController();
-  List<String> _pages = [];
+
+  List<FundJainReaderEntry> _entries = [];
   List<int> _bookmarks = [];
   int _currentPage = 0;
   int _pagesTowardNextHeart = StorageService.getReadingPagesTowardNextHeart();
+  int _dailyPagesRead = StorageService.getReadingDailyPagesRead(_bookId);
+  bool _dailyHeartEarned = StorageService.hasEarnedReadingDailyHeart(_bookId);
   bool _isLoading = true;
   double _fontSize = 16;
   bool _darkMode = false;
@@ -37,6 +44,33 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
     _loadBook();
   }
 
+  FundJainReaderEntry? get _currentEntry {
+    if (_entries.isEmpty ||
+        _currentPage < 0 ||
+        _currentPage >= _entries.length) {
+      return null;
+    }
+    return _entries[_currentPage];
+  }
+
+  FundJainTextEntry? get _currentTextEntry {
+    final entry = _currentEntry;
+    return entry is FundJainTextEntry ? entry : null;
+  }
+
+  FundJainQuizEntry? get _currentQuizEntry {
+    final entry = _currentEntry;
+    return entry is FundJainQuizEntry ? entry : null;
+  }
+
+  bool get _isCurrentPageBookmarked =>
+      _currentTextEntry != null && _bookmarks.contains(_currentPage);
+
+  int get _pagesUntilNextHeart {
+    final progress = _pagesTowardNextHeart % HeartsSystem.readingPagesPerHeart;
+    return HeartsSystem.readingPagesPerHeart - progress;
+  }
+
   Future<void> _loadBookmarks() async {
     final bookmarks = StorageService.getReadingBookmarks(_bookId);
     if (mounted) {
@@ -45,53 +79,21 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
   }
 
   Future<void> _toggleCurrentPageBookmark() async {
-    final page = _currentPage;
+    if (_currentTextEntry == null) return;
     await StorageService.toggleReadingBookmark(
       bookId: _bookId,
-      pageIndex: page,
+      pageIndex: _currentPage,
     );
     await _loadBookmarks();
   }
 
-  bool get _isCurrentPageBookmarked => _bookmarks.contains(_currentPage);
-
-  int get _pagesUntilNextHeart {
-    final progress = _pagesTowardNextHeart % HeartsSystem.readingPagesPerHeart;
-    return HeartsSystem.readingPagesPerHeart - progress;
-  }
-
   Future<void> _loadBook() async {
     final rawText = await rootBundle.loadString('assets/content/fundjain.txt');
-    final cleaned = rawText
-        .replaceAll('\r\n', '\n')
-        .replaceAll('\r', '\n')
-        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
-        .trim();
-
-    // Drop the very first intro chunk so we start at the content.
-    final sections = cleaned.split('\n\n');
-    final trimmedContent =
-        sections.length > 1 ? sections.skip(1).join('\n\n').trim() : cleaned;
-
-    const pageSize = 1200;
-    final words = trimmedContent.split(RegExp(r'\s+'));
-    final pages = <String>[];
-    final buffer = StringBuffer();
-    for (final word in words) {
-      if (buffer.length + word.length + 1 > pageSize) {
-        pages.add(buffer.toString().trim());
-        buffer.clear();
-      }
-      buffer.write(word);
-      buffer.write(' ');
-    }
-    if (buffer.isNotEmpty) {
-      pages.add(buffer.toString().trim());
-    }
+    final result = FundJainBookData.buildReader(rawText);
 
     if (mounted) {
       setState(() {
-        _pages = pages;
+        _entries = result.entries;
         _isLoading = false;
       });
       _registerPageVisit(_currentPage);
@@ -99,7 +101,12 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
   }
 
   Future<void> _registerPageVisit(int pageIndex) async {
-    if (_pages.isEmpty || pageIndex < 0 || pageIndex >= _pages.length) {
+    if (_entries.isEmpty || pageIndex < 0 || pageIndex >= _entries.length) {
+      return;
+    }
+
+    final entry = _entries[pageIndex];
+    if (entry is! FundJainTextEntry) {
       return;
     }
 
@@ -110,11 +117,11 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
             );
     if (!mounted) return;
 
-    if (_pagesTowardNextHeart != result.pagesTowardNextHeart) {
-      setState(() {
-        _pagesTowardNextHeart = result.pagesTowardNextHeart;
-      });
-    }
+    setState(() {
+      _pagesTowardNextHeart = result.pagesTowardNextHeart;
+      _dailyPagesRead = result.dailyPagesRead;
+      _dailyHeartEarned = result.dailyHeartEarned;
+    });
 
     if (result.heartsEarned > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,6 +137,244 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
     }
   }
 
+  Future<void> _openQuiz(FundJainQuizDefinition quiz) async {
+    final completed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => ReadingQuizSessionScreen(
+          quiz: quiz,
+          hearts: ref.read(userProfileProvider).hearts,
+        ),
+      ),
+    );
+
+    if (completed != true) return;
+
+    await StorageService.markReadingQuizCompleted(quiz.id);
+    if (!mounted) return;
+
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.t('quiz_completed_snackbar'))),
+    );
+  }
+
+  void _goToPage(int pageIndex) {
+    if (_entries.isEmpty || pageIndex < 0 || pageIndex >= _entries.length) {
+      return;
+    }
+    _pageController.animateToPage(
+      pageIndex,
+      duration: AppMotion.standard,
+      curve: AppMotion.enterCurve,
+    );
+  }
+
+  void _handlePrimaryAction() {
+    final quizEntry = _currentQuizEntry;
+    if (quizEntry != null) {
+      final isCompleted =
+          StorageService.isReadingQuizCompleted(quizEntry.quiz.id);
+      if (!isCompleted) {
+        _openQuiz(quizEntry.quiz);
+        return;
+      }
+    }
+
+    if (_currentPage < _entries.length - 1) {
+      _goToPage(_currentPage + 1);
+      return;
+    }
+
+    Navigator.of(context).pop();
+  }
+
+  String _primaryButtonLabel(BuildContext context) {
+    final quizEntry = _currentQuizEntry;
+    if (quizEntry != null &&
+        !StorageService.isReadingQuizCompleted(quizEntry.quiz.id)) {
+      return context.t('start_quiz');
+    }
+    return _currentPage == _entries.length - 1
+        ? context.t('finish')
+        : context.t('next');
+  }
+
+  Widget _buildReaderEntry(
+    BuildContext context,
+    FundJainReaderEntry entry,
+    ColorScheme scheme,
+  ) {
+    if (entry is FundJainTextEntry) {
+      return Padding(
+        key: ValueKey(entry.id),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: Container(
+          decoration: BoxDecoration(
+            color: _darkMode ? AppColors.inkBlack : scheme.surface,
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            border: Border.all(color: scheme.outline),
+          ),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                entry.title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: _darkMode ? AppColors.softCream : null,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                entry.isFrontMatter
+                    ? context.t('reader_desc')
+                    : context.t(
+                        'chapter_progress',
+                        args: {
+                          'current': '${entry.pageNumber}',
+                          'total': '${entry.totalChapterPages}',
+                        },
+                      ),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: _darkMode
+                          ? AppColors.textSecondary
+                          : scheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: GlassScrollbar(
+                  child: SingleChildScrollView(
+                    child: TypewriterText(
+                      text: entry.body,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            height: 1.7,
+                            fontSize: _fontSize,
+                            color: _darkMode ? AppColors.textSecondary : null,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final quizEntry = entry as FundJainQuizEntry;
+    final isCompleted =
+        StorageService.isReadingQuizCompleted(quizEntry.quiz.id);
+
+    return Padding(
+      key: ValueKey(quizEntry.id),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Container(
+        decoration: BoxDecoration(
+          color: _darkMode ? AppColors.inkBlack : scheme.surface,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          border: Border.all(
+            color: isCompleted ? AppColors.primary : scheme.outline,
+            width: 1.5,
+          ),
+        ),
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacityValue(0.14),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    quizEntry.quiz.isFinalQuiz
+                        ? Icons.workspace_premium_rounded
+                        : Icons.quiz_rounded,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.t('quiz_checkpoint'),
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        quizEntry.title,
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: _darkMode ? AppColors.softCream : null,
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isCompleted)
+                  Chip(
+                    label: Text(context.t('completed')),
+                    backgroundColor: AppColors.primary.withOpacityValue(0.12),
+                    side: BorderSide.none,
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              quizEntry.quiz.description,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    height: 1.6,
+                    color:
+                        _darkMode ? AppColors.textSecondary : scheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              context.t('quiz_no_heart_cost'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.primary,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            PrimaryButton(
+              label: isCompleted
+                  ? context.t('retake_quiz')
+                  : context.t('start_quiz'),
+              icon: isCompleted
+                  ? Icons.refresh_rounded
+                  : Icons.play_arrow_rounded,
+              onPressed: () => _openQuiz(quizEntry.quiz),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              isCompleted
+                  ? context.t('quiz_completed_snackbar')
+                  : context.t('complete_this_quiz'),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: _darkMode
+                        ? AppColors.textSecondary
+                        : scheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -140,6 +385,11 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final user = ref.watch(userProfileProvider);
+    final currentEntry = _currentEntry;
+    final sliderLabel = currentEntry is FundJainTextEntry
+        ? context.t('page_label', args: {'num': '${_currentPage + 1}'})
+        : context.t('quiz_checkpoint');
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -181,6 +431,27 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                                         : scheme.onSurfaceVariant,
                                   ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.xs),
+                          child: Text(
+                            _dailyHeartEarned
+                                ? context.t('daily_reading_earned')
+                                : context.t(
+                                    'daily_reading_progress',
+                                    args: {
+                                      'count': '$_dailyPagesRead',
+                                      'target':
+                                          '${HeartsSystem.dailyReadingPagesForHeart}',
+                                    },
+                                  ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                          ),
+                        ),
                         if (user.hearts < HeartsSystem.maxHearts)
                           Padding(
                             padding: const EdgeInsets.only(top: AppSpacing.xs),
@@ -200,16 +471,16 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                   ),
                   HeartsPill(hearts: user.hearts),
                   const SizedBox(width: AppSpacing.xs),
-                  if (_pages.isNotEmpty)
+                  if (_entries.isNotEmpty)
                     Text(
-                      '${_currentPage + 1}/${_pages.length}',
+                      '${_currentPage + 1}/${_entries.length}',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: _darkMode ? AppColors.softCream : null,
                           ),
                     ),
                   const SizedBox(width: AppSpacing.xs),
                   MotionPressable(
-                    enabled: _pages.isNotEmpty,
+                    enabled: _currentTextEntry != null,
                     child: IconButton(
                       tooltip: _isCurrentPageBookmarked
                           ? context.t('remove_bookmark')
@@ -224,14 +495,15 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                           : (_darkMode
                               ? AppColors.softCream
                               : scheme.onSurfaceVariant),
-                      onPressed:
-                          _pages.isEmpty ? null : _toggleCurrentPageBookmark,
+                      onPressed: _currentTextEntry == null
+                          ? null
+                          : _toggleCurrentPageBookmark,
                     ),
                   ),
                 ],
               ),
             ),
-            if (_pages.isNotEmpty)
+            if (_entries.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
@@ -239,13 +511,13 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                 ),
                 child: GlassSlider(
                   min: 0,
-                  max: (_pages.length - 1).toDouble(),
+                  max: (_entries.length - 1).toDouble(),
                   value: _currentPage.toDouble(),
-                  divisions: _pages.length > 1 ? _pages.length - 1 : null,
-                  label: context
-                      .t('page_label', args: {'num': '${_currentPage + 1}'}),
-                  onChanged: (v) {
-                    final targetPage = v.round().clamp(0, _pages.length - 1);
+                  divisions: _entries.length > 1 ? _entries.length - 1 : null,
+                  label: sliderLabel,
+                  onChanged: (value) {
+                    final targetPage =
+                        value.round().clamp(0, _entries.length - 1);
                     _pageController.jumpToPage(targetPage);
                     setState(() => _currentPage = targetPage);
                   },
@@ -265,9 +537,12 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                             max: 22,
                             value: _fontSize,
                             divisions: 8,
-                            label: context.t('font_label',
-                                args: {'size': _fontSize.toStringAsFixed(0)}),
-                            onChanged: (v) => setState(() => _fontSize = v),
+                            label: context.t(
+                              'font_label',
+                              args: {'size': _fontSize.toStringAsFixed(0)},
+                            ),
+                            onChanged: (value) =>
+                                setState(() => _fontSize = value),
                           ),
                         ),
                         Text(_fontSize.toStringAsFixed(0)),
@@ -307,18 +582,19 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                   child: Wrap(
                     spacing: AppSpacing.sm,
                     runSpacing: AppSpacing.xs,
-                    children: _bookmarks.map((bookmark) {
+                    children: _bookmarks
+                        .where((bookmark) =>
+                            bookmark >= 0 && bookmark < _entries.length)
+                        .map((bookmark) {
                       return MotionPressable(
                         child: ActionChip(
-                          label: Text(context.t('page_abbreviated',
-                              args: {'num': '${bookmark + 1}'})),
-                          onPressed: () {
-                            _pageController.animateToPage(
-                              bookmark,
-                              duration: AppMotion.standard,
-                              curve: AppMotion.enterCurve,
-                            );
-                          },
+                          label: Text(
+                            context.t(
+                              'page_abbreviated',
+                              args: {'num': '${bookmark + 1}'},
+                            ),
+                          ),
+                          onPressed: () => _goToPage(bookmark),
                         ),
                       );
                     }).toList(),
@@ -334,41 +610,10 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                         setState(() => _currentPage = index);
                         _registerPageVisit(index);
                       },
-                      itemCount: _pages.length,
+                      itemCount: _entries.length,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          key: ValueKey(index),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.lg),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: _darkMode
-                                  ? AppColors.inkBlack
-                                  : scheme.surface,
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.card),
-                              border: Border.all(color: scheme.outline),
-                            ),
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: GlassScrollbar(
-                              child: SingleChildScrollView(
-                                child: TypewriterText(
-                                  text: _pages[index],
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        height: 1.7,
-                                        fontSize: _fontSize,
-                                        color: _darkMode
-                                            ? AppColors.textSecondary
-                                            : null,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
+                        return _buildReaderEntry(
+                            context, _entries[index], scheme);
                       },
                     ),
             ),
@@ -383,32 +628,17 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                         label: context.t('previous'),
                         icon: Icons.chevron_left_rounded,
                         onPressed: _currentPage > 0
-                            ? () {
-                                _pageController.animateToPage(
-                                  _currentPage - 1,
-                                  duration: AppMotion.standard,
-                                  curve: AppMotion.enterCurve,
-                                );
-                              }
+                            ? () => _goToPage(_currentPage - 1)
                             : null,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: PrimaryButton(
-                        label: _currentPage == _pages.length - 1
-                            ? context.t('finish')
-                            : context.t('next'),
+                        label: _primaryButtonLabel(context),
                         icon: Icons.chevron_right_rounded,
-                        onPressed: _currentPage < _pages.length - 1
-                            ? () {
-                                _pageController.animateToPage(
-                                  _currentPage + 1,
-                                  duration: AppMotion.standard,
-                                  curve: AppMotion.enterCurve,
-                                );
-                              }
-                            : () => Navigator.of(context).pop(),
+                        onPressed:
+                            _entries.isEmpty ? null : _handlePrimaryAction,
                       ),
                     ),
                   ],

@@ -1461,6 +1461,9 @@ class AppStrings {
       AppLanguage.hindi: 'रीडर खोलें',
       AppLanguage.gujarati: 'રીડર ખોલો',
     },
+    'daily_reading_reward_hint': {
+      AppLanguage.english: 'Read 10 pages in a day to earn 1 heart.',
+    },
     'could_not_open': {
       AppLanguage.english: 'Could not open link',
       AppLanguage.hindi: 'लिंक खोल नहीं सका',
@@ -1702,10 +1705,39 @@ class AppStrings {
       AppLanguage.hindi: 'फ़ॉन्ट {size}',
       AppLanguage.gujarati: 'ફોન્ટ {size}',
     },
+    'chapter_progress': {
+      AppLanguage.english: 'Chapter page {current} of {total}',
+    },
     'page_abbreviated': {
       AppLanguage.english: 'Pg {num}',
       AppLanguage.hindi: 'पृ {num}',
       AppLanguage.gujarati: 'પૃ {num}',
+    },
+    'quiz_checkpoint': {
+      AppLanguage.english: 'Quiz checkpoint',
+    },
+    'start_quiz': {
+      AppLanguage.english: 'Start Quiz',
+    },
+    'retake_quiz': {
+      AppLanguage.english: 'Retake Quiz',
+    },
+    'complete_this_quiz': {
+      AppLanguage.english:
+          'Complete this quiz before moving to the next section.',
+    },
+    'quiz_no_heart_cost': {
+      AppLanguage.english:
+          'These reading quizzes are review-only and do not cost hearts.',
+    },
+    'quiz_completed_snackbar': {
+      AppLanguage.english: 'Quiz completed.',
+    },
+    'daily_reading_progress': {
+      AppLanguage.english: 'Today: {count}/{target} pages for +1 heart.',
+    },
+    'daily_reading_earned': {
+      AppLanguage.english: 'Today\'s 10-page heart is already earned.',
     },
 
     'previous': {
