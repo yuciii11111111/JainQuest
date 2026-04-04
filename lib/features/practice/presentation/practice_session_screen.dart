@@ -46,7 +46,9 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
       isCorrectAnswer = isCorrect;
     });
 
-    await ref.read(practiceProvider.notifier).answerQuestion(isCorrect);
+    await ref
+        .read(practiceProvider.notifier)
+        .answerQuestion(question, isCorrect);
   }
 
   Future<void> _nextQuestion() async {

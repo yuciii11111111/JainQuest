@@ -40,4 +40,33 @@ void main() {
       expect(progress.completedLessonsOn(DateTime(2026, 3, 15)), 0);
     });
   });
+
+  group('ProgressState defaults and migration', () {
+    test('starts new learners at the first lesson', () {
+      const progress = ProgressState();
+
+      expect(
+        progress.unlockedLessons,
+        contains(ProgressState.initialUnlockedLessonId),
+      );
+      expect(
+        progress.unlockedLessons.first,
+        ProgressState.initialUnlockedLessonId,
+      );
+    });
+
+    test('migrates the legacy fresh state to the first lesson', () {
+      final progress = ProgressState.fromMap(const {
+        'lessonProgress': <String, dynamic>{},
+        'completedLessons': <String>[],
+        'unlockedLessons': <String>['U01_L05'],
+        'earnedBadges': <String>[],
+      });
+
+      expect(
+        progress.unlockedLessons,
+        const [ProgressState.initialUnlockedLessonId],
+      );
+    });
+  });
 }

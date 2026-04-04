@@ -447,7 +447,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       const SizedBox(height: AppSpacing.xl),
 
                       DropdownButtonFormField<AppLanguage>(
-                        value: _selectedLanguage,
+                        initialValue: _selectedLanguage,
                         decoration: InputDecoration(
                           labelText: context.t('preferred_language'),
                           border: OutlineInputBorder(

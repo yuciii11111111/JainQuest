@@ -236,6 +236,43 @@ class _GlassBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final navItems = <Widget>[
+      _NavItem(
+        icon: Icons.home_rounded,
+        label: context.t('home'),
+        isSelected: currentIndex == 0,
+        onTap: () => onTap(0),
+      ),
+      _NavItem(
+        key: resourcesKey,
+        icon: Icons.auto_awesome_rounded,
+        label: context.t('resources'),
+        isSelected: currentIndex == 1,
+        onTap: () => onTap(1),
+      ),
+      _NavItem(
+        key: askKey,
+        imageAsset: 'assets/images/duo_guide.png',
+        label: context.t('ask'),
+        isSelected: currentIndex == 2,
+        onTap: () => onTap(2),
+      ),
+      _NavItem(
+        key: communityKey,
+        icon: Icons.forum_rounded,
+        label: context.t('community'),
+        isSelected: currentIndex == 3,
+        onTap: () => onTap(3),
+      ),
+      _NavItem(
+        key: profileKey,
+        icon: Icons.person_rounded,
+        label: context.t('profile'),
+        isSelected: currentIndex == 4,
+        onTap: () => onTap(4),
+      ),
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: LiquidGlassContainer(
@@ -247,43 +284,16 @@ class _GlassBottomNav extends StatelessWidget {
         padding: EdgeInsets.zero,
         child: SafeArea(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home_rounded,
-                label: context.t('home'),
-                isSelected: currentIndex == 0,
-                onTap: () => onTap(0),
-              ),
-              _NavItem(
-                key: resourcesKey,
-                icon: Icons.auto_awesome_rounded,
-                label: context.t('resources'),
-                isSelected: currentIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              _NavItem(
-                key: askKey,
-                imageAsset: 'assets/images/duo_guide.png',
-                label: context.t('ask'),
-                isSelected: currentIndex == 2,
-                onTap: () => onTap(2),
-              ),
-              _NavItem(
-                key: communityKey,
-                icon: Icons.forum_rounded,
-                label: context.t('community'),
-                isSelected: currentIndex == 3,
-                onTap: () => onTap(3),
-              ),
-              _NavItem(
-                key: profileKey,
-                icon: Icons.person_rounded,
-                label: context.t('profile'),
-                isSelected: currentIndex == 4,
-                onTap: () => onTap(4),
-              ),
-            ],
+            children: navItems
+                .map(
+                  (item) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: item,
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
       ),
@@ -310,6 +320,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     final duration = AppMotion.resolveDuration(context, AppMotion.standard);
     final labelStyle = TextStyle(
       fontSize: 11,
@@ -320,57 +331,66 @@ class _NavItem extends StatelessWidget {
     return MotionPressable(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: LiquidGlassContainer(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.xs,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        tintColor: isSelected ? AppColors.primary : scheme.surface,
-        tintOpacity: isSelected ? 0.5 : 0.12,
-        borderColor: isSelected
-            ? Colors.white.withOpacityValue(0.45)
-            : scheme.outline.withOpacityValue(0.45),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedScale(
-              scale: isSelected ? 1.08 : 1.0,
-              duration: duration,
-              curve: AppMotion.springCurve,
-              child: imageAsset != null
-                  ? Image.asset(
-                      imageAsset!,
-                      width: 24,
-                      height: 24,
-                    )
-                  : Icon(
-                      icon,
-                      size: 24,
-                      color: isSelected ? Colors.white : scheme.onSurface,
-                    ),
-            ),
-            const SizedBox(height: 4),
-            AnimatedDefaultTextStyle(
-              duration: duration,
-              curve: AppMotion.standardCurve,
-              style: labelStyle,
-              child: Text(label),
-            ),
-            const SizedBox(height: 4),
-            AnimatedContainer(
-              duration: duration,
-              curve: AppMotion.standardCurve,
-              width: isSelected ? 18 : 6,
-              height: 3,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Colors.white.withOpacityValue(0.92)
-                    : Colors.white.withOpacityValue(0.22),
-                borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: SizedBox(
+        width: double.infinity,
+        child: LiquidGlassContainer(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          tintColor: isSelected ? AppColors.primary : scheme.surface,
+          tintOpacity: isSelected ? 0.5 : (isLight ? 0.34 : 0.12),
+          borderColor: isSelected
+              ? Colors.white.withOpacityValue(isLight ? 0.82 : 0.45)
+              : scheme.outline.withOpacityValue(isLight ? 0.68 : 0.45),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedScale(
+                scale: isSelected ? 1.08 : 1.0,
+                duration: duration,
+                curve: AppMotion.springCurve,
+                child: imageAsset != null
+                    ? Image.asset(
+                        imageAsset!,
+                        width: 22,
+                        height: 22,
+                      )
+                    : Icon(
+                        icon,
+                        size: 22,
+                        color: isSelected ? Colors.white : scheme.onSurface,
+                      ),
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              AnimatedDefaultTextStyle(
+                duration: duration,
+                curve: AppMotion.standardCurve,
+                style: labelStyle,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: duration,
+                curve: AppMotion.standardCurve,
+                width: isSelected ? 18 : 6,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.white.withOpacityValue(0.92)
+                      : scheme.outline.withOpacityValue(isLight ? 0.82 : 0.4),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

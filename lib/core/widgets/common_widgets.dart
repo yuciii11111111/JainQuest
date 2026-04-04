@@ -185,6 +185,8 @@ class _HeartLossOverlayState extends State<HeartLossOverlay>
       return const SizedBox.shrink();
     }
 
+    final scheme = Theme.of(context).colorScheme;
+
     return IgnorePointer(
       child: Align(
         alignment: Alignment.topCenter,
@@ -200,8 +202,8 @@ class _HeartLossOverlayState extends State<HeartLossOverlay>
                   vertical: AppSpacing.md,
                 ),
                 borderRadius: BorderRadius.circular(AppRadius.card),
-                borderColor: Colors.white.withOpacityValue(0.32),
-                tintColor: Theme.of(context).colorScheme.surface,
+                borderColor: scheme.outline.withOpacityValue(0.72),
+                tintColor: scheme.surface,
                 tintOpacity: 0.62,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

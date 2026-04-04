@@ -32,6 +32,8 @@ class GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     if (crystal) {
       return _CrystalGlassButton(
         label: label,
@@ -65,10 +67,24 @@ class GradientButton extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: borderRadius,
-                color: const Color(0x66240F03),
+                color: isLight
+                    ? scheme.surface.withOpacityValue(0.94)
+                    : const Color(0x66240F03),
                 border: Border.all(
-                  color: Colors.white.withOpacityValue(0.22),
+                  color: isLight
+                      ? scheme.outline.withOpacityValue(0.58)
+                      : Colors.white.withOpacityValue(0.22),
                 ),
+                boxShadow: isLight
+                    ? [
+                        BoxShadow(
+                          color: AppColors.inkBlack.withOpacityValue(0.05),
+                          blurRadius: 20,
+                          spreadRadius: -8,
+                          offset: const Offset(0, 10),
+                        ),
+                      ]
+                    : const [],
               ),
               child: ElevatedButton(
                 onPressed: enabled ? onPressed : null,
@@ -139,8 +155,26 @@ class _CrystalGlassButton extends StatefulWidget {
 class _CrystalGlassButtonState extends State<_CrystalGlassButton> {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     final enabled = widget.onPressed != null && !widget.isLoading;
-    final textColor = enabled ? Colors.white : Colors.white70;
+    final textColor = enabled
+        ? (isLight ? AppColors.lightTextPrimary : Colors.white)
+        : (isLight ? AppColors.lightTextMuted : Colors.white70);
+    final borderColor = isLight
+        ? scheme.outline.withOpacityValue(enabled ? 0.72 : 0.42)
+        : Colors.white.withOpacityValue(enabled ? 0.45 : 0.2);
+    final fillColors = isLight
+        ? <Color>[
+            Colors.white.withOpacityValue(enabled ? 0.94 : 0.86),
+            AppColors.lightCard.withOpacityValue(enabled ? 0.9 : 0.8),
+            AppColors.lightElevated.withOpacityValue(enabled ? 0.84 : 0.72),
+          ]
+        : <Color>[
+            Colors.white.withOpacityValue(enabled ? 0.28 : 0.14),
+            Colors.white.withOpacityValue(enabled ? 0.12 : 0.06),
+            Colors.white.withOpacityValue(enabled ? 0.04 : 0.02),
+          ];
 
     return SizedBox(
       width: widget.width,
@@ -158,18 +192,24 @@ class _CrystalGlassButtonState extends State<_CrystalGlassButton> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: Colors.white.withOpacityValue(enabled ? 0.45 : 0.2),
+                  color: borderColor,
                   width: 1.2,
                 ),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacityValue(enabled ? 0.28 : 0.14),
-                    Colors.white.withOpacityValue(enabled ? 0.12 : 0.06),
-                    Colors.white.withOpacityValue(enabled ? 0.04 : 0.02),
-                  ],
+                  colors: fillColors,
                 ),
+                boxShadow: isLight
+                    ? [
+                        BoxShadow(
+                          color: AppColors.inkBlack.withOpacityValue(0.04),
+                          blurRadius: 18,
+                          spreadRadius: -8,
+                          offset: const Offset(0, 8),
+                        ),
+                      ]
+                    : const [],
               ),
               child: Material(
                 color: Colors.transparent,

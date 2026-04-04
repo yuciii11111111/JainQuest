@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +12,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_motion.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/liquid_glass.dart';
 import '../../auth/presentation/create_account_screen.dart';
 import '../../home/presentation/home_screen.dart';
@@ -34,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _writeAnimation;
 
   Timer? _languageTimer;
+  Timer? _autoProceedTimer;
   int _languageIndex = 0;
   bool _navigating = false;
   bool _isProceeding = false;
@@ -73,6 +76,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startLanguageCycle();
+      _scheduleAutoProceedIfAuthenticated();
     });
   }
 
@@ -91,12 +95,40 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward(from: 0);
   }
 
+  User? _safeCurrentUser() {
+    try {
+      if (Firebase.apps.isEmpty) {
+        return null;
+      }
+      return FirebaseAuth.instance.currentUser;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _scheduleAutoProceedIfAuthenticated() {
+    final authUser = _safeCurrentUser();
+    if (authUser == null) {
+      return;
+    }
+
+    setState(() {
+      _isProceeding = true;
+      _isRestoringSession = true;
+    });
+
+    _autoProceedTimer = Timer(
+      const Duration(milliseconds: 900),
+      _navigateAfterSplash,
+    );
+  }
+
   Future<void> _navigateAfterSplash() async {
     if (_navigating) {
       return;
     }
     _navigating = true;
-    final authUser = FirebaseAuth.instance.currentUser;
+    final authUser = _safeCurrentUser();
     setState(() {
       _isProceeding = true;
       _isRestoringSession = authUser != null;
@@ -121,12 +153,16 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _languageTimer?.cancel();
+    _autoProceedTimer?.cancel();
     _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -177,11 +213,17 @@ class _SplashScreenState extends State<SplashScreen>
               child: LiquidGlassContainer(
                 onTap: _isProceeding ? null : _navigateAfterSplash,
                 borderRadius: BorderRadius.circular(28),
-                tintColor: Colors.white,
-                tintOpacity: _isProceeding ? 0.22 : 0.15,
-                borderColor: Colors.white.withValues(
-                  alpha: _isProceeding ? 0.48 : 0.3,
-                ),
+                tintColor: isDark ? Colors.white : scheme.surface,
+                tintOpacity: isDark
+                    ? (_isProceeding ? 0.22 : 0.15)
+                    : (_isProceeding ? 0.82 : 0.74),
+                borderColor: isDark
+                    ? Colors.white.withValues(
+                        alpha: _isProceeding ? 0.48 : 0.3,
+                      )
+                    : scheme.outline.withValues(
+                        alpha: _isProceeding ? 0.84 : 0.72,
+                      ),
                 child: Center(
                   child: AnimatedSwitcher(
                     duration: AppMotion.standard,
@@ -225,22 +267,30 @@ class _AutoLoginStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textTheme = Theme.of(context).textTheme;
+    final foregroundColor = isDark ? Colors.white : scheme.onSurface;
+    final secondaryColor =
+        isDark ? Colors.white.withValues(alpha: 0.78) : scheme.onSurfaceVariant;
 
     return LiquidGlassContainer(
       borderRadius: BorderRadius.circular(24),
-      tintColor: Colors.white,
-      tintOpacity: 0.12,
-      borderColor: Colors.white.withValues(alpha: 0.24),
+      tintColor: isDark ? Colors.white : scheme.surface,
+      tintOpacity: isDark ? 0.12 : 0.78,
+      borderColor:
+          isDark ? Colors.white.withValues(alpha: 0.24) : scheme.outline,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Row(
         children: [
-          const SizedBox(
+          SizedBox(
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2.2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isDark ? Colors.white : AppColors.primary,
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -252,7 +302,7 @@ class _AutoLoginStatusCard extends StatelessWidget {
                 Text(
                   context.t('auto_logging_in'),
                   style: textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
+                    color: foregroundColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -260,7 +310,7 @@ class _AutoLoginStatusCard extends StatelessWidget {
                 Text(
                   context.t('restoring_progress'),
                   style: textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.78),
+                    color: secondaryColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -285,8 +335,11 @@ class _SplashFooterLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final foregroundColor = isDark ? Colors.white : scheme.onSurface;
     final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: Colors.white,
+          color: foregroundColor,
           fontWeight: FontWeight.w700,
         );
 
@@ -294,12 +347,12 @@ class _SplashFooterLabel extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (isLoading) ...[
-          const SizedBox(
+          SizedBox(
             width: 16,
             height: 16,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
             ),
           ),
           const SizedBox(width: 12),
@@ -344,7 +397,10 @@ class _BrandReveal extends StatelessWidget {
                     child: Text(
                       message.text,
                       maxLines: 1,
-                      style: _resolveWelcomeTextStyle(message.fontFamily),
+                      style: _resolveWelcomeTextStyle(
+                        context,
+                        message.fontFamily,
+                      ),
                     ),
                   ),
                 ),
@@ -356,25 +412,32 @@ class _BrandReveal extends StatelessWidget {
     );
   }
 
-  TextStyle _resolveWelcomeTextStyle(_WelcomeFont fontFamily) {
+  TextStyle _resolveWelcomeTextStyle(
+    BuildContext context,
+    _WelcomeFont fontFamily,
+  ) {
+    final foregroundColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Theme.of(context).colorScheme.onSurface;
+
     switch (fontFamily) {
       case _WelcomeFont.gujarati:
         return GoogleFonts.notoSansGujarati(
-          color: Colors.white,
+          color: foregroundColor,
           fontSize: 72,
           fontWeight: FontWeight.w700,
           height: 1,
         );
       case _WelcomeFont.devanagari:
         return GoogleFonts.notoSansDevanagari(
-          color: Colors.white,
+          color: foregroundColor,
           fontSize: 70,
           fontWeight: FontWeight.w700,
           height: 1,
         );
       case _WelcomeFont.cormorant:
         return GoogleFonts.cormorantGaramond(
-          color: Colors.white,
+          color: foregroundColor,
           fontSize: 84,
           fontWeight: FontWeight.w700,
           height: 1,

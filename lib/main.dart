@@ -69,9 +69,8 @@ class JainQuestApp extends ConsumerWidget {
     final disableAnimations = mediaQuery?.disableAnimations ?? false;
     final viewportSize = mediaQuery?.size ?? const Size(1440, 900);
     final isCompactViewport = viewportSize.width < 900;
-    final lineSpacing = disableAnimations
-        ? 24.0
-        : (isCompactViewport ? 20.0 : 16.0);
+    final lineSpacing =
+        disableAnimations ? 24.0 : (isCompactViewport ? 20.0 : 16.0);
     final pointerSize = isCompactViewport ? 6.0 : 8.0;
 
     // Update system UI overlay style based on theme
@@ -103,20 +102,37 @@ class JainQuestApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final backgroundColor =
+            isDark ? AppColors.inkBlack : AppColors.lightCanvas;
+        final strokeColor =
+            isDark ? const Color(0xD9FFFFFF) : AppColors.lightWaveStroke;
+        final pointerColor =
+            isDark ? const Color(0xFFFFFFFF) : AppColors.lightWavePointer;
+        final overlayColors = isDark
+            ? <Color>[
+                Colors.black.withValues(alpha: 0.12),
+                Colors.black.withValues(alpha: 0.5),
+              ]
+            : <Color>[
+                AppColors.softCream.withValues(alpha: 0.32),
+                Colors.white.withValues(alpha: 0.72),
+              ];
+
         return Listener(
           behavior: HitTestBehavior.translucent,
           onPointerDown: disableAnimations
               ? null
               : (event) =>
-                    waveBackgroundController.updatePointer(event.localPosition),
+                  waveBackgroundController.updatePointer(event.localPosition),
           onPointerHover: disableAnimations
               ? null
               : (event) =>
-                    waveBackgroundController.updatePointer(event.localPosition),
+                  waveBackgroundController.updatePointer(event.localPosition),
           onPointerMove: disableAnimations
               ? null
               : (event) =>
-                    waveBackgroundController.updatePointer(event.localPosition),
+                  waveBackgroundController.updatePointer(event.localPosition),
           onPointerUp: disableAnimations
               ? null
               : (_) => waveBackgroundController.clearPointer(),
@@ -132,13 +148,13 @@ class JainQuestApp extends ConsumerWidget {
               fit: StackFit.expand,
               children: [
                 if (disableAnimations)
-                  const ColoredBox(color: Color(0xFF000000))
+                  ColoredBox(color: backgroundColor)
                 else
                   WaveBackground(
                     controller: waveBackgroundController,
-                    strokeColor: const Color(0xD9FFFFFF),
-                    backgroundColor: const Color(0xFF000000),
-                    pointerColor: const Color(0xFFFFFFFF),
+                    strokeColor: strokeColor,
+                    backgroundColor: backgroundColor,
+                    pointerColor: pointerColor,
                     pointerSize: pointerSize,
                     lineSpacingX: lineSpacing,
                     lineSpacingY: lineSpacing,
@@ -149,10 +165,7 @@ class JainQuestApp extends ConsumerWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.12),
-                          Colors.black.withValues(alpha: 0.5),
-                        ],
+                        colors: overlayColors,
                       ),
                     ),
                   ),

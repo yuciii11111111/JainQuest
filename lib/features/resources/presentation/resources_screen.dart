@@ -160,82 +160,97 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
     final scheme = Theme.of(context).colorScheme;
     final markedComplete = await showModalBottomSheet<bool>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
       ),
       builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.72,
+          minChildSize: 0.45,
+          maxChildSize: 0.92,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    context.t(guide.titleKey),
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                context.t(guide.bodyKey),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(height: 1.6),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              if (isCompleted)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacityValue(0.15),
-                    borderRadius: BorderRadius.circular(AppRadius.small),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  Row(
                     children: [
-                      const Icon(Icons.check_circle_rounded,
-                          size: 16, color: Colors.green),
-                      const SizedBox(width: 6),
-                      Text(
-                        context.t('completed'),
-                        style: Theme.of(context).textTheme.labelMedium,
+                      Expanded(
+                        child: Text(
+                          context.t(guide.titleKey),
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
-                ),
-              const SizedBox(height: AppSpacing.md),
-              if (!isCompleted)
-                OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  icon: const Icon(Icons.check_circle_outline_rounded),
-                  label: Text(context.t('mark_completed')),
-                ),
-              if (!isCompleted) const SizedBox(height: AppSpacing.sm),
-              GradientButton(
-                label: context.t('open_reader'),
-                icon: Icons.auto_stories_rounded,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushUltraSmooth(const ReadingScreen());
-                },
-                width: double.infinity,
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    context.t(guide.bodyKey),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(height: 1.6),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  if (isCompleted)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacityValue(0.15),
+                        borderRadius: BorderRadius.circular(AppRadius.small),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 16,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            context.t('completed'),
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (!isCompleted)
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      icon: const Icon(Icons.check_circle_outline_rounded),
+                      label: Text(context.t('mark_completed')),
+                    ),
+                  if (!isCompleted) const SizedBox(height: AppSpacing.sm),
+                  GradientButton(
+                    label: context.t('open_reader'),
+                    icon: Icons.auto_stories_rounded,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context)
+                          .pushUltraSmooth(const ReadingScreen());
+                    },
+                    width: double.infinity,
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

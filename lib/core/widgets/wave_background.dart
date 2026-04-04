@@ -86,7 +86,7 @@ class _WaveBackgroundState extends State<WaveBackground>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final tickerModeEnabled = TickerMode.of(context);
+    final tickerModeEnabled = TickerMode.valuesOf(context).enabled;
     if (_isTickerModeEnabled == tickerModeEnabled) {
       return;
     }

@@ -9,6 +9,55 @@ import '../models/badge_definition.dart';
 import '../services/storage_service.dart';
 import '../content/unit1_content.dart';
 
+Future<void> _recordQuestionAttempt({
+  required String lessonId,
+  required String questionId,
+  required bool isCorrect,
+}) async {
+  final now = DateTime.now();
+  final previousAttempts = StorageService.getAttemptsForQuestion(questionId);
+  final latestAttempt =
+      previousAttempts.isEmpty ? null : previousAttempts.first;
+  final intervalDays = isCorrect
+      ? (latestAttempt != null && latestAttempt.isCorrect
+          ? (latestAttempt.spacedRepetitionInterval * 2).clamp(1, 14)
+          : 1)
+      : 0;
+
+  try {
+    await StorageService.logAttempt(
+      AttemptLog(
+        id: '${questionId}_${now.microsecondsSinceEpoch}',
+        questionId: questionId,
+        lessonId: lessonId,
+        isCorrect: isCorrect,
+        responseTimeMs: isCorrect ? 4000 : 6000,
+        attemptedAt: now,
+        spacedRepetitionInterval: intervalDays,
+        nextReviewDate: isCorrect ? now.add(Duration(days: intervalDays)) : now,
+      ),
+    );
+  } catch (_) {
+    // Attempt logging should never block the main learning flow.
+  }
+}
+
+String? _lessonIdForQuestion(Iterable<Lesson> lessons, String questionId) {
+  for (final lesson in lessons) {
+    final containsQuestion = lesson.screens.quiz.questions
+        .any((question) => question.questionId == questionId);
+    if (containsQuestion) {
+      return lesson.lessonId;
+    }
+  }
+  return null;
+}
+
+bool _isAttemptDue(AttemptLog attempt, DateTime now) {
+  final nextReviewDate = attempt.nextReviewDate;
+  return nextReviewDate != null && !nextReviewDate.isAfter(now);
+}
+
 // ============================================================================
 // User Profile Provider
 // ============================================================================
@@ -316,11 +365,18 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
   Future<UserProfile?> answerWarmup(bool isCorrect) async {
     if (state == null || state!.warmupAnswered) return null;
 
+    final lessonId = state!.lesson.lessonId;
+    final questionId = '${lessonId}_warmup';
     final xp = isCorrect ? XpRewards.warmup : 0;
     state = state!.copyWith(
       warmupAnswered: true,
       warmupXp: xp,
       totalCorrect: state!.totalCorrect + (isCorrect ? 1 : 0),
+    );
+    await _recordQuestionAttempt(
+      lessonId: lessonId,
+      questionId: questionId,
+      isCorrect: isCorrect,
     );
 
     if (isCorrect) {
@@ -333,6 +389,9 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
   Future<UserProfile?> answerQuizQuestion(bool isCorrect) async {
     if (state == null) return null;
 
+    final lessonId = state!.lesson.lessonId;
+    final question =
+        state!.lesson.screens.quiz.questions[state!.currentQuizQuestionIndex];
     final newAnswers = [...state!.quizAnswers, isCorrect];
     final xpGained = isCorrect ? XpRewards.quiz : 0;
 
@@ -340,6 +399,11 @@ class LessonRunnerNotifier extends StateNotifier<LessonRunnerState?> {
       quizAnswers: newAnswers,
       quizXp: state!.quizXp + xpGained,
       totalCorrect: state!.totalCorrect + (isCorrect ? 1 : 0),
+    );
+    await _recordQuestionAttempt(
+      lessonId: lessonId,
+      questionId: question.questionId,
+      isCorrect: isCorrect,
     );
 
     if (isCorrect) {
@@ -472,24 +536,24 @@ class PracticeNotifier extends StateNotifier<PracticeState?> {
   PracticeNotifier(this.ref) : super(null);
 
   void startPractice(PracticeMode mode) {
-    // Gather questions from completed lessons
     final progress = ref.read(progressProvider);
     final lessons = ref.read(lessonsProvider);
+    final completedLessons = lessons
+        .where((lesson) => progress.isLessonCompleted(lesson.lessonId))
+        .toList();
+    final allQuestions = completedLessons
+        .expand((lesson) => lesson.screens.quiz.questions)
+        .toList();
 
-    final questions = <QuizQuestion>[];
-    for (final lesson in lessons) {
-      if (progress.isLessonCompleted(lesson.lessonId)) {
-        questions.addAll(lesson.screens.quiz.questions);
-      }
-    }
-
-    // Shuffle for review mode
-    if (mode == PracticeMode.review) {
-      questions.shuffle();
-    }
-
-    // Take 8 questions max
-    final sessionQuestions = questions.take(8).toList();
+    final sessionQuestions = switch (mode) {
+      PracticeMode.review =>
+        (List<QuizQuestion>.from(allQuestions)..shuffle()).take(8).toList(),
+      PracticeMode.targetWeakSpots => _buildWeakSpotQuestions(
+          progress: progress,
+          completedLessons: completedLessons,
+          allQuestions: allQuestions,
+        ),
+    };
 
     state = PracticeState(
       mode: mode,
@@ -497,7 +561,114 @@ class PracticeNotifier extends StateNotifier<PracticeState?> {
     );
   }
 
-  Future<void> answerQuestion(bool isCorrect) async {
+  List<QuizQuestion> _buildWeakSpotQuestions({
+    required ProgressState progress,
+    required List<Lesson> completedLessons,
+    required List<QuizQuestion> allQuestions,
+  }) {
+    if (allQuestions.isEmpty) {
+      return const <QuizQuestion>[];
+    }
+
+    final now = DateTime.now();
+    final lessonByQuestionId = <String, String>{};
+    for (final lesson in completedLessons) {
+      for (final question in lesson.screens.quiz.questions) {
+        lessonByQuestionId[question.questionId] = lesson.lessonId;
+      }
+    }
+
+    final attemptsByQuestionId = <String, List<AttemptLog>>{};
+    for (final attempt in StorageService.getAttemptLogs()) {
+      if (!lessonByQuestionId.containsKey(attempt.questionId)) {
+        continue;
+      }
+      attemptsByQuestionId
+          .putIfAbsent(attempt.questionId, () => [])
+          .add(attempt);
+    }
+
+    for (final attempts in attemptsByQuestionId.values) {
+      attempts.sort((a, b) => b.attemptedAt.compareTo(a.attemptedAt));
+    }
+
+    final lowScoreLessonIds = <String>{
+      for (final lesson in completedLessons)
+        if ((progress.lessonProgress[lesson.lessonId]?.bestScore ?? 100) < 100)
+          lesson.lessonId,
+    };
+
+    int priorityFor(QuizQuestion question) {
+      final attempts =
+          attemptsByQuestionId[question.questionId] ?? const <AttemptLog>[];
+      final hasIncorrectAttempts =
+          attempts.any((attempt) => !attempt.isCorrect);
+      final hasDueReview =
+          attempts.any((attempt) => _isAttemptDue(attempt, now));
+      final lessonId = lessonByQuestionId[question.questionId];
+      final isFromLowScoreLesson =
+          lessonId != null && lowScoreLessonIds.contains(lessonId);
+
+      if (hasIncorrectAttempts && hasDueReview) return 0;
+      if (hasIncorrectAttempts) return 1;
+      if (isFromLowScoreLesson) return 2;
+      if (hasDueReview) return 3;
+      return 4;
+    }
+
+    final rankedQuestions = List<QuizQuestion>.from(allQuestions)
+      ..sort((a, b) {
+        final priorityComparison = priorityFor(a).compareTo(priorityFor(b));
+        if (priorityComparison != 0) {
+          return priorityComparison;
+        }
+
+        final incorrectCountA =
+            (attemptsByQuestionId[a.questionId] ?? const <AttemptLog>[])
+                .where((attempt) => !attempt.isCorrect)
+                .length;
+        final incorrectCountB =
+            (attemptsByQuestionId[b.questionId] ?? const <AttemptLog>[])
+                .where((attempt) => !attempt.isCorrect)
+                .length;
+        final incorrectComparison = incorrectCountB.compareTo(incorrectCountA);
+        if (incorrectComparison != 0) {
+          return incorrectComparison;
+        }
+
+        final attemptsA =
+            attemptsByQuestionId[a.questionId] ?? const <AttemptLog>[];
+        final attemptsB =
+            attemptsByQuestionId[b.questionId] ?? const <AttemptLog>[];
+        final latestA = attemptsA.isEmpty ? null : attemptsA.first.attemptedAt;
+        final latestB = attemptsB.isEmpty ? null : attemptsB.first.attemptedAt;
+        if (latestA != null && latestB != null) {
+          final recencyComparison = latestA.compareTo(latestB);
+          if (recencyComparison != 0) {
+            return recencyComparison;
+          }
+        } else if (latestA == null && latestB != null) {
+          return -1;
+        } else if (latestA != null && latestB == null) {
+          return 1;
+        }
+
+        return a.questionId.compareTo(b.questionId);
+      });
+
+    final focusedQuestions = rankedQuestions
+        .where((question) => priorityFor(question) < 4)
+        .take(8)
+        .toList();
+    if (focusedQuestions.isNotEmpty) {
+      return focusedQuestions;
+    }
+
+    final fallbackQuestions = List<QuizQuestion>.from(allQuestions)..shuffle();
+    return fallbackQuestions.take(8).toList();
+  }
+
+  Future<void> answerQuestion(QuizQuestion question, bool isCorrect) async {
     if (state == null) return;
 
     final xp = isCorrect ? XpRewards.practice : 0;
@@ -506,6 +677,17 @@ class PracticeNotifier extends StateNotifier<PracticeState?> {
       correctCount: state!.correctCount + (isCorrect ? 1 : 0),
       xpEarned: state!.xpEarned + xp,
     );
+    final lessonId = _lessonIdForQuestion(
+      ref.read(lessonsProvider),
+      question.questionId,
+    );
+    if (lessonId != null) {
+      await _recordQuestionAttempt(
+        lessonId: lessonId,
+        questionId: question.questionId,
+        isCorrect: isCorrect,
+      );
+    }
 
     if (isCorrect) {
       await ref.read(userProfileProvider.notifier).addXp(xp);

@@ -66,14 +66,17 @@ class AppColors {
   static const Color glassBorder = Color(0x66FBF0F4);
   static const double glassBlur = 24.0;
 
-  // Light Mode (Optional)
+  // Light Mode
+  static const Color lightCanvas = Color(0xFFFFFFFF);
   static const Color lightBackground = Colors.transparent;
-  static const Color lightCard = softCream;
-  static const Color lightElevated = Color(0xFFF7E2EA);
-  static const Color lightTextPrimary = Color(0xFF1C140F);
-  static const Color lightTextSecondary = Color(0xFF312114);
-  static const Color lightTextMuted = Color(0xFF5A3F2B);
-  static const Color lightBorder = Color(0x99ED8F45);
+  static const Color lightCard = Color(0xFFFDF6F1);
+  static const Color lightElevated = Color(0xFFF7EBDD);
+  static const Color lightTextPrimary = Color(0xFF1A140F);
+  static const Color lightTextSecondary = Color(0xFF3A2C20);
+  static const Color lightTextMuted = Color(0xFF665243);
+  static const Color lightBorder = Color(0xFFD9C3AF);
+  static const Color lightWaveStroke = Color(0x29341C0F);
+  static const Color lightWavePointer = Color(0xCC8C4E1D);
 }
 
 // ============================================================================
@@ -164,13 +167,11 @@ class AppGradients {
 class AppTypography {
   AppTypography._();
 
-  static const String fontFamily = 'SF Pro';
+  static const String fontFamily = 'Nunito';
   static const List<String> fontFamilyFallback = [
-    'SF Pro Display',
-    'SF Pro Text',
-    'San Francisco',
-    '.SF Pro Text',
-    '.SF Pro Display',
+    'Noto Sans',
+    'Noto Sans Devanagari',
+    'Noto Sans Gujarati',
     'Helvetica Neue',
     'Arial',
   ];

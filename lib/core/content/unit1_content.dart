@@ -723,7 +723,6 @@ class Unit1Content {
     title: 'Foundations of Jainism',
     level: 'Beginner',
     lessons: [
-      _lesson5,
       ..._generatedLessons,
       _masterTest,
     ],

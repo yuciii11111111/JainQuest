@@ -42,11 +42,36 @@ class LiquidGlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     final shapeIsCircle = shape == LiquidGlassShape.circle;
     final resolvedRadius =
         borderRadius ?? BorderRadius.circular(AppRadius.card);
-    final effectiveBorderColor =
-        borderColor ?? Colors.white.withOpacityValue(0.32);
+    final effectiveBorderColor = borderColor ??
+        (isLight
+            ? scheme.outline.withOpacityValue(0.72)
+            : Colors.white.withOpacityValue(0.32));
+    final highlightColors = isLight
+        ? <Color>[
+            Colors.white.withOpacityValue(0.9),
+            Colors.white.withOpacityValue(0.74),
+            AppColors.softCream.withOpacityValue(0.42),
+          ]
+        : <Color>[
+            Colors.white.withOpacityValue(0.28),
+            Colors.white.withOpacityValue(0.12),
+            Colors.white.withOpacityValue(0.04),
+          ];
+    final boxShadow = isLight
+        ? <BoxShadow>[
+            BoxShadow(
+              color: AppColors.inkBlack.withOpacityValue(0.06),
+              blurRadius: 24,
+              spreadRadius: -10,
+              offset: const Offset(0, 12),
+            ),
+          ]
+        : const <BoxShadow>[];
     final duration = AppMotion.resolveDuration(context, AppMotion.standard);
     final curve = AppMotion.resolveCurve(context, AppMotion.standardCurve);
 
@@ -61,14 +86,11 @@ class LiquidGlassContainer extends StatelessWidget {
           width: borderWidth,
         ),
         color: tintColor?.withOpacityValue(tintOpacity),
+        boxShadow: boxShadow,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacityValue(0.28),
-            Colors.white.withOpacityValue(0.12),
-            Colors.white.withOpacityValue(0.04),
-          ],
+          colors: highlightColors,
         ),
       ),
       child: Padding(

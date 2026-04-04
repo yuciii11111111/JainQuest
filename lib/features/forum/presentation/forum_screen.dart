@@ -743,6 +743,7 @@ class _ReplyComposerSheet extends StatefulWidget {
 class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
   late final TextEditingController _controller;
   late final FocusNode _replyFocusNode;
+  bool _isSubmitting = false;
   String? _replyError;
   String? _submitError;
 
@@ -761,6 +762,9 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) {
+      return;
+    }
     final text = _controller.text.trim();
     setState(() {
       _replyError = null;
@@ -773,6 +777,8 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
       _replyFocusNode.requestFocus();
       return;
     }
+
+    setState(() => _isSubmitting = true);
     try {
       await widget.service.addReply(
         postId: widget.post.id,
@@ -784,6 +790,10 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
       setState(() {
         _submitError = context.t('could_not_post_reply');
       });
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -828,6 +838,7 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
               TextField(
                 controller: _controller,
                 focusNode: _replyFocusNode,
+                enabled: !_isSubmitting,
                 maxLines: 4,
                 minLines: 1,
                 textCapitalization: TextCapitalization.sentences,
@@ -875,10 +886,22 @@ class _ReplyComposerSheetState extends State<_ReplyComposerSheet> {
                         ),
                   ),
                   const Spacer(),
-                  ElevatedButton.icon(
-                    onPressed: _submit,
-                    icon: const Icon(Icons.send_rounded, size: 18),
-                    label: Text(context.t('reply')),
+                  ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.send_rounded, size: 18),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(context.t('reply')),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -908,6 +931,7 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final FocusNode _nameFocusNode;
+  bool _isSubmitting = false;
   String? _nameError;
   String? _submitError;
 
@@ -928,6 +952,9 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) {
+      return;
+    }
     final name = _nameController.text.trim();
     setState(() {
       _nameError = null;
@@ -941,6 +968,7 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
       return;
     }
 
+    setState(() => _isSubmitting = true);
     try {
       final communityId = await widget.service.createCommunity(
         name: name,
@@ -952,6 +980,10 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
       setState(() {
         _submitError = context.t('could_not_create_community');
       });
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -991,6 +1023,7 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
               TextField(
                 controller: _nameController,
                 focusNode: _nameFocusNode,
+                enabled: !_isSubmitting,
                 maxLength: 40,
                 style: Theme.of(context).textTheme.bodyMedium,
                 onChanged: (_) {
@@ -1018,6 +1051,7 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
               const SizedBox(height: AppSpacing.sm),
               TextField(
                 controller: _descriptionController,
+                enabled: !_isSubmitting,
                 maxLines: 3,
                 minLines: 2,
                 maxLength: 120,
@@ -1049,10 +1083,22 @@ class _CommunityComposerSheetState extends State<_CommunityComposerSheet> {
               Row(
                 children: [
                   const Spacer(),
-                  ElevatedButton.icon(
-                    onPressed: _submit,
-                    icon: const Icon(Icons.group_add_rounded, size: 18),
-                    label: Text(context.t('create')),
+                  ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.group_add_rounded, size: 18),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(context.t('create')),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -1083,6 +1129,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
   late final TextEditingController _contentController;
   late final TextEditingController _tagsController;
   late final FocusNode _contentFocusNode;
+  bool _isSubmitting = false;
   String? _selectedCategory;
   String? _contentError;
   String? _submitError;
@@ -1119,6 +1166,9 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) {
+      return;
+    }
     final text = _contentController.text.trim();
     setState(() {
       _contentError = null;
@@ -1132,6 +1182,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
       return;
     }
 
+    setState(() => _isSubmitting = true);
     try {
       await widget.service.createPost(
         content: text,
@@ -1143,6 +1194,10 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
       setState(() {
         _submitError = context.t('could_not_create_post');
       });
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -1184,11 +1239,14 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                       child: FilterChip(
                         label: Text(category.label),
                         selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            setState(() => _selectedCategory = category.id);
-                          }
-                        },
+                        onSelected: _isSubmitting
+                            ? null
+                            : (selected) {
+                                if (selected) {
+                                  setState(
+                                      () => _selectedCategory = category.id);
+                                }
+                              },
                         backgroundColor: scheme.surfaceContainerHighest
                             .withOpacityValue(0.5),
                         selectedColor: AppColors.primary,
@@ -1217,6 +1275,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
               TextField(
                 controller: _contentController,
                 focusNode: _contentFocusNode,
+                enabled: !_isSubmitting,
                 maxLines: 5,
                 minLines: 3,
                 textCapitalization: TextCapitalization.sentences,
@@ -1247,6 +1306,7 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
               const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: _tagsController,
+                enabled: !_isSubmitting,
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
                   labelText: context.t('tags_label'),
@@ -1282,10 +1342,22 @@ class _PostComposerSheetState extends State<_PostComposerSheet> {
                         ),
                   ),
                   const Spacer(),
-                  ElevatedButton.icon(
-                    onPressed: _submit,
-                    icon: const Icon(Icons.send_rounded, size: 18),
-                    label: Text(context.t('post')),
+                  ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.send_rounded, size: 18),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(context.t('post')),
+                            ],
+                          ),
                   ),
                 ],
               ),

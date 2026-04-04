@@ -29,35 +29,27 @@ class GlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final card = LiquidGlassContainer(
-      width: width,
-      height: height,
-      margin: margin,
-      padding: padding ?? const EdgeInsets.all(AppSpacing.md),
-      borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
-      borderColor: borderColor ?? scheme.outline.withOpacityValue(0.6),
-      borderWidth: borderWidth,
-      tintColor: scheme.surface,
-      tintOpacity: 0.26,
-      child: child,
-    );
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final resolvedBorderColor =
+        borderColor ?? scheme.outline.withOpacityValue(isLight ? 0.78 : 0.6);
+    final resolvedTintOpacity = isLight ? 0.82 : 0.26;
 
-    if (onTap != null) {
+    LiquidGlassContainer buildCard({VoidCallback? onTap}) {
       return LiquidGlassContainer(
         width: width,
         height: height,
         margin: margin,
         padding: padding ?? const EdgeInsets.all(AppSpacing.md),
         borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
-        borderColor: borderColor ?? scheme.outline.withOpacityValue(0.6),
+        borderColor: resolvedBorderColor,
         borderWidth: borderWidth,
         tintColor: scheme.surface,
-        tintOpacity: 0.26,
+        tintOpacity: resolvedTintOpacity,
         onTap: onTap,
         child: child,
       );
     }
 
-    return card;
+    return buildCard(onTap: onTap);
   }
 }

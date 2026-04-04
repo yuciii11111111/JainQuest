@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/models/user_models.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/providers/theme_provider.dart';
@@ -72,6 +73,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .setReminderTime(newTime);
       await NotificationService.scheduleAllNotifications();
     }
+  }
+
+  Future<void> _showQuietHoursPicker(
+    NotificationPrefs notifPrefs,
+  ) async {
+    final start = await showTimePicker(
+      context: context,
+      initialTime: _parseTimeOfDay(notifPrefs.quietHoursStart),
+    );
+    if (start == null || !mounted) {
+      return;
+    }
+
+    final end = await showTimePicker(
+      context: context,
+      initialTime: _parseTimeOfDay(notifPrefs.quietHoursEnd),
+    );
+    if (end == null) {
+      return;
+    }
+
+    final startValue =
+        '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
+    final endValue =
+        '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
+
+    await ref
+        .read(notificationPrefsProvider.notifier)
+        .setQuietHours(startValue, endValue);
+    await NotificationService.scheduleAllNotifications();
   }
 
   Future<void> _showResetConfirmation() async {
@@ -207,14 +238,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       notifPrefs.quietHoursEnd,
                     ),
                     enabled: notifPrefs.enableNotifications,
-                    onTap: () {
-                      // Could implement quiet hours picker
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(context.t('quiet_hours_desc')),
-                        ),
-                      );
-                    },
+                    onTap: () => _showQuietHoursPicker(notifPrefs),
                   ),
                 ],
               ),
@@ -453,7 +477,8 @@ class _SwitchTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
+            activeTrackColor: AppColors.primary.withOpacityValue(0.35),
           ),
         ],
       ),

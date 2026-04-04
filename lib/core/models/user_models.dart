@@ -245,6 +245,8 @@ class UserProfile extends Equatable {
 // ============================================================================
 
 class ProgressState extends Equatable {
+  static const String initialUnlockedLessonId = 'U01_L01';
+
   final Map<String, LessonProgress> lessonProgress;
 
   final List<String> completedLessons;
@@ -256,7 +258,7 @@ class ProgressState extends Equatable {
   const ProgressState({
     this.lessonProgress = const {},
     this.completedLessons = const [],
-    this.unlockedLessons = const ['U01_L05'],
+    this.unlockedLessons = const [initialUnlockedLessonId],
     this.earnedBadges = const [],
   });
 
@@ -324,20 +326,56 @@ class ProgressState extends Equatable {
       }
     });
 
+    final completedLessons = (data['completedLessons'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        const <String>[];
+    final unlockedLessons = _normalizeUnlockedLessons(
+      (data['unlockedLessons'] as List?)?.map((e) => e.toString()).toList() ??
+          const <String>[],
+      completedLessons,
+    );
+
     return ProgressState(
       lessonProgress: lessonProgress,
-      completedLessons: (data['completedLessons'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
-      unlockedLessons: (data['unlockedLessons'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const ['U01_L05'],
+      completedLessons: completedLessons,
+      unlockedLessons: unlockedLessons,
       earnedBadges:
           (data['earnedBadges'] as List?)?.map((e) => e.toString()).toList() ??
               const [],
     );
+  }
+
+  static List<String> _normalizeUnlockedLessons(
+    List<String> unlockedLessons,
+    List<String> completedLessons,
+  ) {
+    final normalized = <String>[];
+
+    void addAllUnique(Iterable<String> values) {
+      for (final value in values) {
+        if (value.isEmpty || normalized.contains(value)) {
+          continue;
+        }
+        normalized.add(value);
+      }
+    }
+
+    addAllUnique(unlockedLessons);
+    addAllUnique(completedLessons);
+
+    final isLegacyFreshState = completedLessons.isEmpty &&
+        normalized.length == 1 &&
+        normalized.first == 'U01_L05';
+    if (isLegacyFreshState) {
+      return const [initialUnlockedLessonId];
+    }
+
+    if (normalized.isEmpty) {
+      return const [initialUnlockedLessonId];
+    }
+
+    return normalized;
   }
 
   @override
