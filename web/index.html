@@ -493,6 +493,316 @@
       line-height: 1.45;
     }
 
+    .story-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      min-height: 310vh;
+      padding: 1.5rem 1.5rem 5rem;
+      position: relative;
+    }
+
+    .story-shell {
+      position: sticky;
+      top: calc(var(--nav-height) + 1rem);
+      min-height: calc(100vh - var(--nav-height) - 1.5rem);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+      gap: clamp(1rem, 3vw, 2rem);
+      align-items: center;
+    }
+
+    .story-copy {
+      display: grid;
+      gap: 1.35rem;
+      align-self: center;
+    }
+
+    .story-copy .section-title {
+      max-width: 9ch;
+    }
+
+    .story-copy .section-copy {
+      max-width: 29rem;
+    }
+
+    .story-steps {
+      display: grid;
+      gap: 0.85rem;
+      margin-top: 0.35rem;
+    }
+
+    .story-step {
+      padding: 1rem 1.05rem;
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      display: grid;
+      gap: 0.38rem;
+      opacity: 0.38;
+      transform: translateX(0);
+      transition: opacity 0.34s ease, transform 0.34s ease,
+        border-color 0.34s ease, background-color 0.34s ease,
+        box-shadow 0.34s ease;
+    }
+
+    .story-step.is-active {
+      opacity: 1;
+      transform: translateX(10px);
+      background: rgba(255, 255, 255, 0.055);
+      border-color: rgba(212, 137, 67, 0.28);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.16);
+    }
+
+    .story-step-label {
+      color: var(--text-tertiary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .story-step-title {
+      color: var(--text-primary);
+      font-family: 'Fraunces', serif;
+      font-size: 1.28rem;
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .story-step-copy {
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+      line-height: 1.65;
+      max-width: 26rem;
+    }
+
+    .story-stage-wrap {
+      perspective: 1800px;
+      min-height: clamp(32rem, 72vh, 44rem);
+    }
+
+    .story-stage {
+      position: relative;
+      min-height: inherit;
+      padding: clamp(1.2rem, 4vw, 2rem);
+      overflow: hidden;
+      display: grid;
+      gap: 1rem;
+      transform-style: preserve-3d;
+      transform-origin: 50% 50%;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(212, 137, 67, 0.17), transparent 36%),
+        radial-gradient(circle at 86% 16%, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(160deg, rgba(9, 13, 19, 0.96), rgba(6, 8, 13, 0.92));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .story-stage.is-animated {
+      display: block;
+    }
+
+    .story-stage::before {
+      content: '';
+      position: absolute;
+      inset: 1rem;
+      border-radius: calc(var(--radius-large) - 8px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+    }
+
+    .story-stage::after {
+      content: '';
+      position: absolute;
+      inset: auto 8% 11%;
+      height: 24%;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(212, 137, 67, 0.22), transparent 72%);
+      filter: blur(28px);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .story-depth-glow {
+      position: absolute;
+      inset: 12% auto auto 10%;
+      width: clamp(12rem, 26vw, 18rem);
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(212, 137, 67, 0.26), transparent 70%);
+      filter: blur(18px);
+      opacity: 0.8;
+      pointer-events: none;
+      display: none;
+    }
+
+    .story-orbit {
+      position: absolute;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+      display: none;
+    }
+
+    .story-orbit-one {
+      inset: 11% 18% auto auto;
+      width: 13rem;
+      height: 13rem;
+      transform: rotate(18deg);
+    }
+
+    .story-orbit-two {
+      inset: auto auto 14% 12%;
+      width: 9rem;
+      height: 9rem;
+      transform: rotate(-14deg);
+      opacity: 0.7;
+    }
+
+    .story-card {
+      position: relative;
+      width: 100%;
+      min-height: 22rem;
+      border-radius: 28px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transform-origin: center center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(8, 12, 18, 0.88));
+      display: grid;
+      grid-template-rows: 1.1fr 0.9fr;
+      will-change: transform, opacity, filter;
+    }
+
+    .story-stage.is-animated .story-depth-glow,
+    .story-stage.is-animated .story-orbit {
+      display: block;
+    }
+
+    .story-stage.is-animated .story-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(29rem, 62%);
+    }
+
+    .story-card::after {
+      content: '';
+      position: absolute;
+      inset: auto 1.2rem 1.1rem;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .story-card-media {
+      position: relative;
+      padding: 1.2rem 1.2rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .story-card-media::before {
+      content: '';
+      position: absolute;
+      inset: 1.1rem 1.1rem 0;
+      border-radius: 24px 24px 18px 18px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 62%),
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 34%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .story-card-media img {
+      position: relative;
+      z-index: 1;
+      width: min(13rem, 58%);
+      aspect-ratio: 1;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.3));
+      transform: translateZ(30px);
+    }
+
+    .story-card-body {
+      position: relative;
+      z-index: 1;
+      padding: 1.2rem 1.2rem 1.1rem;
+      display: grid;
+      align-content: start;
+      gap: 0.62rem;
+      background: linear-gradient(180deg, rgba(7, 10, 15, 0.08), rgba(7, 10, 15, 0.86));
+    }
+
+    .story-card-kicker {
+      color: rgba(241, 235, 226, 0.72);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .story-card-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.44rem;
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      max-width: 12ch;
+    }
+
+    .story-card-copy {
+      color: var(--text-secondary);
+      font-size: 0.93rem;
+      line-height: 1.66;
+      max-width: 26rem;
+    }
+
+    .story-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.2rem;
+    }
+
+    .story-tag {
+      padding: 0.44rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(241, 235, 226, 0.86);
+      font-size: 0.77rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .story-card-one .story-card-media::before {
+      background:
+        linear-gradient(145deg, rgba(223, 155, 95, 0.22), rgba(15, 22, 32, 0.34)),
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 34%);
+    }
+
+    .story-card-two .story-card-media::before {
+      background:
+        linear-gradient(150deg, rgba(120, 147, 190, 0.24), rgba(10, 16, 24, 0.38)),
+        radial-gradient(circle at 76% 24%, rgba(255, 255, 255, 0.14), transparent 30%);
+    }
+
+    .story-card-three .story-card-media::before {
+      background:
+        linear-gradient(155deg, rgba(87, 145, 139, 0.22), rgba(9, 16, 19, 0.42)),
+        radial-gradient(circle at 24% 26%, rgba(255, 255, 255, 0.13), transparent 30%);
+    }
+
+    .story-card-four .story-card-media::before {
+      background:
+        linear-gradient(145deg, rgba(160, 118, 194, 0.2), rgba(12, 17, 26, 0.4)),
+        radial-gradient(circle at 78% 22%, rgba(255, 255, 255, 0.14), transparent 30%);
+    }
+
     .content-section {
       max-width: var(--max-width);
       margin: 0 auto;
@@ -735,6 +1045,27 @@
         grid-template-columns: 1fr;
       }
 
+      .story-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .story-copy .section-title,
+      .story-card-title {
+        max-width: none;
+      }
+
+      .story-stage-wrap {
+        order: -1;
+      }
+
+      .story-card {
+        width: 100%;
+      }
+
+      .story-stage.is-animated .story-card {
+        width: min(32rem, 78%);
+      }
+
       .feature-grid,
       .split-grid {
         grid-template-columns: 1fr;
@@ -775,8 +1106,54 @@
         grid-template-columns: 1fr;
       }
 
+      .story-section {
+        min-height: auto;
+        padding-top: 0;
+      }
+
+      .story-shell {
+        position: static;
+        min-height: 0;
+        gap: 1rem;
+      }
+
+      .story-stage-wrap {
+        min-height: 0;
+      }
+
+      .story-stage {
+        min-height: auto;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .story-depth-glow,
+      .story-orbit {
+        display: none;
+      }
+
+      .story-card {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        min-height: 0;
+      }
+
+      .story-steps,
+      .story-stage {
+        perspective: none;
+      }
+
+      .story-step,
+      .story-step.is-active {
+        opacity: 1;
+        transform: none;
+      }
+
       .hero-actions .button,
-      .cta-card .button {
+      .cta-card .button,
+      .story-shell .button {
         width: 100%;
       }
     }
@@ -794,6 +1171,37 @@
       }
 
       .reveal {
+        opacity: 1;
+        transform: none;
+      }
+
+      .story-section {
+        min-height: auto;
+      }
+
+      .story-shell {
+        position: static;
+        min-height: 0;
+      }
+
+      .story-stage {
+        display: grid;
+        gap: 1rem;
+        transform: none !important;
+      }
+
+      .story-card {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        transform: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      .story-step,
+      .story-step.is-active {
         opacity: 1;
         transform: none;
       }
@@ -818,6 +1226,7 @@
           </a>
 
           <div class="nav-actions">
+            <a href="#story" class="nav-link">Story</a>
             <a href="#experience" class="nav-link">Experience</a>
             <a href="#approach" class="nav-link">Approach</a>
             <button type="button" class="button button-primary" onclick="launchApp()">
@@ -848,8 +1257,8 @@
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </button>
-              <a href="#experience" class="button button-secondary">
-                See the Experience
+              <a href="#story" class="button button-secondary">
+                Watch It Unfold
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M12 5v14M5 12l7 7 7-7" />
@@ -931,6 +1340,110 @@
                 <div class="micro-label">Progress</div>
                 <div class="micro-title">A place to return, continue, and track growth over time.</div>
               </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="story-section" id="story" data-story-section>
+          <div class="story-shell">
+            <div class="story-copy reveal">
+              <div class="section-kicker">Scroll Story</div>
+              <h2 class="section-title">Watch the landing page open up in 3D as you scroll.</h2>
+              <p class="section-copy">
+                This section turns the landing into a pinned scene. Each layer unwraps into place so lessons,
+                reflection, guidance, and progress feel like parts of one connected journey instead of separate blocks.
+              </p>
+
+              <div class="story-steps" aria-label="Story steps">
+                <article class="story-step is-active" data-story-step="0">
+                  <div class="story-step-label">Step 01</div>
+                  <h3 class="story-step-title">Start with a calm entry point</h3>
+                  <p class="story-step-copy">The first card opens with a clear lesson path so the experience feels easy to enter.</p>
+                </article>
+                <article class="story-step" data-story-step="1">
+                  <div class="story-step-label">Step 02</div>
+                  <h3 class="story-step-title">Let reflection open the next layer</h3>
+                  <p class="story-step-copy">Prompts and small rituals make the learning feel more personal as the stack unfolds.</p>
+                </article>
+                <article class="story-step" data-story-step="2">
+                  <div class="story-step-label">Step 03</div>
+                  <h3 class="story-step-title">Bring the guide into the scene</h3>
+                  <p class="story-step-copy">Questions and guidance slide forward so curiosity becomes part of the flow, not a detour.</p>
+                </article>
+                <article class="story-step" data-story-step="3">
+                  <div class="story-step-label">Step 04</div>
+                  <h3 class="story-step-title">End on progress you can feel</h3>
+                  <p class="story-step-copy">The final spread reveals momentum, practice, and consistency as the landing settles.</p>
+                </article>
+              </div>
+            </div>
+
+            <div class="story-stage-wrap reveal">
+              <div class="story-stage surface-panel" data-story-stage>
+                <div class="story-depth-glow" aria-hidden="true"></div>
+                <div class="story-orbit story-orbit-one" aria-hidden="true"></div>
+                <div class="story-orbit story-orbit-two" aria-hidden="true"></div>
+
+                <article class="story-card story-card-one" data-story-card="0">
+                  <div class="story-card-media">
+                    <img src="duo_guide.png" alt="" aria-hidden="true">
+                  </div>
+                  <div class="story-card-body">
+                    <div class="story-card-kicker">Lesson Layer</div>
+                    <h3 class="story-card-title">Core ideas arrive with less friction.</h3>
+                    <p class="story-card-copy">The opening card frames ahimsa, aparigraha, and anekantavada as a calm starting point rather than a dense wall of content.</p>
+                    <div class="story-tag-row" aria-label="Lesson highlights">
+                      <span class="story-tag">Focused lessons</span>
+                      <span class="story-tag">Modern language</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="story-card story-card-two" data-story-card="1">
+                  <div class="story-card-media">
+                    <img src="duo_guide.png" alt="" aria-hidden="true">
+                  </div>
+                  <div class="story-card-body">
+                    <div class="story-card-kicker">Reflection Layer</div>
+                    <h3 class="story-card-title">Small pauses make the learning sink in.</h3>
+                    <p class="story-card-copy">Reflection prompts and mindful checkpoints unfold next, giving the page a slower rhythm instead of one long sales block.</p>
+                    <div class="story-tag-row" aria-label="Reflection highlights">
+                      <span class="story-tag">Mindful prompts</span>
+                      <span class="story-tag">Daily practice</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="story-card story-card-three" data-story-card="2">
+                  <div class="story-card-media">
+                    <img src="duo_guide.png" alt="" aria-hidden="true">
+                  </div>
+                  <div class="story-card-body">
+                    <div class="story-card-kicker">Guide Layer</div>
+                    <h3 class="story-card-title">Questions pull the guide closer.</h3>
+                    <p class="story-card-copy">As the third card opens, the built-in guide comes forward to show that curiosity and explanation are part of the product from the start.</p>
+                    <div class="story-tag-row" aria-label="Guide highlights">
+                      <span class="story-tag">Guided Q&amp;A</span>
+                      <span class="story-tag">Adaptive help</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="story-card story-card-four" data-story-card="3">
+                  <div class="story-card-media">
+                    <img src="duo_guide.png" alt="" aria-hidden="true">
+                  </div>
+                  <div class="story-card-body">
+                    <div class="story-card-kicker">Progress Layer</div>
+                    <h3 class="story-card-title">The final spread lands on momentum.</h3>
+                    <p class="story-card-copy">The last card settles into the foreground and closes the sequence on continuity, progress, and a reason to come back tomorrow.</p>
+                    <div class="story-tag-row" aria-label="Progress highlights">
+                      <span class="story-tag">Visible growth</span>
+                      <span class="story-tag">Consistent return</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           </div>
         </section>
@@ -1102,6 +1615,147 @@
     document.querySelectorAll('.reveal').forEach((element) => {
       revealObserver.observe(element);
     });
+
+    (function initStoryScene() {
+      const storySection = document.querySelector('[data-story-section]');
+      const storyStage = document.querySelector('[data-story-stage]');
+      const storyCards = Array.from(document.querySelectorAll('[data-story-card]'));
+      const storySteps = Array.from(document.querySelectorAll('[data-story-step]'));
+
+      if (!storySection || !storyStage || storyCards.length === 0) {
+        return;
+      }
+
+      const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const mobileQuery = window.matchMedia('(max-width: 720px)');
+      let frameId = 0;
+
+      const cardConfigs = [
+        { x: -0.25, y: -0.18, z: -0.06, rotateY: -14, rotateX: 7, rotateZ: -7, scale: 0.98 },
+        { x: 0.26, y: -0.12, z: 0.04, rotateY: 16, rotateX: -6, rotateZ: 8, scale: 1.02 },
+        { x: -0.16, y: 0.22, z: 0.1, rotateY: -11, rotateX: 6, rotateZ: -5, scale: 0.99 },
+        { x: 0.21, y: 0.27, z: 0.18, rotateY: 10, rotateX: -4, rotateZ: 6, scale: 1.04 },
+      ];
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function mix(start, end, progress) {
+        return start + (end - start) * progress;
+      }
+
+      function easeOutCubic(value) {
+        return 1 - Math.pow(1 - value, 3);
+      }
+
+      function getCardProgress(index, progress) {
+        const start = index * 0.16;
+        const end = start + 0.34;
+        return clamp((progress - start) / (end - start), 0, 1);
+      }
+
+      function setActiveStep(activeIndex) {
+        storySteps.forEach((step, index) => {
+          step.classList.toggle('is-active', index === activeIndex);
+        });
+      }
+
+      function clearTransforms() {
+        storyStage.classList.remove('is-animated');
+        storyStage.style.transform = '';
+        storyStage.style.setProperty('--story-progress', '1');
+        storyCards.forEach((card) => {
+          card.style.transform = '';
+          card.style.opacity = '';
+          card.style.filter = '';
+        });
+        setActiveStep(0);
+      }
+
+      function updateScene() {
+        frameId = 0;
+
+        if (reducedMotionQuery.matches || mobileQuery.matches) {
+          clearTransforms();
+          return;
+        }
+
+        const rect = storySection.getBoundingClientRect();
+        const totalScrollable = Math.max(rect.height - window.innerHeight, 1);
+        const progress = clamp((-rect.top + window.innerHeight * 0.14) / totalScrollable, 0, 1);
+        const sceneSize = Math.min(storyStage.clientWidth, storyStage.clientHeight);
+        let activeIndex = 0;
+        let bestProgress = -1;
+
+        storyStage.classList.add('is-animated');
+        storyStage.style.setProperty('--story-progress', progress.toFixed(4));
+        storyStage.style.transform =
+          `rotateX(${mix(10, 2, progress)}deg) rotateY(${mix(-13, 10, progress)}deg)`;
+
+        storyCards.forEach((card, index) => {
+          const config = cardConfigs[index];
+          const local = getCardProgress(index, progress);
+          const eased = easeOutCubic(local);
+          const baseSpread = sceneSize * 0.46;
+          const startY = sceneSize * (-0.02 + index * 0.028);
+          const startZ = -sceneSize * 0.44 + index * 24;
+          const startRotateY = index % 2 === 0 ? -78 : 78;
+          const startRotateX = index % 2 === 0 ? 18 : -18;
+          const startRotateZ = index % 2 === 0 ? -9 : 9;
+          const x = mix(0, config.x * baseSpread, eased);
+          const y = mix(startY, config.y * baseSpread, eased);
+          const z = mix(startZ, config.z * baseSpread, eased);
+          const rotateY = mix(startRotateY, config.rotateY, eased);
+          const rotateX = mix(startRotateX, config.rotateX, eased);
+          const rotateZ = mix(startRotateZ, config.rotateZ, eased);
+          const scale = mix(0.8 + index * 0.03, config.scale, eased);
+          const opacity = mix(0.34, 1, eased);
+          const blur = mix(14, 0, eased);
+
+          card.style.transform =
+            `translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(${scale})`;
+          card.style.opacity = opacity.toFixed(3);
+          card.style.filter = `blur(${blur.toFixed(2)}px)`;
+
+          if (local > bestProgress) {
+            bestProgress = local;
+            activeIndex = index;
+          }
+        });
+
+        if (progress > 0.92) {
+          activeIndex = storySteps.length - 1;
+        }
+
+        setActiveStep(activeIndex);
+      }
+
+      function requestUpdate() {
+        if (frameId) {
+          return;
+        }
+
+        frameId = requestAnimationFrame(updateScene);
+      }
+
+      function bindQueryChange(query, handler) {
+        if (typeof query.addEventListener === 'function') {
+          query.addEventListener('change', handler);
+          return;
+        }
+
+        if (typeof query.addListener === 'function') {
+          query.addListener(handler);
+        }
+      }
+
+      requestUpdate();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+      bindQueryChange(reducedMotionQuery, requestUpdate);
+      bindQueryChange(mobileQuery, requestUpdate);
+    })();
 
     (function initWaveBackground() {
       const canvas = document.getElementById('wave-canvas');
