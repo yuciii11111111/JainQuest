@@ -304,79 +304,94 @@ class _AuthFlowScreenState extends ConsumerState<AuthFlowScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                children: [
-                  if (_step != _AuthStep.intent && _step != _AuthStep.welcome)
-                    MotionPressable(
-                      enabled: !_isLoading,
-                      child: IconButton(
-                        onPressed: _isLoading ? null : _goBack,
-                        tooltip: context.t('back'),
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                        color: scheme.onSurface,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
+                        child: Row(
+                          children: [
+                            if (_step != _AuthStep.intent &&
+                                _step != _AuthStep.welcome)
+                              MotionPressable(
+                                enabled: !_isLoading,
+                                child: IconButton(
+                                  onPressed: _isLoading ? null : _goBack,
+                                  tooltip: context.t('back'),
+                                  icon: const Icon(
+                                      Icons.arrow_back_ios_new_rounded),
+                                  color: scheme.onSurface,
+                                ),
+                              )
+                            else
+                              const SizedBox(width: 48),
+                            const Spacer(),
+                          ],
+                        ),
                       ),
-                    )
-                  else
-                    const SizedBox(width: 48),
-                  const Spacer(),
-                ],
-              ),
-            ),
-            const Spacer(),
-            Text(
-              'JainQuest',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    color: scheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 56,
-                  ),
-            ),
-            if (_intent == AuthIntent.signIn) ...[
-              const SizedBox(height: AppSpacing.md),
-              _LoginIconRow(colorScheme: scheme),
-            ],
-            const Spacer(),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(AppSpacing.lg),
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: scheme.surface.withOpacityValue(0.9),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: scheme.outline),
-              ),
-              child: AnimatedSwitcher(
-                duration: AppMotion.standard,
-                switchInCurve: AppMotion.enterCurve,
-                switchOutCurve: AppMotion.exitCurve,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: AppMotion.contentOffset,
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: KeyedSubtree(
-                  key: ValueKey(_step.name + _showConfirmPassword.toString()),
-                  child: AutofillGroup(
-                    child: _buildStepContent(context),
+                      const Spacer(),
+                      Text(
+                        'JainQuest',
+                        style:
+                            Theme.of(context).textTheme.displaySmall?.copyWith(
+                                  color: scheme.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 56,
+                                ),
+                      ),
+                      if (_intent == AuthIntent.signIn) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        _LoginIconRow(colorScheme: scheme),
+                      ],
+                      const Spacer(),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.all(AppSpacing.lg),
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: scheme.surface.withOpacityValue(0.9),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: scheme.outline),
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: AppMotion.standard,
+                          switchInCurve: AppMotion.enterCurve,
+                          switchOutCurve: AppMotion.exitCurve,
+                          transitionBuilder: (child, animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: AppMotion.contentOffset,
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: KeyedSubtree(
+                            key: ValueKey(
+                                _step.name + _showConfirmPassword.toString()),
+                            child: AutofillGroup(
+                              child: _buildStepContent(context),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

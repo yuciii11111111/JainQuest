@@ -247,7 +247,7 @@ class ForumService {
   String _buildHandle(String name, String userId) {
     final trimmed = name.trim();
     if (trimmed.isNotEmpty) {
-      return '@${trimmed.toLowerCase().replaceAll(RegExp(r'\\s+'), '')}';
+      return '@${trimmed.toLowerCase().replaceAll(RegExp(r'\s+'), '')}';
     }
     return '@user${userId.substring(0, 4)}';
   }

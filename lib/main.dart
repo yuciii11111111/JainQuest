@@ -103,6 +103,20 @@ class JainQuestApp extends ConsumerWidget {
       themeMode: themeMode,
       builder: (context, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        // On wide viewports (web/desktop) the mobile-first UI was stretching
+        // edge-to-edge and looking broken. Clamp it to a phone-like width and
+        // center it; the animated background still fills the full window.
+        final pageChild = child ?? const SizedBox.shrink();
+        final viewportWidth = MediaQuery.of(context).size.width;
+        final framedChild = viewportWidth > 620
+            ? Center(
+                child: SizedBox(
+                  width: 480,
+                  height: double.infinity,
+                  child: pageChild,
+                ),
+              )
+            : pageChild;
         final backgroundColor =
             isDark ? AppColors.inkBlack : AppColors.lightCanvas;
         final strokeColor =
@@ -170,7 +184,7 @@ class JainQuestApp extends ConsumerWidget {
                     ),
                   ),
                 ),
-                child ?? const SizedBox.shrink(),
+                framedChild,
                 const GuidedTourOverlay(),
               ],
             ),

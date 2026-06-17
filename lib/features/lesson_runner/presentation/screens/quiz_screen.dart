@@ -36,6 +36,7 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
   String? selectedChoiceId;
   bool showFeedback = false;
   bool? isCorrectAnswer;
+  bool _advancing = false;
 
   @override
   void didUpdateWidget(QuizScreenWidget oldWidget) {
@@ -108,10 +109,16 @@ class _QuizScreenWidgetState extends State<QuizScreenWidget> {
   }
 
   Future<void> _continueToNext() async {
-    if (widget.currentQuestionIndex >= widget.screen.questions.length - 1) {
-      await widget.onComplete();
-    } else {
-      widget.onNextQuestion();
+    if (_advancing) return;
+    _advancing = true;
+    try {
+      if (widget.currentQuestionIndex >= widget.screen.questions.length - 1) {
+        await widget.onComplete();
+      } else {
+        widget.onNextQuestion();
+      }
+    } finally {
+      if (mounted) _advancing = false;
     }
   }
 

@@ -208,6 +208,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
 
               _BadgesTab(
+                user: user,
                 progress: progress,
                 lessonBadges: lessonBadges,
                 allBadges: allBadges,
@@ -384,15 +385,40 @@ class _ProfileAvatar extends StatelessWidget {
 }
 
 class _BadgesTab extends StatelessWidget {
+  final UserProfile user;
   final ProgressState progress;
   final List<BadgeDefinition> lessonBadges;
   final List<BadgeModel> allBadges;
 
   const _BadgesTab({
+    required this.user,
     required this.progress,
     required this.lessonBadges,
     required this.allBadges,
   });
+
+  /// The `BadgeDefinitions.allBadges` IDs are never written to
+  /// `progress.earnedBadges` (only `BADGE_*` lesson IDs are), so these
+  /// achievements would otherwise stay permanently locked. Derive their
+  /// earned state from data we already track. `guru_seeker` has no persisted
+  /// counter, so it is intentionally hidden rather than shown forever-locked.
+  bool _isGamificationBadgeEarned(String badgeId) {
+    switch (badgeId) {
+      case 'first_steps':
+        return progress.completedLessons.isNotEmpty;
+      case 'week_warrior':
+        return user.longestStreak >= 7;
+      case 'perfect_score':
+        return progress.lessonProgress.values
+            .any((lesson) => lesson.bestScore >= 100);
+      case 'unit_master':
+        return progress.earnedBadges.contains('BADGE_UNIT_MASTER');
+      case 'streak_legend':
+        return user.longestStreak >= 30;
+      default:
+        return progress.earnedBadges.contains(badgeId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -415,15 +441,17 @@ class _BadgesTab extends StatelessWidget {
 
     // Add gamification badges (Badge)
     for (final badge in allBadges) {
+      // No persisted counter exists for this one, so it can never reflect
+      // reality — hide it instead of showing a permanently-locked badge.
+      if (badge.id == 'guru_seeker') continue;
       // Skip if already added as lesson badge
       if (!seenBadgeIds.add(badge.id)) continue;
 
-      final isEarned = progress.earnedBadges.contains(badge.id);
       combinedBadges.add(_BadgeDisplay(
         id: badge.id,
         name: badge.name,
         description: badge.description,
-        isEarned: isEarned,
+        isEarned: _isGamificationBadgeEarned(badge.id),
       ));
     }
 

@@ -9,11 +9,17 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/floating_card.dart';
 import '../../../core/widgets/glass_card.dart';
 
+/// Caps how many profiles the leaderboard streams. Without this the entire
+/// `users` collection is downloaded (and re-downloaded on every user's XP
+/// change), which is a Firestore cost/bandwidth and privacy problem at scale.
+const int kLeaderboardLimit = 100;
+
 final leaderboardProvider =
     StreamProvider.autoDispose<List<UserProfile>>((ref) {
   return FirebaseFirestore.instance
       .collection('users')
       .orderBy('totalXp', descending: true)
+      .limit(kLeaderboardLimit)
       .snapshots()
       .map((snapshot) {
     final profiles = snapshot.docs

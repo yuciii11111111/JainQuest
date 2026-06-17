@@ -34,7 +34,11 @@ migrate_working_dir/
 /coverage/
 
 # Local tooling
-.tools/node-22/
+.tools/
+
+# Firebase hosting cache
+.firebase/
+firebase-debug.log*
 
 # Symbolication related
 app.*.symbols

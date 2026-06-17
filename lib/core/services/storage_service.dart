@@ -54,8 +54,7 @@ class StorageService {
     _userId = currentUser.uid;
     _userProfile = UserProfile(id: _userId, createdAt: DateTime.now());
 
-    await _ensureDocumentsExist();
-    await _loadCachedData();
+    await _loadAll();
     _isInitialized = true;
   }
 
@@ -85,56 +84,68 @@ class StorageService {
     return _userDoc().collection('attempts');
   }
 
-  static Future<void> _ensureDocumentsExist() async {
-    final userSnap = await _userDoc().get();
-    if (!userSnap.exists) {
-      final newUser = UserProfile(
+  /// Reads every per-user document in a single parallel batch (instead of the
+  /// previous ~10 sequential round-trips, 4 of which were duplicated between
+  /// an "ensure exists" pass and a "load" pass). Missing documents are created
+  /// from defaults in one batched write. This is on the splash -> home
+  /// critical path, so the latency saved here is user-visible.
+  static Future<void> _loadAll() async {
+    final results = await Future.wait([
+      _userDoc().get(),
+      _progressDoc().get(),
+      _notificationDoc().get(),
+      _settingsDoc().get(),
+      _readingDoc().get(),
+      _attemptsCollection().get(),
+    ]);
+
+    final userSnap = results[0] as DocumentSnapshot<Map<String, dynamic>>;
+    final progressSnap = results[1] as DocumentSnapshot<Map<String, dynamic>>;
+    final prefsSnap = results[2] as DocumentSnapshot<Map<String, dynamic>>;
+    final themeSnap = results[3] as DocumentSnapshot<Map<String, dynamic>>;
+    final readingSnap = results[4] as DocumentSnapshot<Map<String, dynamic>>;
+    final attemptsSnap = results[5] as QuerySnapshot<Map<String, dynamic>>;
+
+    final batch = _firestore.batch();
+    var hasMissingDocs = false;
+
+    if (userSnap.exists && userSnap.data() != null) {
+      _userProfile = UserProfile.fromMap(userSnap.data()!, fallbackId: _userId);
+    } else {
+      _userProfile = UserProfile(
         id: _userId,
         createdAt: DateTime.now(),
         showGuidedTour: true,
       );
-      await _userDoc().set(newUser.toMap());
+      batch.set(_userDoc(), _userProfile.toMap());
+      hasMissingDocs = true;
     }
 
-    final progressSnap = await _progressDoc().get();
-    if (!progressSnap.exists) {
-      await _progressDoc().set(const ProgressState().toMap());
-    }
-
-    final prefsSnap = await _notificationDoc().get();
-    if (!prefsSnap.exists) {
-      await _notificationDoc().set(const NotificationPrefs().toMap());
-    }
-
-    final themeSnap = await _settingsDoc().get();
-    if (!themeSnap.exists) {
-      await _settingsDoc().set({'isDarkMode': true});
-    }
-  }
-
-  static Future<void> _loadCachedData() async {
-    final userSnap = await _userDoc().get();
-    if (userSnap.exists && userSnap.data() != null) {
-      _userProfile = UserProfile.fromMap(userSnap.data()!, fallbackId: _userId);
-    }
-
-    final progressSnap = await _progressDoc().get();
     if (progressSnap.exists && progressSnap.data() != null) {
       _progressState = ProgressState.fromMap(progressSnap.data()!);
+    } else {
+      _progressState = const ProgressState();
+      batch.set(_progressDoc(), _progressState.toMap());
+      hasMissingDocs = true;
     }
 
-    final prefsSnap = await _notificationDoc().get();
     if (prefsSnap.exists && prefsSnap.data() != null) {
       _notificationPrefs = NotificationPrefs.fromMap(prefsSnap.data()!);
+    } else {
+      _notificationPrefs = const NotificationPrefs();
+      batch.set(_notificationDoc(), _notificationPrefs.toMap());
+      hasMissingDocs = true;
     }
 
-    final themeSnap = await _settingsDoc().get();
     if (themeSnap.exists && themeSnap.data() != null) {
       final isDark = themeSnap.data()!['isDarkMode'] as bool? ?? true;
       _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    } else {
+      _themeMode = ThemeMode.dark;
+      batch.set(_settingsDoc(), {'isDarkMode': true});
+      hasMissingDocs = true;
     }
 
-    final readingSnap = await _readingDoc().get();
     if (readingSnap.exists && readingSnap.data() != null) {
       final readingData = readingSnap.data()!;
       final rawBookmarks =
@@ -206,10 +217,13 @@ class StorageService {
       _readingPagesTowardNextHeart = 0;
     }
 
-    final attemptsSnap = await _attemptsCollection().get();
     _attemptLogs = attemptsSnap.docs
         .map((doc) => AttemptLog.fromMap(doc.data(), fallbackId: doc.id))
         .toList();
+
+    if (hasMissingDocs) {
+      await batch.commit();
+    }
   }
 
   // =========================================================================
