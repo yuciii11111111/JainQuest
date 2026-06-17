@@ -29,6 +29,7 @@
     }
   },
   "hosting": {
+    "site": "jainquest-app",
     "source": ".",
     "ignore": [
       "firebase.json",
